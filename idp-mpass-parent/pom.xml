@@ -33,6 +33,15 @@ THE SOFTWARE.
     <artifactId>idp-mpass-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    
+    <modules>
+        <module>../idp-attribute-impl-authnid</module>
+        <module>../idp-attribute-impl-ecadata</module>
+        <module>../idp-authn-api-shibsp</module>
+        <module>../idp-authn-api-socialuser</module>
+        <module>../idp-authn-impl-shibsp</module>
+        <module>../idp-authn-impl-socialuser</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
