@@ -28,6 +28,7 @@ THE SOFTWARE.
         <groupId>fi.okm.mpass</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-attribute-impl-ecadata</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
