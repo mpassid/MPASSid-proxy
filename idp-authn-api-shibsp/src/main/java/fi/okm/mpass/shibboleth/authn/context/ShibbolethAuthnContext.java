@@ -23,6 +23,9 @@
 
 package fi.okm.mpass.shibboleth.authn.context;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
@@ -37,24 +40,30 @@ public class ShibbolethAuthnContext extends BaseContext {
     /** Shibboleth SP session index attribute name. */
     public static final String SHIB_SP_SESSION_INDEX = "Shib-Session-Index";
 
-    /** Shibbolet SP application id attribute name. */
+    /** Shibboleth SP application id attribute name. */
     public static final String SHIB_SP_APPLICATION_ID = "Shib-Application-ID";
 
-    /** Shibbolet SP session id attribute name. */
+    /** Shibboleth SP session id attribute name. */
     public static final String SHIB_SP_SESSION_ID = "Shib-Session-ID";
 
-    /** Shibbolet SP authentication instant attribute name. */
+    /** Shibboleth SP authentication instant attribute name. */
     public static final String SHIB_SP_AUTHENTICATION_INSTANT = "Shib-Authentication-Instant";
 
-    /** Shibbolet SP authentication method attribute name. */
+    /** Shibboleth SP authentication method attribute name. */
     public static final String SHIB_SP_AUTHENTICATION_METHOD = "Shib-Authentication-Method";
 
-    /** Shibbolet SP identity provider attribute name. */
+    /** Shibboleth SP identity provider attribute name. */
     public static final String SHIB_SP_IDENTITY_PROVIDER = "Shib-Identity-Provider";
 
-    /** Shibbolet SP authentication context class attribute name. */
+    /** Shibboleth SP authentication context class attribute name. */
     public static final String SHIB_SP_AUTHN_CONTEXT_CLASS = "Shib-AuthnContext-Class";
 
+    /** Map of http headers values. */
+    @Nonnull @NotEmpty private Map<String, String> headers;
+    
+    /** Map of request attribute values. */
+    @Nonnull @NotEmpty private Map<String, String> attributes;
+    
     /** The IdP who authenticated the user. */
     @Nonnull @NotEmpty private String idp;
 
@@ -66,6 +75,50 @@ public class ShibbolethAuthnContext extends BaseContext {
 
     /** The authentication context class how user was authenticated at the IdP. */
     @Nonnull @NotEmpty private String contextClass;
+
+    /**
+     * Constructor.
+     */
+    public ShibbolethAuthnContext() {
+        headers = new HashMap<String, String>();
+        attributes = new HashMap<String, String>();
+    }
+    
+    /**
+     * Get the Http headers.
+     * 
+     * @return headers
+     */
+    @Nonnull @NotEmpty public Map<String, String> getHeaders() {
+        return headers;
+    }
+    
+    /**
+     * Set the Http headers.
+     * 
+     * @param httpHeaders The Http headers.
+     */
+    @Nonnull @NotEmpty public void setHeaders(Map<String, String> httpHeaders) {
+        headers = httpHeaders;
+    }
+
+    /**
+     * Get the request attributes.
+     * 
+     * @return attributes
+     */
+    @Nonnull @NotEmpty public Map<String, String> getAttributes() {
+        return attributes;
+    }
+    
+    /**
+     * Set the request attributes.
+     * 
+     * @param requestAttributes The request attributes.
+     */
+    @Nonnull @NotEmpty public void setAttributes(Map<String, String> requestAttributes) {
+        attributes = requestAttributes;
+    }
 
     /**
      * Get the IdP who authenticated the user.
