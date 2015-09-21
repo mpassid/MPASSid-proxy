@@ -22,6 +22,8 @@
  */
 package fi.okm.mpass.idp.authn.impl;
 
+import java.security.NoSuchAlgorithmException;
+
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import org.springframework.social.google.api.Google;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements Google authentication. */
@@ -67,10 +70,11 @@ public class GoogleIdentity extends AbstractOAuth2Identity implements
      * @see fi.csc.idp.authn.impl.SocialRedirectAuthenticator#getSubject()
      */
     @Override
-    public Subject getSubject(HttpServletRequest httpRequest) {
+    public Subject getSubject(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException {
         log.trace("Entering");
-        AccessGrant accessGrant = getAccessGrant(httpRequest);
-        if (accessGrant == null) {
+        AccessGrant accessGrant=null;
+    	accessGrant = getAccessGrant(httpRequest);
+		if (accessGrant == null) {
             // not authenticated
             log.trace("Leaving");
             return null;
