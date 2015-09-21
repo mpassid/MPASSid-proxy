@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package fi.okm.mpass.shibboleth.authn.principal.impl;
 
 import javax.annotation.Nonnull;
@@ -28,16 +27,16 @@ import javax.annotation.Nonnull;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 
 /**
- * This class is designed to carry HTTP header key and value -pairs inside {@link Principal}.
+ * This class is designed to carry request attribute key and value -pairs inside {@link Principal}.
  */
-public class ShibHeaderPrincipal extends KeyValuePrincipal {
+public class ShibAttributePrincipal extends KeyValuePrincipal {
 
     /**
      * Constructor.
      * 
      * @param theName containing the key and the value, separated by '<=>'
      */
-    public ShibHeaderPrincipal(@Nonnull @NotEmpty final String theName) {
+    public ShibAttributePrincipal(@Nonnull @NotEmpty final String theName) {
         super(theName);
     }
 
@@ -47,7 +46,7 @@ public class ShibHeaderPrincipal extends KeyValuePrincipal {
      * @param theKey the key, can not be null or empty
      * @param theValue the value corresponding to the key, can not be null or empty
      */
-    public ShibHeaderPrincipal(@Nonnull @NotEmpty final String theKey, @Nonnull @NotEmpty final String theValue) {
+    public ShibAttributePrincipal(@Nonnull @NotEmpty final String theKey, @Nonnull @NotEmpty final String theValue) {
         super(theKey, theValue);
     }
 
@@ -62,9 +61,9 @@ public class ShibHeaderPrincipal extends KeyValuePrincipal {
             return true;
         }
 
-        if (other instanceof ShibHeaderPrincipal) {
-            return getName().equals(((ShibHeaderPrincipal) other).getName())
-                    && getValue().equals(((ShibHeaderPrincipal) other).getValue());
+        if (other instanceof ShibAttributePrincipal) {
+            return getName().equals(((ShibAttributePrincipal) other).getName())
+                    && getValue().equals(((ShibAttributePrincipal) other).getValue());
         }
 
         return false;
@@ -78,7 +77,7 @@ public class ShibHeaderPrincipal extends KeyValuePrincipal {
 
     /** {@inheritDoc} */
     @Override
-    public ShibHeaderPrincipal clone() throws CloneNotSupportedException {
-        return (ShibHeaderPrincipal) super.clone();
+    public ShibAttributePrincipal clone() throws CloneNotSupportedException {
+        return (ShibAttributePrincipal) super.clone();
     }
 }
