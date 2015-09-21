@@ -34,6 +34,7 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements FB authentication. */
@@ -68,10 +69,11 @@ public class FacebookIdentity extends AbstractOAuth2Identity implements
      * @see fi.csc.idp.authn.impl.SocialRedirectAuthenticator#getSubject()
      */
     @Override
-    public Subject getSubject(HttpServletRequest httpRequest) {
+    public Subject getSubject(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException{
         log.trace("Entering");
-        AccessGrant accessGrant = getAccessGrant(httpRequest);
-        if (accessGrant == null) {
+        AccessGrant accessGrant=null;
+        accessGrant = getAccessGrant(httpRequest);
+		if (accessGrant == null) {
             // not authenticated
             log.trace("Leaving");
             return null;
