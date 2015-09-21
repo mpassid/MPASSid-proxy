@@ -39,7 +39,9 @@ import net.shibboleth.idp.authn.ExternalAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
+import net.shibboleth.idp.authn.AuthnEventIds;
 
 /**
  * Extracts Social identity and places it in a request attribute to be used by
@@ -72,59 +74,63 @@ public class SocialUserAuthServlet extends HttpServlet {
             final HttpServletResponse httpResponse) throws ServletException,
             IOException {
         log.trace("Entering");
-        SocialIdentityFactory sif = (SocialIdentityFactory) getServletContext()
-                .getAttribute(
-                        "socialUserImplementationFactoryBeanInServletContext");
-        SocialRedirectAuthenticator socialRedirectAuthenticator = sif
-                .getAuthenticator(httpRequest);
-        if (socialRedirectAuthenticator == null) {
-            // TODO: use webflow specific error
-            log.error("no authenticator");
-            log.trace("Leaving");
-            return;
-        }
-        final Subject subject = socialRedirectAuthenticator
-                .getSubject(httpRequest);
-
-        // TODO: Error case handling
-        /*
-         * Currently if something goes wrong after redirect, like user denies
-         * access or something else, user returns here again to restart
-         * authenticaton which then fails
-         * 
-         * Implementation works only in positive case.
-         */
-
-        if (subject == null) {
-            String key;
-            try {
-                key = ExternalAuthentication
-                        .startExternalAuthentication(httpRequest);
-            } catch (ExternalAuthenticationException e) {
-                e.printStackTrace();
-                log.trace("Leaving");
-                return;
-            }
-            // TODO: Better key
-            httpRequest.getSession().setAttribute("ext_auth_start_key", key);
-            log.debug("Making a redirect to authenticate the user");
-            httpResponse.sendRedirect(socialRedirectAuthenticator
-                    .getRedirectUrl(httpRequest));
-            log.trace("Leaving");
-            return;
-        }
-        httpRequest.setAttribute(ExternalAuthentication.SUBJECT_KEY, subject);
-        final String key = (String) httpRequest.getSession().getAttribute(
-                "ext_auth_start_key");
+        
         try {
-            ExternalAuthentication.finishExternalAuthentication(key,
+	        SocialIdentityFactory sif = (SocialIdentityFactory) getServletContext()
+	                .getAttribute(
+	                        "socialUserImplementationFactoryBeanInServletContext");
+	        SocialRedirectAuthenticator socialRedirectAuthenticator = sif
+	                .getAuthenticator(httpRequest);
+	        if (socialRedirectAuthenticator == null) {
+	        	//Authentication not possible, use some other flow;
+				httpRequest.setAttribute(ExternalAuthentication.AUTHENTICATION_ERROR_KEY, AuthnEventIds.RESELECT_FLOW);
+            	ExternalAuthentication.finishExternalAuthentication(getAuthenticationKey(httpRequest), httpRequest, httpResponse);
+				log.trace("Leaving");
+	            return;
+	        }
+	        Subject subject;
+			try {
+				subject = socialRedirectAuthenticator
+				        .getSubject(httpRequest);
+			} catch (SocialRedirectAuthenticationException e) {
+				//Authentication has been interrupted;
+				httpRequest.setAttribute(ExternalAuthentication.AUTHENTICATION_ERROR_KEY, e.getAuthEventId());
+            	ExternalAuthentication.finishExternalAuthentication(getAuthenticationKey(httpRequest), httpRequest, httpResponse);
+				log.trace("Leaving");
+	            return;
+			}
+	        if (subject == null) {
+	        	//Start authentication sequence, there is no user nor Subject
+	        	getAuthenticationKey(httpRequest);
+	            log.debug("Making a redirect to authenticate the user");
+	            httpResponse.sendRedirect(socialRedirectAuthenticator
+	                    .getRedirectUrl(httpRequest));
+	            log.trace("Leaving");
+	            return;
+	        }
+	        
+	        ExternalAuthentication.finishExternalAuthentication(getAuthenticationKey(httpRequest),
                     httpRequest, httpResponse);
-        } catch (ExternalAuthenticationException e) {
-            e.printStackTrace();
-            log.trace("Leaving");
-            return;
-        }
-
+       
+        } catch (final ExternalAuthenticationException e) {
+        	log.trace("Leaving");
+            throw new ServletException("Error processing external authentication request", e);
+        }       
+        log.trace("Leaving");
+    }
+  
+    /*Returns authentication key. Starts the sequence if not already started*/
+    private String getAuthenticationKey(final HttpServletRequest httpRequest) throws ExternalAuthenticationException{
+    	log.trace("Entering");
+    	String key = (String) httpRequest.getSession().getAttribute(
+                "ext_auth_start_key");
+    	if (key==null || key.isEmpty()){
+    		key = ExternalAuthentication
+                    .startExternalAuthentication(httpRequest);
+    		httpRequest.getSession().setAttribute("ext_auth_start_key", key);
+    	}
+    	log.trace("Leaving");
+    	return key;
     }
 
 }
