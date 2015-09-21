@@ -36,6 +36,10 @@ THE SOFTWARE.
     <name>idp-authn-api-socialuser</name>
     <dependencies>
         <dependency>
+            <groupId>net.shibboleth.idp</groupId>
+            <artifactId>idp-authn-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
