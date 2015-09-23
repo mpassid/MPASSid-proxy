@@ -115,7 +115,8 @@ public class SocialUserAuthServlet extends HttpServlet {
                 log.trace("Leaving");
                 return;
             }
-
+            httpRequest.setAttribute(ExternalAuthentication.SUBJECT_KEY,
+                    subject);
             ExternalAuthentication.finishExternalAuthentication(
                     getAuthenticationKey(httpRequest), httpRequest,
                     httpResponse);
