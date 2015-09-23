@@ -29,22 +29,39 @@ import org.slf4j.LoggerFactory;
 
 public class SocialRedirectAuthenticationException extends Exception {
 
-	String event;
-	/** Class logger. */
+    /* Authentication event id */
+    private String event;
+    /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
             .getLogger(SocialRedirectAuthenticationException.class);
-    
-	public SocialRedirectAuthenticationException(String description, String authEvent){
-		super(description);
-		log.trace("Entering");
-		event=authEvent;
-		log.trace("Leaving");
+
+    /**
+     * If user is not authenticated, user must be redirected to returned url.
+     * 
+     * @param description
+     *            Description for exception
+     * @param authEvent
+     *            Authnentication event id
+     *
+     */
+    public SocialRedirectAuthenticationException(String description,
+            String authEvent) {
+        super(description);
+        log.trace("Entering");
+        event = authEvent;
+        log.trace("Leaving");
     }
-	
-	public String getAuthEventId(){
-		log.trace("Entering & Leaving");
-		return event;
-	}
-	
+
+    /**
+     * Authentication event id.
+     * 
+     * @return the authentication event id
+     *
+     */
+    public String getAuthEventId() {
+        log.trace("Entering & Leaving");
+        return event;
+    }
+
 }
