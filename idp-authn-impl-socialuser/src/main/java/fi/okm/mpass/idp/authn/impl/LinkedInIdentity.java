@@ -68,11 +68,12 @@ public class LinkedInIdentity extends AbstractOAuth2Identity implements
      * @see fi.csc.idp.authn.impl.SocialRedirectAuthenticator#getSubject()
      */
     @Override
-    public Subject getSubject(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException{
+    public Subject getSubject(HttpServletRequest httpRequest)
+            throws SocialRedirectAuthenticationException {
         log.trace("Entering");
-        AccessGrant accessGrant=null;
+        AccessGrant accessGrant = null;
         accessGrant = getAccessGrant(httpRequest);
-		if (accessGrant == null) {
+        if (accessGrant == null) {
             // not authenticated
             log.trace("Leaving");
             return null;
