@@ -26,6 +26,7 @@
         <module>../idp-attribute-impl-ecadata</module>
         <module>../idp-authn-api-shibsp</module>
         <module>../idp-authn-api-socialuser</module>
+        <module>../idp-authn-impl-discovery</module>
         <module>../idp-authn-impl-shibsp</module>
         <module>../idp-authn-impl-socialuser</module>
     </modules>

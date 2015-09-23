@@ -23,7 +23,11 @@
 
 package fi.okm.mpass.shibboleth.authn.impl;
 
-import javax.security.auth.Subject;
+import net.shibboleth.idp.authn.AuthnEventIds;
+import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
+import net.shibboleth.idp.profile.ActionTestingSupport;
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
@@ -33,21 +37,14 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
-import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
-import net.shibboleth.idp.authn.AuthenticationResult;
-import net.shibboleth.idp.authn.AuthnEventIds;
-import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
-import net.shibboleth.idp.profile.ActionTestingSupport;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 /**
- * Unit tests for {@link ExtractShibPrincipalsFromSubject}.
+ * Unit tests for {@link ExtractShibbolethAttributesFromRequest}.
  */
-public class ExtractShibPrincipalsFromSubjectTest extends PopulateAuthenticationContextTest {
+public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenticationContextTest {
 
     /** The action to be tested. */
-    private ExtractShibPrincipalsFromSubject action;
+    private ExtractShibbolethAttributesFromRequest action;
 
     /** The idp of the context. */
     private String expectedIdp;
@@ -60,13 +57,18 @@ public class ExtractShibPrincipalsFromSubjectTest extends PopulateAuthentication
 
     /** The method of the context. */
     private String expectedMethod;
+    
+    /** The request attribute. */
+    private String expectedAttribute;
+    
+    /** The HTTP header. */
+    private String expectedHeader;
 
     /** {@inheritDoc} */
     @BeforeMethod
     public void setUp() throws Exception {
         super.setUp();
-        action = new ExtractShibPrincipalsFromSubject("");
-        action.setHttpServletRequest(new MockHttpServletRequest());
+        action = new ExtractShibbolethAttributesFromRequest("");
     }
 
     /**
@@ -78,33 +80,20 @@ public class ExtractShibPrincipalsFromSubjectTest extends PopulateAuthentication
         expectedInstant = "mockInstant";
         expectedContextClass = "mockContextClass";
         expectedMethod = "mockMethod";
+        expectedAttribute = "mockAttribute";
+        expectedHeader = "mockHeader";
     }
 
     /**
-     * Tests action without {@link AuthenticationResult}.
+     * Tests action without {@link HttpServletRequest}.
      * 
      * @throws ComponentInitializationException 
      */
     @Test
-    public void testNoAuthnResult() throws ComponentInitializationException {
+    public void testNoServlet() throws ComponentInitializationException {
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
-    }
-
-    /**
-     * Tests action without any principals in {@link Subject}.
-     * 
-     * @throws ComponentInitializationException 
-     */
-    @Test
-    public void testNoPrincipals() throws ComponentInitializationException {
-        action.initialize();
-        final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
-        Subject subject = new Subject();
-        authCtx.setAuthenticationResult(new AuthenticationResult("mockId", subject));
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_SUBJECT);
     }
 
     /**
@@ -114,25 +103,30 @@ public class ExtractShibPrincipalsFromSubjectTest extends PopulateAuthentication
      */
     @Test
     public void testSuccess() throws ComponentInitializationException {
+        action.setHttpServletRequest(new MockHttpServletRequest());
+        ((MockHttpServletRequest) action.getHttpServletRequest())
+            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant);
+        ((MockHttpServletRequest) action.getHttpServletRequest())
+            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod);
+        ((MockHttpServletRequest) action.getHttpServletRequest())
+            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
+        ((MockHttpServletRequest) action.getHttpServletRequest())
+            .addHeader(ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
+        ((MockHttpServletRequest) action.getHttpServletRequest()).addHeader(expectedHeader, expectedHeader);
+        ((MockHttpServletRequest) action.getHttpServletRequest()).setAttribute(expectedAttribute, expectedAttribute);
         action.initialize();
         final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
-        Subject subject = new Subject();
-        subject.getPrincipals().add(
-                new ShibHeaderPrincipal(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant));
-        subject.getPrincipals().add(
-                new ShibHeaderPrincipal(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod));
-        subject.getPrincipals().add(
-                new ShibHeaderPrincipal(ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass));
-        subject.getPrincipals().add(
-                new ShibHeaderPrincipal(ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp));
-        authCtx.setAuthenticationResult(new AuthenticationResult("mockId", subject));
         final Event event = action.execute(src);
-        ActionTestingSupport.assertProceedEvent(event);
+        Assert.assertNull(event);
         final ShibbolethAuthnContext shibCtx = authCtx.getSubcontext(ShibbolethAuthnContext.class, false);
         Assert.assertNotNull(shibCtx, "No shibboleth context attached");
         Assert.assertEquals(shibCtx.getIdp(), expectedIdp);
         Assert.assertEquals(shibCtx.getInstant(), expectedInstant);
         Assert.assertEquals(shibCtx.getMethod(), expectedMethod);
-        Assert.assertEquals(shibCtx.getContextClass(), expectedContextClass);
+        Assert.assertEquals(shibCtx.getContextClass(), expectedContextClass);        
+        Assert.assertEquals(shibCtx.getAttributes().size(), 1);
+        Assert.assertEquals(shibCtx.getAttributes().get(expectedAttribute), expectedAttribute);
+        Assert.assertEquals(shibCtx.getHeaders().size(), 1);
+        Assert.assertEquals(shibCtx.getHeaders().get(expectedHeader), expectedHeader);
     }
 }
