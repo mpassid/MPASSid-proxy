@@ -22,12 +22,13 @@ After successful compilation, the _target_ directory contains _idp-authn-api-soc
 
 ## Deployment
 
-After compilation, the _target/idp-authn-api-socialuser-\<version\>.jar_ must be deployed to the IdP Web
+If you are deploying [idp-authn-impl-socialuser], please refer to those deployment instructions only.
+Otherwise, after compilation, the _target/idp-authn-api-socialuser-\<version\>.jar_ must be deployed to the IdP Web
 application. Depending on the IdP installation, the module deployment may be achieved for instance with the
 following sequence:
 
 ```
-cp target/idp-authn-api-shibsp-1.0-SNAPSHOT.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib
+cp target/idp-authn-api-idp-authn-api-socialuser-1.0-SNAPSHOT.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib
 cd /opt/shibboleth-idp
 sh bin/build.sh
 ```
