@@ -31,6 +31,20 @@ cp -r target/idp-authn-impl-socialuser-\<version\>-bin/idp-authn-impl-socialuser
 
 The second final command will rebuild the _war_-package for the IdP application.
 
-- You will need to define the OAUTH1/OAUTH2 parameters for the applied authentication methods to beans defined in /opt/shibboleth-idp/flows/authn/SocialUser/socialuser-authn-beans.xml 
-- You will need to add the applied authentication methods to /opt/shibboleth-idp/conf/authn/general-authn.xml
-- /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions
+The copied flows/beans will not work unless you configure them:
+
+1. You will need to define the OAUTH1/OAUTH2 parameters for the  authentication beans defined in /opt/shibboleth-idp/flows/authn/SocialUser/socialuser-authn-beans.xml. Those beans will need to be mapped in SocialUserImplementationFactory bean defined in the same file. 
+2. You will need to add the new authentication flows to /opt/shibboleth-idp/conf/authn/general-authn.xml
+
+```
+<bean id="authn/SocialUserTwitter" parent="shibboleth.AuthenticationFlow"
+            p:nonBrowserSupported="false" />
+<bean id="authn/SocialUserFacebook" parent="shibboleth.AuthenticationFlow"
+            p:nonBrowserSupported="false" />       
+<bean id="authn/SocialUserGoogle" parent="shibboleth.AuthenticationFlow"
+            p:nonBrowserSupported="false" />
+<bean id="authn/SocialUserLinkedIn" parent="shibboleth.AuthenticationFlow"
+            p:nonBrowserSupported="false" />
+```
+3. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions
+4. New authentication flow can now be used by defining it to idp.properties file
