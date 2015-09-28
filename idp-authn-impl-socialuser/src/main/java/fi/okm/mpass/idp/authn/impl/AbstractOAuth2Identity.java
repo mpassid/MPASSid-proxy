@@ -196,6 +196,8 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
      * Throws an error if user authentication has failed Returns Authorization
      * Code if such exists Returns null if authentication has not been performed
      * yet
+     * 
+     * @throws SocialRedirectAuthenticationException
      */
     private String getAuthorizationCode(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
