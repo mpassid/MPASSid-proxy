@@ -16,6 +16,16 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources/flows</directory>
+            <outputDirectory>flows</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}/dependency</directory>
             <outputDirectory>edit-webapp/WEB-INF/lib</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
