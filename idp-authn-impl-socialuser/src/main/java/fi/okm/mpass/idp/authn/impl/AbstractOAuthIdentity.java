@@ -25,12 +25,16 @@ package fi.okm.mpass.idp.authn.impl;
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
+import net.shibboleth.idp.authn.AuthnEventIds;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.oauth1.AuthorizedRequestToken;
 import org.springframework.social.oauth1.OAuth1Operations;
 import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
+
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 
 /** Implements methods common to OAuth(1) types. */
 public abstract class AbstractOAuthIdentity extends AbstractIdentity {
@@ -126,6 +130,28 @@ public abstract class AbstractOAuthIdentity extends AbstractIdentity {
         return authorizeUrl;
     }
 
+    /*
+     * Throws an error if user authentication has failed Returns Authorization
+     * Code if such exists Returns null if authentication has not been performed
+     * yet
+     * 
+     * @throws SocialRedirectAuthenticationException
+     */
+    private OAuthToken getRequestToken(HttpServletRequest httpRequest)
+            throws SocialRedirectAuthenticationException {
+        log.trace("Entering");
+        //Is this twitter specific
+        String denied = httpRequest.getParameter("denied");
+        if (denied != null && !denied.isEmpty()) {
+            log.trace("Leaving");
+            throw new SocialRedirectAuthenticationException("user denied", AuthnEventIds.AUTHN_EXCEPTION);
+        }
+        OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
+                .getAttribute("ext_auth_request_token");
+        log.trace("Leaving");
+        return requestToken;
+    }
+    
     /**
      * Returns Access Token if user is known, otherwise null.
      * 
@@ -133,13 +159,13 @@ public abstract class AbstractOAuthIdentity extends AbstractIdentity {
      *            the request
      * 
      * @return Access Token
+     * @throws SocialRedirectAuthenticationException 
      */
-    public OAuthToken getAccessToken(HttpServletRequest httpRequest) {
+    public OAuthToken getAccessToken(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException {
         log.trace("Entering");
         OAuthToken accessToken = null;
         try {
-            OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
-                    .getAttribute("ext_auth_request_token");
+            OAuthToken requestToken = getRequestToken(httpRequest);
             if (requestToken == null) {
                 // not authenticated
                 log.trace("Leaving");
