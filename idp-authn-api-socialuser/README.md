@@ -2,10 +2,8 @@
 
 ## Overview
 
-This module contains interface classes for [idp-authn-impl-socialuser]
-(https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-socialuser). These two modules can
-be used for adding Social based authentication methods for [Shibboleth Identity Provider v3]
-(https://wiki.shibboleth.net/confluence/display/IDP30/Home).
+This module contains interface classes for [idp-authn-impl-socialuser](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-socialuser). These two modules can
+be used for adding Social based authentication methods for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home).
 
 ## Prequisities and compilation
 
@@ -14,7 +12,7 @@ be used for adding Social based authentication methods for [Shibboleth Identity 
 - Currently [idp-mpass-parent](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-mpass-parent) -module in the Maven repository or in the relative path _../idp-mpass-parent_.
 
 ```
-cd idp-authn-api-shibsp
+cd idp-authn-api-socialuser
 mvn package
 ```
 
