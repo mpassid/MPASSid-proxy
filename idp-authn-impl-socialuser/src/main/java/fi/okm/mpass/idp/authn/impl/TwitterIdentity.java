@@ -33,6 +33,7 @@ import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.social.oauth1.OAuthToken;
 
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements Twitter authentication. */
@@ -68,7 +69,7 @@ public class TwitterIdentity extends AbstractOAuthIdentity implements
      * @see fi.csc.idp.authn.impl.SocialRedirectAuthenticator#getSubject()
      */
     @Override
-    public Subject getSubject(HttpServletRequest httpRequest) {
+    public Subject getSubject(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException {
         log.trace("Entering");
         OAuthToken accessToken = getAccessToken(httpRequest);
         if (accessToken == null) {
