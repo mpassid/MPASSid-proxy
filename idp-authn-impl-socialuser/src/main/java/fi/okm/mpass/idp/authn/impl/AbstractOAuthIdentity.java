@@ -140,18 +140,19 @@ public abstract class AbstractOAuthIdentity extends AbstractIdentity {
     private OAuthToken getRequestToken(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
         log.trace("Entering");
-        //Is this twitter specific
+        // Is this twitter specific
         String denied = httpRequest.getParameter("denied");
         if (denied != null && !denied.isEmpty()) {
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException("user denied", AuthnEventIds.AUTHN_EXCEPTION);
+            throw new SocialRedirectAuthenticationException("user denied",
+                    AuthnEventIds.AUTHN_EXCEPTION);
         }
         OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
                 .getAttribute("ext_auth_request_token");
         log.trace("Leaving");
         return requestToken;
     }
-    
+
     /**
      * Returns Access Token if user is known, otherwise null.
      * 
@@ -159,9 +160,10 @@ public abstract class AbstractOAuthIdentity extends AbstractIdentity {
      *            the request
      * 
      * @return Access Token
-     * @throws SocialRedirectAuthenticationException 
+     * @throws SocialRedirectAuthenticationException
      */
-    public OAuthToken getAccessToken(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException {
+    public OAuthToken getAccessToken(HttpServletRequest httpRequest)
+            throws SocialRedirectAuthenticationException {
         log.trace("Entering");
         OAuthToken accessToken = null;
         try {
