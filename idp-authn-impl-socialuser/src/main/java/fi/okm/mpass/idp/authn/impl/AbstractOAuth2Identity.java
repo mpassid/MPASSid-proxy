@@ -248,7 +248,7 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
      * @param httpRequest
      *            the request
      * @return Access Grant
-     * @throws Exception
+     * @throws SocialRedirectAuthenticationException
      */
     public AccessGrant getAccessGrant(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
