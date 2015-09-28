@@ -168,7 +168,7 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
         if (state == null) {
             log.trace("Leaving");
             throw new SocialRedirectAuthenticationException(
-                    "State parameter missing", AuthnEventIds.RESELECT_FLOW);
+                    "State parameter missing", AuthnEventIds.AUTHN_EXCEPTION);
         }
         MessageDigest md;
         try {
@@ -179,7 +179,7 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
             log.trace("Leaving");
             throw new SocialRedirectAuthenticationException(
                     "Unable to hash, use some other method",
-                    AuthnEventIds.RESELECT_FLOW);
+                    AuthnEventIds.AUTHN_EXCEPTION);
         }
         md.reset();
         md.update(httpRequest.getSession().getId().getBytes());
@@ -188,7 +188,7 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
             log.error("state parameter mismatch");
             log.trace("Leaving");
             throw new SocialRedirectAuthenticationException(
-                    "State parameter mismatch", AuthnEventIds.RESELECT_FLOW);
+                    "State parameter mismatch", AuthnEventIds.AUTHN_EXCEPTION);
         }
     }
 
@@ -214,7 +214,7 @@ public abstract class AbstractOAuth2Identity extends AbstractIdentity {
                 event = AuthnEventIds.AUTHN_EXCEPTION;
                 break;
             case "access_denied":
-                event = AuthnEventIds.NO_CREDENTIALS;
+                event = AuthnEventIds.AUTHN_EXCEPTION;
                 break;
             case "unsupported_response_type":
                 event = AuthnEventIds.AUTHN_EXCEPTION;
