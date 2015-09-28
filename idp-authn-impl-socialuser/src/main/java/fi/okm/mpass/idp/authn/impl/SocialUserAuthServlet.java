@@ -85,7 +85,7 @@ public class SocialUserAuthServlet extends HttpServlet {
                 // Authentication not possible, use some other flow;
                 httpRequest.setAttribute(
                         ExternalAuthentication.AUTHENTICATION_ERROR_KEY,
-                        AuthnEventIds.RESELECT_FLOW);
+                        AuthnEventIds.AUTHN_EXCEPTION);
                 ExternalAuthentication.finishExternalAuthentication(
                         getAuthenticationKey(httpRequest), httpRequest,
                         httpResponse);
