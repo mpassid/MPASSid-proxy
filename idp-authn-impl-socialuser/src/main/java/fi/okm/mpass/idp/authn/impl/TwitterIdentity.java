@@ -69,7 +69,8 @@ public class TwitterIdentity extends AbstractOAuthIdentity implements
      * @see fi.csc.idp.authn.impl.SocialRedirectAuthenticator#getSubject()
      */
     @Override
-    public Subject getSubject(HttpServletRequest httpRequest) throws SocialRedirectAuthenticationException {
+    public Subject getSubject(HttpServletRequest httpRequest)
+            throws SocialRedirectAuthenticationException {
         log.trace("Entering");
         OAuthToken accessToken = getAccessToken(httpRequest);
         if (accessToken == null) {
