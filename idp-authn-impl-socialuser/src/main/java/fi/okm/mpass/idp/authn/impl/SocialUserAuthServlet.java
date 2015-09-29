@@ -108,7 +108,7 @@ public class SocialUserAuthServlet extends HttpServlet {
             }
             if (subject == null) {
                 // Start authentication sequence, there is no user nor Subject
-                getAuthenticationKey(httpRequest);
+                startAuthentication(httpRequest);
                 log.debug("Making a redirect to authenticate the user");
                 httpResponse.sendRedirect(socialRedirectAuthenticator
                         .getRedirectUrl(httpRequest));
@@ -129,6 +129,16 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
     }
 
+    /* Returns authentication key. Starts the sequence */
+    private void startAuthentication(final HttpServletRequest httpRequest)
+            throws ExternalAuthenticationException {
+        log.trace("Entering");
+        String key = ExternalAuthentication
+                    .startExternalAuthentication(httpRequest);
+        httpRequest.getSession().setAttribute("ext_auth_start_key", key);
+        log.trace("Leaving");
+    }
+    
     /* Returns authentication key. Starts the sequence if not already started */
     private String getAuthenticationKey(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
