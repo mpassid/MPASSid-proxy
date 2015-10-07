@@ -84,9 +84,62 @@
     
     <bean id="LinkedInIdentity"
         class="fi.okm.mpass.idp.authn.impl.LinkedInIdentity" scope="prototype">
-        <property name="consumerKey" value=""/>
-        <property name="consumerSecret" value=""/> 
+        <property name="appId" value=""/>
+        <property name="appSecret" value=""/> 
+        <property name="scope" value="rr_basicprofile"/>
     </bean> 
+    
+    <!--  No example authentication flow is provided for this generic bean -->
+    <bean id="ExampleOpenIdConnectIdentity"
+        class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
+        <property name="clientId" value=""/>
+        <property name="clientSecret" value=""/>
+        <property name="authorizationEndpoint" value=""/>
+        <property name="tokenEndpoint" value=""/>
+        
+        <!-- userinfo and revocation not applied yet  
+        <property name="userinfoEndpoint" value=""/>
+        <property name="revocationEndpoint" value=""/>
+        -->
+       
+        <!--  oidc scope values. OPENID is set by default
+        <property name="scope">
+         <list>
+            <value></value>
+         </list>
+        </property>
+        -->
+        
+        <!-- oidc prompt value 
+        <property name="prompt" value=""/>
+        -->
+        
+        <!-- oidc display value 
+        <property name="prompt" value=""/>
+        -->
+        
+        <!--  oidc acr values
+        <property name="acr">
+         <list>
+            <value></value>
+         </list>
+        </property>
+        -->
+        
+        <!--  Mapping of claims to principals -->
+        <property name="claimsPrincipals">
+         <map>
+            <!--  first oidc claim is always treated also as usernameprincipal -->
+            <entry key="sub" value="userId"/>
+            <entry key="iss" value="providerId"/>
+            <!-- 
+            <entry key="" value="email"/>
+            <entry key="" value="firstName"/>
+            <entry key="" value="lastName"/>
+            -->
+         </map>
+        </property>
+    </bean>
     
     <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
       <property name="attributes">
