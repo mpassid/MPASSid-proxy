@@ -22,7 +22,6 @@
  */
 package fi.okm.mpass.idp.authn.impl;
 
-import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
