@@ -60,6 +60,12 @@
             <artifactId>idp-authn-api-socialuser</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- TODO Version to parent pom -->
+        <dependency>
+          <groupId>com.nimbusds</groupId>
+          <artifactId>oauth2-oidc-sdk</artifactId>
+          <version>4.16.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -74,7 +80,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeGroupIds>fi.okm.mpass,org.springframework.security,
+                            <includeGroupIds>org.apache.commons,net.minidev,com.nimbusds,fi.okm.mpass,org.springframework.security,
                                 org.springframework.social,com.fasterxml.jackson.core,javax.inject</includeGroupIds>
                         </configuration>
                     </execution>
