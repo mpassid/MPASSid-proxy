@@ -37,8 +37,8 @@ import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements LnkdN authentication. */
-public class LinkedInIdentity extends AbstractOAuth2Identity implements
-        SocialRedirectAuthenticator {
+public class LinkedInIdentity extends AbstractSpringSocialOAuth2Identity
+        implements SocialRedirectAuthenticator {
 
     /** Class logger. */
     @Nonnull
