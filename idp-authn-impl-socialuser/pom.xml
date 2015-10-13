@@ -62,6 +62,11 @@
         </dependency>
         <!-- TODO Version to parent pom -->
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
           <groupId>com.nimbusds</groupId>
           <artifactId>oauth2-oidc-sdk</artifactId>
           <version>4.16.1</version>
@@ -80,7 +85,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeGroupIds>org.apache.commons,net.minidev,com.nimbusds,fi.okm.mpass,org.springframework.security,
+                            <includeGroupIds>org.apache.commons,commons-io,net.minidev,com.nimbusds,fi.okm.mpass,org.springframework.security,
                                 org.springframework.social,com.fasterxml.jackson.core,javax.inject</includeGroupIds>
                         </configuration>
                     </execution>
