@@ -37,8 +37,8 @@ import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements Twitter authentication. */
-public class TwitterIdentity extends AbstractOAuthIdentity implements
-        SocialRedirectAuthenticator {
+public class TwitterIdentity extends AbstractSpringSocialOAuthIdentity
+        implements SocialRedirectAuthenticator {
 
     /** Class logger. */
     @Nonnull
