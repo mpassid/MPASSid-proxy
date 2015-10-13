@@ -134,11 +134,11 @@ public class SocialUserAuthServlet extends HttpServlet {
             throws ExternalAuthenticationException {
         log.trace("Entering");
         String key = ExternalAuthentication
-                    .startExternalAuthentication(httpRequest);
+                .startExternalAuthentication(httpRequest);
         httpRequest.getSession().setAttribute("ext_auth_start_key", key);
         log.trace("Leaving");
     }
-    
+
     /* Returns authentication key. Starts the sequence if not already started */
     private String getAuthenticationKey(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
