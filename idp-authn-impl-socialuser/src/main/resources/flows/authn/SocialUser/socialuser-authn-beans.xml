@@ -90,6 +90,28 @@
     </bean> 
     
     <!--  No example authentication flow is provided for this generic bean -->
+    <bean id="ExampleOauth2Identity"
+        class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
+        <property name="clientId" value=""/>
+        <property name="clientSecret" value=""/>
+        <property name="authorizationEndpoint" value="https://accounts.google.com/o/oauth2/auth"/>
+        <property name="tokenEndpoint" value="https://www.googleapis.com/oauth2/v3/token"/>
+        <property name="userinfoEndpoint" value="https://www.googleapis.com/oauth2/v1/userinfo"/>
+        <property name="scope">
+         <list>
+            <value>profile</value>
+         </list>
+        </property>
+        <property name="claimsPrincipals">
+         <map>
+            <entry key="id" value="userId"/>
+            <entry key="given_name" value="firstName"/>
+            <entry key="family_name" value="lastName"/>
+         </map>
+        </property>
+    </bean>
+    
+    <!--  No example authentication flow is provided for this generic bean -->
     <bean id="ExampleOpenIdConnectIdentity"
         class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
         <property name="clientId" value=""/>
