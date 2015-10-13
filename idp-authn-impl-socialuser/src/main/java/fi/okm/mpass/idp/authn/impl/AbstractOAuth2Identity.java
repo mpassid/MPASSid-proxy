@@ -20,255 +20,300 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package fi.okm.mpass.idp.authn.impl;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
+
+import net.shibboleth.idp.authn.AuthnEventIds;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.codec.Hex;
-import org.springframework.social.oauth2.AccessGrant;
-import org.springframework.social.oauth2.GrantType;
-import org.springframework.social.oauth2.OAuth2Operations;
-import org.springframework.social.oauth2.OAuth2Parameters;
-import org.springframework.web.client.HttpClientErrorException;
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
-import net.shibboleth.idp.authn.AuthnEventIds;
 
-/** Implements methods common to Oauth2 types. */
-public abstract class AbstractOAuth2Identity extends AbstractIdentity {
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
+import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
+import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+
+/** Implements OAuth2/OpenId basics for classes using Nimbus library. */
+public abstract class AbstractOAuth2Identity {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
             .getLogger(AbstractOAuth2Identity.class);
 
-    /** Oauth2 Application id. */
+    /** OIDC Scope. */
+    private Scope scope;
+    /** OIDC Client Id. */
+    private ClientID clientID;
+    /** OIDC Client Secret. */
+    private Secret clientSecret;
+    /** OIDC Authorization Endpoint. */
+    private URI authorizationEndpoint;
+    /** OIDC Token Endpoint. */
+    private URI tokenEndpoint;
+    /** OIDC UserInfo Endpoint. */
+    private URI userinfoEndpoint;
+    /** OIDC Revocation Endpoint. */
+    private URI revocationEndpoint;
+
+    /** map of claims to principals. */
     @Nonnull
-    private String appId;
-    /** Oauth2 Application secret. */
-    @Nonnull
-    private String appSecret;
-    /** Oauth2 methods. */
-    private OAuth2Operations oauthOperations;
-    /** scope parameter. */
-    @Nullable
-    private String scope;
+    private Map<String, String> claimsPrincipals;
 
     /**
-     * Setter for Oauth2 operations.
+     * Setter for OAuth2 Scope values.
      * 
-     * @param operations
-     *            Oauth2 operations
+     * @param oauth2Scopes
+     *            OAuth2 Scope values
      */
-    public void setOauthOperations(OAuth2Operations operations) {
-        log.trace("Entering & Leaving");
-        this.oauthOperations = operations;
-    }
-
-    /**
-     * Setter for Oauth2 state.
-     * 
-     * @param oauth2Scope
-     *            Oauth2 state
-     */
-    public void setScope(String oauth2Scope) {
-        log.trace("Entering & Leaving");
-        this.scope = oauth2Scope;
-    }
-
-    /**
-     * Setter for Oauth2 appication id.
-     * 
-     * @param oauth2AppId
-     *            Oauth2 Application ID
-     */
-    public void setAppId(String oauth2AppId) {
-        log.trace("Entering & Leaving");
-        this.appId = oauth2AppId;
-    }
-
-    /**
-     * Setter for Oauth2 application secret.
-     * 
-     * @param oauth2AppSecret
-     *            Oauth2 Application Secret
-     */
-    public void setAppSecret(String oauth2AppSecret) {
-        log.trace("Entering & Leaving");
-        this.appSecret = oauth2AppSecret;
-    }
-
-    /**
-     * Getter for Oauth2 appication id.
-     * 
-     * @return Oauth2 application id
-     */
-    protected String getAppId() {
-        log.trace("Entering & Leaving");
-        return this.appId;
-    }
-
-    /**
-     * Getter for Oauth2 application secret.
-     * 
-     * @return Oauth2 application secret
-     */
-    protected String getAppSecret() {
-        log.trace("Entering & Leaving");
-        return this.appSecret;
-    }
-
-    /**
-     * Returns redirect url for authentication.
-     * 
-     * @param httpRequest
-     *            the request
-     * 
-     * @return redirect url
-     */
-    public String getRedirectUrl(HttpServletRequest httpRequest) {
+    public void setScope(List<String> oauth2Scopes) {
         log.trace("Entering");
-        OAuth2Parameters params = new OAuth2Parameters();
-        if (scope != null) {
-            params.setScope(scope);
+        scope = new Scope();
+        for (String oidcScope : oauth2Scopes) {
+            scope.add(oidcScope);
         }
+        log.trace("Leaving");
+    }
+
+    /**
+     * Getter for OAuth2 Scope values.
+     * 
+     * @return OAuth2 Scope values
+     */
+    protected Scope getScope() {
+        log.trace("Entering");
+        if (scope == null) {
+            scope = new Scope();
+        }
+        log.trace("Leaving");
+        return scope;
+    }
+
+    /**
+     * Sets map of claims to principals.
+     * 
+     * @param oidcClaimsPrincipals
+     *            map of claims to principals
+     * */
+    public void setClaimsPrincipals(Map<String, String> oidcClaimsPrincipals) {
+        log.trace("Entering");
+        this.claimsPrincipals = oidcClaimsPrincipals;
+        log.trace("Leaving");
+    }
+
+    /**
+     * Gets map of claims to principals.
+     * 
+     * @return map of claims to principals
+     * */
+    protected Map<String, String> getClaimsPrincipals() {
+        log.trace("Entering & Leaving");
+        return claimsPrincipals;
+    }
+
+    /**
+     * Setter for authorization endpoint.
+     * 
+     * @param endPoint
+     *            OpenId AuthorizationEndpoint
+     * @throws URISyntaxException
+     */
+    public void setAuthorizationEndpoint(String endPoint)
+            throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        this.authorizationEndpoint = new URI(endPoint);
+    }
+
+    /**
+     * Getter for authorization endpoint.
+     * 
+     * @return AuthorizationEndpoint
+     */
+    protected URI getAuthorizationEndpoint() {
+        log.trace("Entering & Leaving");
+        return authorizationEndpoint;
+    }
+
+    /**
+     * Setter for OpenId token endpoint.
+     * 
+     * @param endPoint
+     *            OpenId TokenEndpoint
+     * @throws URISyntaxException
+     */
+    public void setTokenEndpoint(String endPoint) throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        this.tokenEndpoint = new URI(endPoint);
+    }
+
+    /**
+     * Getter for OpenId token endpoint.
+     * 
+     * @return TokenEndpoint
+     */
+    protected URI getTokenEndpoint() throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        return tokenEndpoint;
+    }
+
+    /**
+     * Setter for OpenId userinfo endpoint.
+     * 
+     * @param endPoint
+     *            OpenId UserinfoEndpoint
+     * @throws URISyntaxException
+     */
+    public void setUserinfoEndpoint(String endPoint) throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        this.userinfoEndpoint = new URI(endPoint);
+    }
+
+    /**
+     * Getter for OpenId userinfo endpoint.
+     * 
+     * @return OpenId UserinfoEndpoint
+     */
+    protected URI getUserinfoEndpoint() throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        return userinfoEndpoint;
+    }
+
+    /**
+     * Setter for OpenId revocation endpoint.
+     * 
+     * @param endPoint
+     *            OpenId RevocationEndpoint
+     * @throws URISyntaxException
+     */
+    public void setRevocationEndpoint(String endPoint)
+            throws URISyntaxException {
+        log.trace("Entering & Leaving");
+        this.revocationEndpoint = new URI(endPoint);
+    }
+
+    /**
+     * Getter for OpenId revocation endpoint.
+     * 
+     * @return OpenId RevocationEndpoint
+     */
+    protected URI getRevocationEndpoint() {
+        log.trace("Entering & Leaving");
+        return revocationEndpoint;
+    }
+
+    /**
+     * Setter for Oauth2 client id.
+     * 
+     * @param oauth2ClientId
+     *            Oauth2 Client ID
+     */
+    public void setClientId(String oauth2ClientId) {
+        log.trace("Entering & Leaving");
+        this.clientID = new ClientID(oauth2ClientId);
+    }
+
+    /**
+     * Getter for Oauth2 client id.
+     * 
+     * @return Oauth2 Client ID
+     */
+    protected ClientID getClientId() {
+        log.trace("Entering & Leaving");
+        return clientID;
+    }
+
+    /**
+     * Setter for Oauth2 Client secret.
+     * 
+     * @param oauth2ClientSecret
+     *            Oauth2 Client Secret
+     */
+    public void setClientSecret(String oauth2ClientSecret) {
+        log.trace("Entering & Leaving");
+        this.clientSecret = new Secret(oauth2ClientSecret);
+    }
+
+    /**
+     * Getter for Oauth2 Client secret.
+     * 
+     * @return Oauth2 Client Secret
+     */
+    protected Secret getClientSecret() {
+        log.trace("Entering & Leaving");
+        return clientSecret;
+    }
+
+    protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
+            throws SocialRedirectAuthenticationException {
+        log.trace("Entering");
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.reset();
-            md.update(httpRequest.getSession().getId().getBytes());
-            String digest = new String(Hex.encode(md.digest()));
-            params.setState(digest);
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state");
-            e.printStackTrace();
+            AuthenticationResponse response = null;
+            String temp = httpRequest.getRequestURL() + "?"
+                    + httpRequest.getQueryString();
+            URI uri = new URI(temp);
+            response = AuthenticationResponseParser.parse(uri);
+            if (!response.indicatesSuccess()) {
+                log.trace("Leaving");
+                AuthenticationErrorResponse errorResponse = (AuthenticationErrorResponse) response;
+                String error = errorResponse.getErrorObject().getCode();
+                String errorDescription = errorResponse.getErrorObject()
+                        .getDescription();
+                if (errorDescription != null && !errorDescription.isEmpty()) {
+                    error += " : " + errorDescription;
+                }
+                log.trace("Leaving");
+                throw new SocialRedirectAuthenticationException(error,
+                        AuthnEventIds.AUTHN_EXCEPTION);
+            }
+            AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) response;
+            AuthorizationCode code = successResponse.getAuthorizationCode();
+            URI callback = new URI(httpRequest.getRequestURL().toString());
+            AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code,
+                    callback);
+            ClientAuthentication clientAuth = new ClientSecretBasic(
+                    getClientId(), getClientSecret());
+            TokenRequest request = new TokenRequest(getTokenEndpoint(),
+                    clientAuth, codeGrant);
+            State state = (State) httpRequest.getSession().getAttribute(
+                    "fi.okm.mpass.state");
+            if (state == null || !state.equals(successResponse.getState())) {
+                throw new SocialRedirectAuthenticationException(
+                        "State parameter not satisfied",
+                        AuthnEventIds.AUTHN_EXCEPTION);
+            }
+            return request;
+        } catch (IllegalArgumentException e) {
+            log.debug("User is not authenticated yet");
             log.trace("Leaving");
             return null;
-        }
-        params.setRedirectUri(httpRequest.getRequestURL().toString());
-        String authorizeUrl = oauthOperations.buildAuthorizeUrl(
-                GrantType.AUTHORIZATION_CODE, params);
-        log.trace("Leaving");
-        return authorizeUrl;
 
-    }
-
-    /*
-     * Throws an error if state parameter is not the expected one
-     */
-    private void validateState(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
-        log.trace("Entering");
-        String state = httpRequest.getParameter("state");
-        if (state == null) {
-            log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
-                    "State parameter missing", AuthnEventIds.AUTHN_EXCEPTION);
-        }
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state");
+        } catch (URISyntaxException | ParseException e) {
             e.printStackTrace();
-            log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
-                    "Unable to hash, use some other method",
-                    AuthnEventIds.AUTHN_EXCEPTION);
-        }
-        md.reset();
-        md.update(httpRequest.getSession().getId().getBytes());
-        String cmpState = new String(Hex.encode(md.digest()));
-        if (!state.equalsIgnoreCase(cmpState)) {
-            log.error("state parameter mismatch");
-            log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
-                    "State parameter mismatch", AuthnEventIds.AUTHN_EXCEPTION);
-        }
-    }
-
-    /*
-     * Throws an error if user authentication has failed Returns Authorization
-     * Code if such exists Returns null if authentication has not been performed
-     * yet
-     * 
-     * @throws SocialRedirectAuthenticationException
-     */
-    private String getAuthorizationCode(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
-        log.trace("Entering");
-        String error = httpRequest.getParameter("error");
-        if (error != null && !error.isEmpty()) {
-            log.trace("Leaving");
-            String event = AuthnEventIds.AUTHN_EXCEPTION;
-            switch (error) {
-            case "invalid_request":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "unauthorized_client":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "access_denied":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "unsupported_response_type":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "invalid_scope":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "server_error":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            case "temporarily_unavailable":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
-                break;
-            }
-            String error_description = httpRequest
-                    .getParameter("error_description");
-            if (error_description != null && !error_description.isEmpty()) {
-                error += " : " + error_description;
-            }
-            log.debug("Authentication failed: " + error);
-            throw new SocialRedirectAuthenticationException(error, event);
-        }
-        String authorizationCode = httpRequest.getParameter("code");
-        log.trace("Leaving");
-        return authorizationCode;
-    }
-
-    /**
-     * Returns Access Grant if user is known, otherwise null.
-     * 
-     * @param httpRequest
-     *            the request
-     * @return Access Grant
-     * @throws SocialRedirectAuthenticationException
-     */
-    public AccessGrant getAccessGrant(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
-        log.trace("Entering");
-        AccessGrant accessGrant = null;
-        try {
-            String authorizationCode = getAuthorizationCode(httpRequest);
-            if (authorizationCode == null) {
-                return null;
-            }
-            validateState(httpRequest);
-            accessGrant = oauthOperations.exchangeForAccess(authorizationCode,
-                    httpRequest.getRequestURL().toString(), null);
-        } catch (HttpClientErrorException e) {
             log.trace("Leaving");
             throw new SocialRedirectAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
-        log.trace("Leaving");
-        return accessGrant;
     }
 
 }
