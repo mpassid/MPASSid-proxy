@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("serial")
 public class SocialRedirectAuthenticationException extends Exception {
 
     /* Authentication event id */
