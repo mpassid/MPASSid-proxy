@@ -22,7 +22,6 @@
  */
 package fi.okm.mpass.idp.authn.impl;
 
-
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +37,8 @@ import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements Google authentication. */
-public class GoogleIdentity extends AbstractOAuth2Identity implements
-        SocialRedirectAuthenticator {
+public class GoogleIdentity extends AbstractSpringSocialOAuth2Identity
+        implements SocialRedirectAuthenticator {
 
     /** Class logger. */
     @Nonnull
