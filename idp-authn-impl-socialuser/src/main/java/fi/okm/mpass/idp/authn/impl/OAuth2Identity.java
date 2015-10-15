@@ -123,7 +123,6 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             // try reading stuff from accesstoken
             Subject subject = new Subject();
             parsePrincipalsFromClaims(subject, accessToken.toJSONObject());
-            log.debug("accesToken:" + accessToken.toJSONString());
             if (getUserinfoEndpoint() != null
                     && !getUserinfoEndpoint().toString().isEmpty()) {
                 // The protected resource / web API
@@ -134,7 +133,6 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                         accessToken.toAuthorizationHeader());
                 String userinfo = IOUtils.toString(conn.getInputStream());
                 conn.getInputStream().close();
-                log.debug("userinfo to string:" + userinfo.toString());
                 try {
                     parsePrincipalsFromClaims(subject,
                             JSONObjectUtils.parseJSONObject(userinfo));
@@ -159,7 +157,8 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
     }
 
     /* parse principals from claim */
-    private void parsePrincipalsFromClaims(Subject subject, JSONObject potClaims) {
+    protected void parsePrincipalsFromClaims(Subject subject,
+            JSONObject potClaims) {
 
         log.trace("Entering");
         boolean first = true;
@@ -167,7 +166,6 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             log.trace("Leaving");
             return;
         }
-        log.debug("potential claims are:" + potClaims.toString());
         for (Map.Entry<String, String> entry : getClaimsPrincipals().entrySet()) {
 
             String claim = entry.getKey().toString();
@@ -175,20 +173,16 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 first = false;
                 continue;
             }
-            log.debug("looking for claim named " + claim);
             String value = potClaims.get(claim) != null ? potClaims.get(claim)
                     .toString() : null;
             if (value == null || value.isEmpty()) {
                 first = false;
-                log.debug("claim value not found");
                 continue;
             }
-            log.debug("found value " + value);
             subject.getPrincipals().add(
                     new SocialUserPrincipal(Types.valueOf(entry.getValue()),
                             value));
             if (first) {
-                log.debug("Setting claim as usernameprincipal");
                 subject.getPrincipals().add(new UsernamePrincipal(value));
                 first = false;
             }
