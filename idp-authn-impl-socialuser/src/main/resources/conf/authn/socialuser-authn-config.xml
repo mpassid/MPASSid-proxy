@@ -41,9 +41,14 @@
         c:_0="contextRelative:Authn/SocialUser/Google">
     </bean>
     
-       <!-- Servlet context-relative path to wherever your implementation lives. -->
+    <!-- Servlet context-relative path to wherever your implementation lives. -->
     <bean id="shibboleth.authn.SocialUserLinkedIn.externalAuthnPath" class="java.lang.String"
         c:_0="contextRelative:Authn/SocialUser/Google">
+    </bean>
+    
+    <!-- Servlet context-relative path to wherever your implementation lives. -->
+    <bean id="shibboleth.authn.SocialUserYle.externalAuthnPath" class="java.lang.String"
+        c:_0="contextRelative:Authn/SocialUser/Yle">
     </bean>
     
     <!-- Populate RP UI info from metadata? -->
