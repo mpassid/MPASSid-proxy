@@ -89,6 +89,28 @@
         <property name="scope" value="rr_basicprofile"/>
     </bean> 
     
+    <bean id="OAuth2YleIdentity"
+        class="fi.okm.mpass.idp.authn.impl.YleIdentity">
+        <property name="appId" value="fe66c61b"/>
+        <property name="appKey" value="1d5434575274a01f383f85169791a124"/>
+        <property name="clientId" value="educloud-test-id-12345"/>
+        <property name="clientSecret" value="2pas1lanrait1O!"/>
+        <property name="authorizationEndpoint" value="https://auth.api-test.yle.fi/v1/authorize"/>
+        <property name="tokenEndpoint" value="https://auth.api-test.yle.fi/v1/token?app_id=fe66c61b&amp;app_key=1d5434575274a01f383f85169791a124"/>
+        <property name="userinfoEndpoint" value="https://auth.api-test.yle.fi/v1/tokeninfo?app_id=fe66c61b&amp;app_key=1d5434575274a01f383f85169791a124"/>
+        <property name="scope">
+         <list>
+            <value>sub</value>
+         </list>
+        </property>
+        <property name="claimsPrincipals">
+         <map>
+            <entry key="user_key" value="userId"/>
+         </map>
+        </property>
+    </bean>
+    
+    
     <!--  No example authentication flow is provided for this generic bean -->
     <bean id="ExampleOauth2Identity"
         class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
