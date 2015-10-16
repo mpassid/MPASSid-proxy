@@ -50,8 +50,6 @@ public class ExtractSocialPrincipalsFromSubjectTest extends PopulateAuthenticati
     @BeforeMethod public void setUp() throws Exception {
         super.setUp();
         action = new ExtractSocialPrincipalsFromSubject();
-        MockHttpServletRequest mockHttpServletRequest=new MockHttpServletRequest();
-        action.setHttpServletRequest(mockHttpServletRequest);
         action.initialize();
     }
     
@@ -61,20 +59,9 @@ public class ExtractSocialPrincipalsFromSubjectTest extends PopulateAuthenticati
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
     
-    @Test public void testMissingIdentity() throws Exception {
-        AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
-        final UsernamePasswordContext upCtx = authCtx.getSubcontext(UsernamePasswordContext.class, true);
-        upCtx.setUsername(null);
-        upCtx.setPassword(null);
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
-    }
     
     @Test public void testIdentity() throws Exception {
         //TODO..
-        //AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
-        //final UsernamePasswordContext upCtx = authCtx.getSubcontext(UsernamePasswordContext.class, true);
-        //upCtx.setUsername("test123");
               
     }
 
