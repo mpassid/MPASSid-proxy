@@ -84,17 +84,6 @@ public class ExtractSocialPrincipalsFromSubject extends
             log.trace("Leaving");
             return;
         }
-        final UsernamePasswordContext upCtx = authenticationContext.getSubcontext(UsernamePasswordContext.class, true);
-        if (upCtx.getUsername()==null || upCtx.getUsername().isEmpty()){
-            log.info(
-                    "{} Username has not been set",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return;
-        }
-        
         final Subject subject = authenticationContext.getSubcontext(
                 ExternalAuthenticationContext.class).getSubject();
         final Set<SocialUserPrincipal> principals = subject
