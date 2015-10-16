@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 public class SocialRedirectAuthenticationExceptionTest {
 
     /**
-     * Void tests exception parameters
+     * Tests exception parameters
      */
     @Test public void voidExceptionParameters() {
         try {
