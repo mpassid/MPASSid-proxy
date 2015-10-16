@@ -33,6 +33,7 @@ import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.ExternalAuthenticationContext;
+import net.shibboleth.idp.authn.context.UsernamePasswordContext;
 
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -70,7 +71,7 @@ public class ExtractSocialPrincipalsFromSubject extends
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        final SocialUserContext upCtx = authenticationContext.getSubcontext(
+        final SocialUserContext suCtx = authenticationContext.getSubcontext(
                 SocialUserContext.class, true);
         final HttpServletRequest request = getHttpServletRequest();
         authenticationContext.setResultCacheable(false);
@@ -83,7 +84,17 @@ public class ExtractSocialPrincipalsFromSubject extends
             log.trace("Leaving");
             return;
         }
-
+        final UsernamePasswordContext upCtx = authenticationContext.getSubcontext(UsernamePasswordContext.class, true);
+        if (upCtx.getUsername()==null || upCtx.getUsername().isEmpty()){
+            log.info(
+                    "{} Username has not been set",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        
         final Subject subject = authenticationContext.getSubcontext(
                 ExternalAuthenticationContext.class).getSubject();
         final Set<SocialUserPrincipal> principals = subject
@@ -92,22 +103,22 @@ public class ExtractSocialPrincipalsFromSubject extends
             SocialUserPrincipal.Types type = sprin.getTypesType();
             switch (type) {
             case providerId:
-                upCtx.setProviderId(sprin.getValue());
+                suCtx.setProviderId(sprin.getValue());
                 break;
             case userId:
-                upCtx.setUserId(sprin.getValue());
+                suCtx.setUserId(sprin.getValue());
                 break;
             case email:
-                upCtx.setEmail(sprin.getValue());
+                suCtx.setEmail(sprin.getValue());
                 break;
             case firstName:
-                upCtx.setFirstName(sprin.getValue());
+                suCtx.setFirstName(sprin.getValue());
                 break;
             case lastName:
-                upCtx.setLastName(sprin.getValue());
+                suCtx.setLastName(sprin.getValue());
                 break;
             case displayName:
-                upCtx.setDisplayName(sprin.getValue());
+                suCtx.setDisplayName(sprin.getValue());
                 break;
             default:
                 log.info("unmapped principal of type/value:" + sprin.getType()
