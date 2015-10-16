@@ -71,6 +71,35 @@
           <artifactId>oauth2-oidc-sdk</artifactId>
           <version>4.16.1</version>
         </dependency>
+        
+        <!-- Test Dependencies, add to parent POM -->
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-profile-api</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.shibboleth.idp</groupId>
+            <artifactId>idp-authn-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.shibboleth.idp</groupId>
+            <artifactId>idp-authn-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.shibboleth.idp</groupId>
+            <artifactId>idp-profile-api</artifactId>
+            <version>${shib.idp.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        
+        
     </dependencies>
     <build>
         <plugins>
