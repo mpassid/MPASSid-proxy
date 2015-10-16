@@ -33,7 +33,7 @@ public class SocialRedirectAuthenticationExceptionTest {
     /**
      * Tests exception parameters
      */
-    @Test public void voidExceptionParameters() {
+    @Test public void testExceptionParameters() {
         try {
             throw new SocialRedirectAuthenticationException(null, null);
         } catch (SocialRedirectAuthenticationException e) {
