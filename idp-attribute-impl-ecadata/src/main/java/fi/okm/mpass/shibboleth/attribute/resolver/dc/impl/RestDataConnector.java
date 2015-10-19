@@ -128,7 +128,7 @@ public class RestDataConnector extends AbstractDataConnector {
                 attributeCallUrl
                         + "?"
                         + idpIdValue
-                        + "="
+                        + "_id="
                         + collectSingleAttributeValue(
                                 attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), hookAttribute);
 
