@@ -38,8 +38,8 @@ import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements FB authentication. */
-public class FacebookIdentity extends AbstractOAuth2Identity implements
-        SocialRedirectAuthenticator {
+public class FacebookIdentity extends AbstractSpringSocialOAuth2Identity
+        implements SocialRedirectAuthenticator {
 
     /** Class logger. */
     @Nonnull

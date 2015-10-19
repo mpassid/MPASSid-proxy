@@ -22,47 +22,36 @@
  */
 package fi.okm.mpass.idp.authn;
 
-import javax.annotation.Nonnull;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-@SuppressWarnings("serial")
-public class SocialRedirectAuthenticationException extends Exception {
-
-    /* Authentication event id */
-    private String event;
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SocialRedirectAuthenticationException.class);
+/**
+ * Unit tests for {@link SocialRedirectAuthenticationException}.
+ */
+public class SocialRedirectAuthenticationExceptionTest {
 
     /**
-     * If user is not authenticated, user must be redirected to returned url.
-     * 
-     * @param description
-     *            Description for exception
-     * @param authEvent
-     *            Authnentication event id
-     *
+     * Tests exception parameters
      */
-    public SocialRedirectAuthenticationException(String description,
-            String authEvent) {
-        super(description);
-        log.trace("Entering");
-        event = authEvent;
-        log.trace("Leaving");
+    @Test public void testExceptionParameters() {
+        try {
+            throw new SocialRedirectAuthenticationException(null, null);
+        } catch (SocialRedirectAuthenticationException e) {
+            Assert.assertNull(e.getMessage());
+            Assert.assertNull(e.getAuthEventId());
+        }
+        try {
+            throw new SocialRedirectAuthenticationException("", "");
+        } catch (SocialRedirectAuthenticationException e) {
+            Assert.assertEquals(e.getMessage(),"");
+            Assert.assertEquals(e.getAuthEventId(),"");
+        }
+        try {
+            throw new SocialRedirectAuthenticationException("description", "event");
+        } catch (SocialRedirectAuthenticationException e) {
+            Assert.assertEquals(e.getMessage(),"description");
+            Assert.assertEquals(e.getAuthEventId(),"event");
+        }
     }
-
-    /**
-     * Authentication event id.
-     * 
-     * @return the authentication event id
-     *
-     */
-    public String getAuthEventId() {
-        log.trace("Entering & Leaving");
-        return event;
-    }
-
+    
 }

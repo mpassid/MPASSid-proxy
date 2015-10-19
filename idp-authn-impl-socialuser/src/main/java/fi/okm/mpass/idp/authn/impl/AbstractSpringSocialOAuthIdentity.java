@@ -37,12 +37,13 @@ import org.springframework.social.oauth1.OAuthToken;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 
 /** Implements methods common to OAuth(1) types. */
-public abstract class AbstractOAuthIdentity extends AbstractIdentity {
+public abstract class AbstractSpringSocialOAuthIdentity extends
+        AbstractIdentity {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
-            .getLogger(AbstractOAuthIdentity.class);
+            .getLogger(AbstractSpringSocialOAuthIdentity.class);
 
     /** OAuth Application id. */
     @Nonnull
