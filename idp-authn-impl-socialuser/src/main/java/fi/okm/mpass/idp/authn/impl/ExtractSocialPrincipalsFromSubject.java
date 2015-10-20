@@ -90,6 +90,9 @@ public class ExtractSocialPrincipalsFromSubject extends
                 .getPrincipals(SocialUserPrincipal.class);
         for (SocialUserPrincipal sprin : principals) {
             SocialUserPrincipal.Types type = sprin.getTypesType();
+            if (type==null){
+                continue;
+            }
             switch (type) {
             case providerId:
                 suCtx.setProviderId(sprin.getValue());
