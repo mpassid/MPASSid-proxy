@@ -186,7 +186,7 @@ public class YleIdentity extends OAuth2Identity implements
                             e.getMessage(), AuthnEventIds.AUTHN_EXCEPTION);
                 }
             }
-
+            addDefaultPrincipals(subject);
             return subject;
 
         } catch (SerializeException | IOException | URISyntaxException
@@ -200,13 +200,19 @@ public class YleIdentity extends OAuth2Identity implements
 
     }
 
-    /*Yle authorize server is behind gateway requiring own set of keys as query
-     parameters.*/
+    /**
+     * Yle authorize server is behind gateway requiring own set of keys as query
+     * parameters.
+     * 
+     */
     private String getYleGatewayCredentialsTrail() {
         return "&app_id=" + appId + "&app_key=" + appKey;
     }
 
-    /*Yle authorize server insists on having credentials as query parameters.*/
+    /**
+     * Yle authorize server insists on having credentials as query parameters.
+     * 
+     */
     private String getClientCredentialsTrail() {
         return "&client_id=" + getClientId().getValue() + "&client_secret="
                 + getClientSecret().getValue();
