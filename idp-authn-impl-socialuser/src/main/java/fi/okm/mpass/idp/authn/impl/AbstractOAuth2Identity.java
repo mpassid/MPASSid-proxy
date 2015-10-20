@@ -27,11 +27,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.AuthnEventIds;
+import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +57,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 
 /** Implements OAuth2/OpenId basics for classes using Nimbus library. */
 public abstract class AbstractOAuth2Identity {
@@ -62,25 +67,30 @@ public abstract class AbstractOAuth2Identity {
     private final Logger log = LoggerFactory
             .getLogger(AbstractOAuth2Identity.class);
 
-    /** OIDC Scope. */
+    /**  Scope. */
     private Scope scope;
-    /** OIDC Client Id. */
+    /**  Client Id. */
     private ClientID clientID;
-    /** OIDC Client Secret. */
+    /**  Client Secret. */
     private Secret clientSecret;
-    /** OIDC Authorization Endpoint. */
+    /**  Authorization Endpoint. */
     private URI authorizationEndpoint;
-    /** OIDC Token Endpoint. */
+    /**  Token Endpoint. */
     private URI tokenEndpoint;
-    /** OIDC UserInfo Endpoint. */
+    /**  UserInfo Endpoint. */
     private URI userinfoEndpoint;
-    /** OIDC Revocation Endpoint. */
+    /**  Revocation Endpoint. */
     private URI revocationEndpoint;
 
     /** map of claims to principals. */
     @Nonnull
     private Map<String, String> claimsPrincipals;
 
+    /** map of principal default values. */
+    @Nonnull
+    private Map<String, String> principalsDefaults;
+
+    
     /**
      * Setter for OAuth2 Scope values.
      * 
@@ -90,8 +100,8 @@ public abstract class AbstractOAuth2Identity {
     public void setScope(List<String> oauth2Scopes) {
         log.trace("Entering");
         scope = new Scope();
-        for (String oidcScope : oauth2Scopes) {
-            scope.add(oidcScope);
+        for (String oauth2Scope : oauth2Scopes) {
+            scope.add(oauth2Scope);
         }
         log.trace("Leaving");
     }
@@ -111,14 +121,37 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
+     * Sets map of principal defaults.
+     * 
+     * @param oauth2PrincipalsDefaults
+     *            map of principal defaults
+     * */
+    public void setPrincipalsDefaults(Map<String, String> oauth2PrincipalsDefaults) {
+        log.trace("Entering");
+        this.principalsDefaults = oauth2PrincipalsDefaults;
+        log.trace("Leaving");
+    }
+
+    /**
+     * Gets map of claims to principals.
+     * 
+     * @return map of claims to principals
+     * */
+    protected Map<String, String> getPrincipalsDefaults() {
+        log.trace("Entering & Leaving");
+        return principalsDefaults;
+    }
+
+    
+    /**
      * Sets map of claims to principals.
      * 
-     * @param oidcClaimsPrincipals
+     * @param oauth2ClaimsPrincipals
      *            map of claims to principals
      * */
-    public void setClaimsPrincipals(Map<String, String> oidcClaimsPrincipals) {
+    public void setClaimsPrincipals(Map<String, String> oauth2ClaimsPrincipals) {
         log.trace("Entering");
-        this.claimsPrincipals = oidcClaimsPrincipals;
+        this.claimsPrincipals = oauth2ClaimsPrincipals;
         log.trace("Leaving");
     }
 
@@ -136,7 +169,7 @@ public abstract class AbstractOAuth2Identity {
      * Setter for authorization endpoint.
      * 
      * @param endPoint
-     *            OpenId AuthorizationEndpoint
+     *             AuthorizationEndpoint
      * @throws URISyntaxException
      */
     public void setAuthorizationEndpoint(String endPoint)
@@ -156,10 +189,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for OpenId token endpoint.
+     * Setter for  token endpoint.
      * 
      * @param endPoint
-     *            OpenId TokenEndpoint
+     *             TokenEndpoint
      * @throws URISyntaxException
      */
     public void setTokenEndpoint(String endPoint) throws URISyntaxException {
@@ -168,9 +201,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for OpenId token endpoint.
+     * Getter for  token endpoint.
      * 
      * @return TokenEndpoint
+     * @throws URISyntaxException
      */
     protected URI getTokenEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -178,10 +212,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for OpenId userinfo endpoint.
+     * Setter for  userinfo endpoint.
      * 
      * @param endPoint
-     *            OpenId UserinfoEndpoint
+     *             UserinfoEndpoint
      * @throws URISyntaxException
      */
     public void setUserinfoEndpoint(String endPoint) throws URISyntaxException {
@@ -190,9 +224,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for OpenId userinfo endpoint.
+     * Getter for  userinfo endpoint.
      * 
-     * @return OpenId UserinfoEndpoint
+     * @return  UserinfoEndpoint
+     * @throws URISyntaxException
      */
     protected URI getUserinfoEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -200,10 +235,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for OpenId revocation endpoint.
+     * Setter for  revocation endpoint.
      * 
      * @param endPoint
-     *            OpenId RevocationEndpoint
+     *             RevocationEndpoint
      * @throws URISyntaxException
      */
     public void setRevocationEndpoint(String endPoint)
@@ -213,9 +248,9 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for OpenId revocation endpoint.
+     * Getter for  revocation endpoint.
      * 
-     * @return OpenId RevocationEndpoint
+     * @return  RevocationEndpoint
      */
     protected URI getRevocationEndpoint() {
         log.trace("Entering & Leaving");
@@ -264,6 +299,13 @@ public abstract class AbstractOAuth2Identity {
         return clientSecret;
     }
 
+    
+    
+    /**
+     * This method forms Token request.
+     * 
+     * @param httpRequest the request back from the oauth2 server
+     */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
         log.trace("Entering");
@@ -314,6 +356,76 @@ public abstract class AbstractOAuth2Identity {
             throw new SocialRedirectAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
+    }
+    
+    /**
+     * This method sets default principal values to subject if such principal does not exist already.
+     * 
+     * @param subject 
+     */
+    protected void addDefaultPrincipals(Subject subject) {
+        log.trace("Entering");
+        if (getPrincipalsDefaults() == null || getPrincipalsDefaults().isEmpty()) {
+            log.trace("Leaving");
+            return;
+        }
+        for (Map.Entry<String, String> entry : getPrincipalsDefaults().entrySet()) {
+            String principal = entry.getKey().toString();
+            boolean found=false;
+            final Set<SocialUserPrincipal> principals = subject
+                    .getPrincipals(SocialUserPrincipal.class);
+            for (SocialUserPrincipal sprin : principals) {
+                if (principal.equals(sprin.getType())){
+                    found=true;
+                    break;
+                }
+            }
+            if (!found){
+                subject.getPrincipals().add(new SocialUserPrincipal(principal,entry.getValue()));   
+            }
+        }
+        log.trace("Leaving");
+        
+        
+    }
+    
+    
+    /**
+     * This method parses principals from claim.
+     * 
+     * @param subject we add claims to 
+     * @potClaims potential claims
+     */
+    protected void parsePrincipalsFromClaims(Subject subject,
+            JSONObject potClaims) {
+
+        log.trace("Entering");
+        boolean first = true;
+        if (getClaimsPrincipals() == null || getClaimsPrincipals().isEmpty()) {
+            log.trace("Leaving");
+            return;
+        }
+        for (Map.Entry<String, String> entry : getClaimsPrincipals().entrySet()) {
+            String claim = entry.getKey().toString();
+            if (claim == null || claim.isEmpty()) {
+                first = false;
+                continue;
+            }
+            String value = potClaims.get(claim) != null ? potClaims.get(claim)
+                    .toString() : null;
+            if (value == null || value.isEmpty()) {
+                first = false;
+                continue;
+            }
+            subject.getPrincipals().add(
+                    new SocialUserPrincipal(entry.getValue(),
+                            value));
+            if (first) {
+                subject.getPrincipals().add(new UsernamePrincipal(value));
+                first = false;
+            }
+        }
+        log.trace("Leaving");
     }
 
 }
