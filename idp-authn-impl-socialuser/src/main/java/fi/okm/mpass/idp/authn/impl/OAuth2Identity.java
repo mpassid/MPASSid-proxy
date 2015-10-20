@@ -143,7 +143,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                             e.getMessage(), AuthnEventIds.AUTHN_EXCEPTION);
                 }
             }
-
+            addDefaultPrincipals(subject);
             return subject;
 
         } catch (SerializeException | IOException | URISyntaxException
@@ -156,38 +156,6 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
 
     }
 
-    /* parse principals from claim */
-    protected void parsePrincipalsFromClaims(Subject subject,
-            JSONObject potClaims) {
-
-        log.trace("Entering");
-        boolean first = true;
-        if (getClaimsPrincipals() == null || getClaimsPrincipals().isEmpty()) {
-            log.trace("Leaving");
-            return;
-        }
-        for (Map.Entry<String, String> entry : getClaimsPrincipals().entrySet()) {
-
-            String claim = entry.getKey().toString();
-            if (claim == null || claim.isEmpty()) {
-                first = false;
-                continue;
-            }
-            String value = potClaims.get(claim) != null ? potClaims.get(claim)
-                    .toString() : null;
-            if (value == null || value.isEmpty()) {
-                first = false;
-                continue;
-            }
-            subject.getPrincipals().add(
-                    new SocialUserPrincipal(Types.valueOf(entry.getValue()),
-                            value));
-            if (first) {
-                subject.getPrincipals().add(new UsernamePrincipal(value));
-                first = false;
-            }
-        }
-        log.trace("Leaving");
-    }
+    
 
 }
