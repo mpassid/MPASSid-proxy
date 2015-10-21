@@ -28,20 +28,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
-import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.AuthnEventIds;
-import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
-import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
-import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
@@ -155,7 +150,5 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
         }
 
     }
-
-    
 
 }
