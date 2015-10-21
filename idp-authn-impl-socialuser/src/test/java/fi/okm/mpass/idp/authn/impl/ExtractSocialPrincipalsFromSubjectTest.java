@@ -26,14 +26,12 @@ package fi.okm.mpass.idp.authn.impl;
 import org.testng.Assert;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
-import net.shibboleth.idp.authn.ExternalAuthentication;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.ExternalAuthenticationContext;
-import net.shibboleth.idp.authn.context.UsernamePasswordContext;
 import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 
 import javax.security.auth.Subject;
@@ -50,64 +48,76 @@ import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
 
 /** {@link ExtractSocialPrincipalsFromSubject} unit test. */
-public class ExtractSocialPrincipalsFromSubjectTest extends PopulateAuthenticationContextTest{
+public class ExtractSocialPrincipalsFromSubjectTest extends
+        PopulateAuthenticationContextTest {
 
-    private ExtractSocialPrincipalsFromSubject action; 
-    
-    @BeforeMethod public void setUp() throws Exception {
+    private ExtractSocialPrincipalsFromSubject action;
+
+    @BeforeMethod
+    public void setUp() throws Exception {
         super.setUp();
         action = new ExtractSocialPrincipalsFromSubject();
-        
+
     }
-    
-    @Test public void testNoServlet() throws Exception {
+
+    @Test
+    public void testNoServlet() throws Exception {
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
-    
-    
-    @Test public void testIdentity() throws Exception {
-        Subject subject=new Subject();
-        
-        SocialUserPrincipal socialUserPrincipalProviderId=new SocialUserPrincipal(Types.providerId,"providerId");
+
+    @Test
+    public void testIdentity() throws Exception {
+        Subject subject = new Subject();
+
+        SocialUserPrincipal socialUserPrincipalProviderId = new SocialUserPrincipal(
+                Types.providerId, "providerId");
         subject.getPrincipals().add(socialUserPrincipalProviderId);
-        SocialUserPrincipal socialUserPrincipalDisplayName=new SocialUserPrincipal(Types.displayName,"displayName");
+        SocialUserPrincipal socialUserPrincipalDisplayName = new SocialUserPrincipal(
+                Types.displayName, "displayName");
         subject.getPrincipals().add(socialUserPrincipalDisplayName);
-        SocialUserPrincipal socialUserPrincipalEmail=new SocialUserPrincipal(Types.email,"email");
+        SocialUserPrincipal socialUserPrincipalEmail = new SocialUserPrincipal(
+                Types.email, "email");
         subject.getPrincipals().add(socialUserPrincipalEmail);
-        SocialUserPrincipal socialUserPrincipalFirstName=new SocialUserPrincipal(Types.firstName,"firstName");
+        SocialUserPrincipal socialUserPrincipalFirstName = new SocialUserPrincipal(
+                Types.firstName, "firstName");
         subject.getPrincipals().add(socialUserPrincipalFirstName);
-        SocialUserPrincipal socialUserPrincipalLastName=new SocialUserPrincipal(Types.lastName,"lastName");
+        SocialUserPrincipal socialUserPrincipalLastName = new SocialUserPrincipal(
+                Types.lastName, "lastName");
         subject.getPrincipals().add(socialUserPrincipalLastName);
-        SocialUserPrincipal socialUserPrincipalUserId=new SocialUserPrincipal(Types.userId,"userId");
+        SocialUserPrincipal socialUserPrincipalUserId = new SocialUserPrincipal(
+                Types.userId, "userId");
         subject.getPrincipals().add(socialUserPrincipalUserId);
-        SocialUserPrincipal socialUserPrincipalUS=new SocialUserPrincipal("unsupported","unsupported");
+        SocialUserPrincipal socialUserPrincipalUS = new SocialUserPrincipal(
+                "unsupported", "unsupported");
         subject.getPrincipals().add(socialUserPrincipalUS);
-        
-        SocialUserContext suCtx=initContexts(subject);
-        
+
+        SocialUserContext suCtx = initContexts(subject);
+
         Assert.assertNotNull(suCtx);
-        Assert.assertEquals(suCtx.getProviderId(),"providerId");
-        Assert.assertEquals(suCtx.getDisplayName(),"displayName");
-        Assert.assertEquals(suCtx.getEmail(),"email");
-        Assert.assertEquals(suCtx.getFirstName(),"firstName");
-        Assert.assertEquals(suCtx.getLastName(),"lastName");
-        Assert.assertEquals(suCtx.getUserId(),"userId");
+        Assert.assertEquals(suCtx.getProviderId(), "providerId");
+        Assert.assertEquals(suCtx.getDisplayName(), "displayName");
+        Assert.assertEquals(suCtx.getEmail(), "email");
+        Assert.assertEquals(suCtx.getFirstName(), "firstName");
+        Assert.assertEquals(suCtx.getLastName(), "lastName");
+        Assert.assertEquals(suCtx.getUserId(), "userId");
     }
-    
-    private SocialUserContext initContexts(Subject subject) throws ComponentInitializationException{
-        MockHttpServletRequest mockHttpServletRequest=new MockHttpServletRequest();
+
+    private SocialUserContext initContexts(Subject subject)
+            throws ComponentInitializationException {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         action.setHttpServletRequest(mockHttpServletRequest);
         action.initialize();
-        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class, false);
-        ExternalAuthenticationContext externalAuthenticationContext=new ExternalAuthenticationContext();
+        final AuthenticationContext ac = prc.getSubcontext(
+                AuthenticationContext.class, false);
+        ExternalAuthenticationContext externalAuthenticationContext = new ExternalAuthenticationContext();
         externalAuthenticationContext.setSubject(subject);
         ac.addSubcontext(externalAuthenticationContext);
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
-        return (SocialUserContext) ac.getSubcontext(SocialUserContext.class,false);
+        return (SocialUserContext) ac.getSubcontext(SocialUserContext.class,
+                false);
     }
-   
 
 }
