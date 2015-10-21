@@ -90,7 +90,7 @@ public class ExtractSocialPrincipalsFromSubject extends
                 .getPrincipals(SocialUserPrincipal.class);
         for (SocialUserPrincipal sprin : principals) {
             SocialUserPrincipal.Types type = sprin.getTypesType();
-            if (type==null){
+            if (type == null) {
                 continue;
             }
             switch (type) {
