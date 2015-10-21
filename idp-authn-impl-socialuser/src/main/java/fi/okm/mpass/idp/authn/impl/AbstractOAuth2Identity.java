@@ -67,19 +67,19 @@ public abstract class AbstractOAuth2Identity {
     private final Logger log = LoggerFactory
             .getLogger(AbstractOAuth2Identity.class);
 
-    /**  Scope. */
+    /** Scope. */
     private Scope scope;
-    /**  Client Id. */
+    /** Client Id. */
     private ClientID clientID;
-    /**  Client Secret. */
+    /** Client Secret. */
     private Secret clientSecret;
-    /**  Authorization Endpoint. */
+    /** Authorization Endpoint. */
     private URI authorizationEndpoint;
-    /**  Token Endpoint. */
+    /** Token Endpoint. */
     private URI tokenEndpoint;
-    /**  UserInfo Endpoint. */
+    /** UserInfo Endpoint. */
     private URI userinfoEndpoint;
-    /**  Revocation Endpoint. */
+    /** Revocation Endpoint. */
     private URI revocationEndpoint;
 
     /** map of claims to principals. */
@@ -90,7 +90,6 @@ public abstract class AbstractOAuth2Identity {
     @Nonnull
     private Map<String, String> principalsDefaults;
 
-    
     /**
      * Setter for OAuth2 Scope values.
      * 
@@ -126,7 +125,8 @@ public abstract class AbstractOAuth2Identity {
      * @param oauth2PrincipalsDefaults
      *            map of principal defaults
      * */
-    public void setPrincipalsDefaults(Map<String, String> oauth2PrincipalsDefaults) {
+    public void setPrincipalsDefaults(
+            Map<String, String> oauth2PrincipalsDefaults) {
         log.trace("Entering");
         this.principalsDefaults = oauth2PrincipalsDefaults;
         log.trace("Leaving");
@@ -142,7 +142,6 @@ public abstract class AbstractOAuth2Identity {
         return principalsDefaults;
     }
 
-    
     /**
      * Sets map of claims to principals.
      * 
@@ -169,7 +168,7 @@ public abstract class AbstractOAuth2Identity {
      * Setter for authorization endpoint.
      * 
      * @param endPoint
-     *             AuthorizationEndpoint
+     *            AuthorizationEndpoint
      * @throws URISyntaxException
      */
     public void setAuthorizationEndpoint(String endPoint)
@@ -189,10 +188,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for  token endpoint.
+     * Setter for token endpoint.
      * 
      * @param endPoint
-     *             TokenEndpoint
+     *            TokenEndpoint
      * @throws URISyntaxException
      */
     public void setTokenEndpoint(String endPoint) throws URISyntaxException {
@@ -201,7 +200,7 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for  token endpoint.
+     * Getter for token endpoint.
      * 
      * @return TokenEndpoint
      * @throws URISyntaxException
@@ -212,10 +211,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for  userinfo endpoint.
+     * Setter for userinfo endpoint.
      * 
      * @param endPoint
-     *             UserinfoEndpoint
+     *            UserinfoEndpoint
      * @throws URISyntaxException
      */
     public void setUserinfoEndpoint(String endPoint) throws URISyntaxException {
@@ -224,9 +223,9 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for  userinfo endpoint.
+     * Getter for userinfo endpoint.
      * 
-     * @return  UserinfoEndpoint
+     * @return UserinfoEndpoint
      * @throws URISyntaxException
      */
     protected URI getUserinfoEndpoint() throws URISyntaxException {
@@ -235,10 +234,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for  revocation endpoint.
+     * Setter for revocation endpoint.
      * 
      * @param endPoint
-     *             RevocationEndpoint
+     *            RevocationEndpoint
      * @throws URISyntaxException
      */
     public void setRevocationEndpoint(String endPoint)
@@ -248,9 +247,9 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Getter for  revocation endpoint.
+     * Getter for revocation endpoint.
      * 
-     * @return  RevocationEndpoint
+     * @return RevocationEndpoint
      */
     protected URI getRevocationEndpoint() {
         log.trace("Entering & Leaving");
@@ -299,12 +298,13 @@ public abstract class AbstractOAuth2Identity {
         return clientSecret;
     }
 
-    
-    
     /**
      * This method forms Token request.
      * 
-     * @param httpRequest the request back from the oauth2 server
+     * @param httpRequest
+     *            the request back from the oauth2 server
+     * @return  returns token request
+     * @throws  SocialRedirectAuthenticationException
      */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
@@ -357,44 +357,48 @@ public abstract class AbstractOAuth2Identity {
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
     }
-    
+
     /**
-     * This method sets default principal values to subject if such principal does not exist already.
+     * This method sets default principal values to subject if such principal
+     * does not exist already.
      * 
-     * @param subject 
+     * @param subject
+     *          The subject we add default principal values to
      */
     protected void addDefaultPrincipals(Subject subject) {
         log.trace("Entering");
-        if (getPrincipalsDefaults() == null || getPrincipalsDefaults().isEmpty()) {
+        if (getPrincipalsDefaults() == null
+                || getPrincipalsDefaults().isEmpty()) {
             log.trace("Leaving");
             return;
         }
-        for (Map.Entry<String, String> entry : getPrincipalsDefaults().entrySet()) {
+        for (Map.Entry<String, String> entry : getPrincipalsDefaults()
+                .entrySet()) {
             String principal = entry.getKey().toString();
-            boolean found=false;
+            boolean found = false;
             final Set<SocialUserPrincipal> principals = subject
                     .getPrincipals(SocialUserPrincipal.class);
             for (SocialUserPrincipal sprin : principals) {
-                if (principal.equals(sprin.getType())){
-                    found=true;
+                if (principal.equals(sprin.getType())) {
+                    found = true;
                     break;
                 }
             }
-            if (!found){
-                subject.getPrincipals().add(new SocialUserPrincipal(principal,entry.getValue()));   
+            if (!found) {
+                subject.getPrincipals().add(
+                        new SocialUserPrincipal(principal, entry.getValue()));
             }
         }
         log.trace("Leaving");
-        
-        
+
     }
-    
-    
+
     /**
      * This method parses principals from claim.
      * 
-     * @param subject we add claims to 
-     * @potClaims potential claims
+     * @param subject
+     *            we add claims to
+     * @param potClaims potential claims
      */
     protected void parsePrincipalsFromClaims(Subject subject,
             JSONObject potClaims) {
@@ -418,8 +422,7 @@ public abstract class AbstractOAuth2Identity {
                 continue;
             }
             subject.getPrincipals().add(
-                    new SocialUserPrincipal(entry.getValue(),
-                            value));
+                    new SocialUserPrincipal(entry.getValue(), value));
             if (first) {
                 subject.getPrincipals().add(new UsernamePrincipal(value));
                 first = false;
