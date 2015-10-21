@@ -137,7 +137,8 @@ public class YleIdentity extends OAuth2Identity implements
 
             // Yle server insists on having credentials as query parameters
             HTTPRequest req = request.toHTTPRequest();
-            // We add the credentials but have them still in headers, violation of RFC
+            // We add the credentials but have them still in headers, violation
+            // of RFC
             req.setQuery(request.toHTTPRequest().getQuery()
                     + getClientCredentialsTrail());
 
