@@ -303,8 +303,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param httpRequest
      *            the request back from the oauth2 server
-     * @return  returns token request
-     * @throws  SocialRedirectAuthenticationException
+     * @return returns token request
+     * @throws SocialRedirectAuthenticationException
      */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
@@ -363,7 +363,7 @@ public abstract class AbstractOAuth2Identity {
      * does not exist already.
      * 
      * @param subject
-     *          The subject we add default principal values to
+     *            The subject we add default principal values to
      */
     protected void addDefaultPrincipals(Subject subject) {
         log.trace("Entering");
@@ -398,7 +398,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param subject
      *            we add claims to
-     * @param potClaims potential claims
+     * @param potClaims
+     *            potential claims
      */
     protected void parsePrincipalsFromClaims(Subject subject,
             JSONObject potClaims) {
