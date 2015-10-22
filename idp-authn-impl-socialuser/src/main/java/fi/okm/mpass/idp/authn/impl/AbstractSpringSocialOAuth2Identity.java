@@ -135,6 +135,10 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      */
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
+        if (httpRequest == null) {
+            log.trace("Leaving");
+            return null;
+        }
         OAuth2Parameters params = new OAuth2Parameters();
         if (scope != null) {
             params.setScope(scope);
