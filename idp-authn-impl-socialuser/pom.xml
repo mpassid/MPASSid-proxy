@@ -74,6 +74,12 @@
         
         <!-- Test Dependencies, add to parent POM -->
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>${opensaml.groupId}</groupId>
             <artifactId>opensaml-profile-api</artifactId>
             <version>${opensaml.version}</version>
