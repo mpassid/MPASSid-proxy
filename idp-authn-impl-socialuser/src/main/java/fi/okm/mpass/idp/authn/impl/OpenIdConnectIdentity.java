@@ -157,6 +157,10 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     @Override
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
+        if (httpRequest == null) {
+            log.trace("Leaving");
+            return null;
+        }
         ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
         httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);

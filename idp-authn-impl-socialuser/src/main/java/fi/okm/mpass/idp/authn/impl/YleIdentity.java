@@ -100,6 +100,10 @@ public class YleIdentity extends OAuth2Identity implements
     @Override
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
+        if (httpRequest == null) {
+            log.trace("Leaving");
+            return null;
+        }
         State state = new State();
         httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);
         String ret = null;
