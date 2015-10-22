@@ -80,7 +80,7 @@ public class OpenIdConnectIdentityTest {
         Assert.assertNotNull(params.contains("state"));
         for (NameValuePair param : params) {
             if (param.getName().equals("scope")) {
-                Assert.assertEquals(param.getValue(), "openid");
+                Assert.assertTrue(param.getValue().contains("openid"));
             }
             if (param.getName().equals("response_type")) {
                 Assert.assertEquals(param.getValue(), "code");
