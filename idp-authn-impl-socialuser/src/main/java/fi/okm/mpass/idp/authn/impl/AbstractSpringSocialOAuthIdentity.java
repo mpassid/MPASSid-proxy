@@ -121,6 +121,10 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
 
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
+        if (httpRequest == null) {
+            log.trace("Leaving");
+            return null;
+        }
         OAuthToken requestToken = oauthOperations.fetchRequestToken(httpRequest
                 .getRequestURL().toString(), null);
         httpRequest.getSession().setAttribute("ext_auth_request_token",
