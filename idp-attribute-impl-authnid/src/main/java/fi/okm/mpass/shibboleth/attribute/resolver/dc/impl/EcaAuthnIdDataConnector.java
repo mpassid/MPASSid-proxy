@@ -415,7 +415,7 @@ public class EcaAuthnIdDataConnector extends AbstractDataConnector {
                 }
                 if (skipCalculation.get(attributeName) != null) {
                     log.debug("Adding the value {} to the existing entry {}", attributeValue, attributeName);
-                    skipCalculation.get(attributeValue).add(attributeValue);
+                    skipCalculation.get(attributeName).add(attributeValue);
                 } else {
                     log.debug("Creating a new entry {} with value {}", attributeName, attributeValue);
                     final List<String> newValue = new ArrayList<String>();
