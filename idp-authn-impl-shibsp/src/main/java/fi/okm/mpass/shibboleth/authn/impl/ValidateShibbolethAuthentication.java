@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -69,9 +70,12 @@ import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ValidateShibbolethAuthentication extends AbstractValidationAction {
 
+    /** The delimeter if multiple usernameAttributes set. */
+    public static final String USERNAME_DELIMITER = ",";
+
     /** Class logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(ValidateShibbolethAuthentication.class);
-
+    
     /** Context containing the result to validate. */
     @Nullable private ShibbolethAuthnContext shibbolethContext;
     
@@ -149,26 +153,46 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Username in attributes={}, headers={}", 
-                shibbolethContext.getAttributes().containsKey(usernameAttribute),
-                shibbolethContext.getHeaders().containsKey(usernameAttribute));
-        if (!shibbolethContext.getAttributes().containsKey(usernameAttribute) &&
-                !shibbolethContext.getHeaders().containsKey(usernameAttribute)) {
+                getUsernameFromMap(shibbolethContext.getAttributes()) != null,
+                getUsernameFromMap(shibbolethContext.getHeaders()) != null);            
+        if (getUsernameFromMap(shibbolethContext.getAttributes()) == null &&
+                getUsernameFromMap(shibbolethContext.getHeaders()) == null) {
             handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
                     AuthnEventIds.NO_CREDENTIALS);
             return;
         }
         buildAuthenticationResult(profileRequestContext, authenticationContext);
+    }    
+    
+    /**
+     * Returns any username as defined by usernameAttribute from the given map.
+     * @param map The map potentially containing usernameAttribute.
+     * @return The username.
+     */
+    protected String getUsernameFromMap(final Map<String, String> map) {
+        if (usernameAttribute.contains(USERNAME_DELIMITER)) {
+            final StringTokenizer tokenizer = new StringTokenizer(usernameAttribute, USERNAME_DELIMITER);
+            while (tokenizer.hasMoreElements()) {
+                final String username = tokenizer.nextToken();
+                if (map.containsKey(username)) {
+                    return map.get(username);
+                }
+            }
+        } else {
+            return map.get(usernameAttribute);
+        } 
+        return null;
     }
     
     /** {@inheritDoc} */
     @Override
     @Nonnull protected Subject populateSubject(@Nonnull final Subject subject) {
-        if (shibbolethContext.getAttributes().containsKey(usernameAttribute)) {
+        if (getUsernameFromMap(shibbolethContext.getAttributes()) != null) {
             subject.getPrincipals().add(
-                    new UsernamePrincipal(shibbolethContext.getAttributes().get(usernameAttribute)));
+                    new UsernamePrincipal(getUsernameFromMap(shibbolethContext.getAttributes())));
         } else {
             subject.getPrincipals().add(
-                    new UsernamePrincipal(shibbolethContext.getHeaders().get(usernameAttribute)));
+                    new UsernamePrincipal(getUsernameFromMap(shibbolethContext.getHeaders())));
         }
         if (populateAttributes) {
             log.debug("{} Populating the attribute principals into the subject", getLogPrefix());

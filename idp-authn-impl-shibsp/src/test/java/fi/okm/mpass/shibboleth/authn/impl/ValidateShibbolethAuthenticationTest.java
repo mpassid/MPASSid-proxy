@@ -47,6 +47,9 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     /** The action to be tested. */
     private ValidateShibbolethAuthentication action;
     
+    /** The configuration for the attribute containing username. */
+    private String uidConfig;
+    
     /** The attribute containing username. */
     private String uid;
     
@@ -56,10 +59,11 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     /** {@inheritDoc} */
     @BeforeMethod public void setUp() throws Exception {
         super.setUp();
+        uidConfig = "username,username2";
         uid = "username";
         uidValue = "mockUser";
         action = new ValidateShibbolethAuthentication();
-        action.setUsernameAttribute(uid);
+        action.setUsernameAttribute(uidConfig);
         action.setPopulateAttributes(true);
         action.initialize();
     }
