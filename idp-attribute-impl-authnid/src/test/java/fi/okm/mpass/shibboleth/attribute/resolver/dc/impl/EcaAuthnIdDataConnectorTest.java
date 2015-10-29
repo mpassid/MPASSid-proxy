@@ -173,6 +173,30 @@ public class EcaAuthnIdDataConnectorTest {
                 srcAttributeValues.get(0));
         
     }
+    
+    /**
+     * Tests {@link EcaAuthnIdDataConnector} with configuration that skips calculation.
+     * @throws ComponentInitializationException If component cannot be initialized.
+     * @throws ResolutionException If attribute resolution fails.
+     */
+    @Test public void testSkip() throws ComponentInitializationException, ResolutionException {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-skip.xml");
+        final AttributeResolutionContext context =
+                TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, TestSources.IDP_ENTITY_ID,
+                        TestSources.SP_ENTITY_ID);
+        final AttributeResolverWorkContext workContext = 
+                context.getSubcontext(AttributeResolverWorkContext.class, false);
+        recordWorkContextAttribute(srcAttributeName, srcAttributeValues.get(0), workContext);
+        recordWorkContextAttribute("idpId", "skipId", workContext);
+        final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
+        Assert.assertEquals(dataConnector.getId(), "authnid");
+        Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertEquals(resolvedAttributes.size(), 1);
+        Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
+                srcAttributeValues.get(0));
+    }
+    
 
     
     /**
