@@ -122,8 +122,9 @@ public class EcaAuthnIdDataConnector extends AbstractDataConnector {
                     if (sourceExistsInAnother(getSkipCalculation().get(key), attributeDefinitions.get(key)
                             .getResolvedAttribute().getValues())) {
                         log.debug("skipCalculation configuration matched");
+                        // First source attribute is used
                         return buildResponse(collectSingleAttributeValue(attributeDefinitions, 
-                                getSkipCalculationSrc()));
+                                srcAttributeNames.get(0)));
                     }
                 } else {
                     log.trace("Attribute {} was not found in the context", key);
