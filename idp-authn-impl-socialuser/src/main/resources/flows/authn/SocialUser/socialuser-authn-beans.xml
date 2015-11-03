@@ -58,6 +58,7 @@
             <entry key="/Twitter" value-ref="TwitterIdentity"/>
             <entry key="/Google" value-ref="GoogleIdentity"/>
             <entry key="/LinkedIn" value-ref="LinkedInIdentity"/>
+            <entry key="/Yle" value-ref="OAuth2YleIdentity"/>
          </map>
         </property>
     </bean>
