@@ -49,9 +49,7 @@
             p:classifiedMessages-ref="shibboleth.authn.SocialUser.ClassifiedMessageMap"
             p:resultCachingPredicate="#{getObject('shibboleth.authn.RemoteUser.resultCachingPredicate')}" />
     
-    <bean id="ExtractSocialPrincipalsFromSubject"
-        class="fi.okm.mpass.idp.authn.impl.ExtractSocialPrincipalsFromSubject" scope="prototype"/>    
-     
+    <!-- Example map, servlet location->bean -->
     <bean id="SocialUserImplementationFactory"
         class="fi.okm.mpass.idp.authn.impl.SocialIdentityFactory" scope="prototype"> 
         <property name="socialImplBeans">
@@ -64,41 +62,43 @@
         </property>
     </bean>
     
+    <!-- example authentication beans -->
+    
     <bean id="FacebookIdentity"
     	class="fi.okm.mpass.idp.authn.impl.FacebookIdentity" scope="prototype">
-    	<property name="appId" value=""/>
-    	<property name="appSecret" value=""/> 
+    	<property name="appId" value="put_here"/>
+    	<property name="appSecret" value="put_here"/> 
     </bean> 
     
     <bean id="GoogleIdentity"
         class="fi.okm.mpass.idp.authn.impl.GoogleIdentity" scope="prototype">
-        <property name="appId" value=""/>
-        <property name="appSecret" value=""/>
+        <property name="appId" value="put_here"/>
+        <property name="appSecret" value="put_here"/>
         <property name="scope" value="profile"/> 
     </bean> 
     
     <bean id="TwitterIdentity"
         class="fi.okm.mpass.idp.authn.impl.TwitterIdentity" scope="prototype">
-        <property name="consumerKey" value=""/>
-        <property name="consumerSecret" value=""/> 
+        <property name="consumerKey" value="put_here"/>
+        <property name="consumerSecret" value="put_here"/> 
     </bean> 
     
     <bean id="LinkedInIdentity"
         class="fi.okm.mpass.idp.authn.impl.LinkedInIdentity" scope="prototype">
-        <property name="appId" value=""/>
-        <property name="appSecret" value=""/> 
+        <property name="appId" value="put_here"/>
+        <property name="appSecret" value="put_here"/> 
         <property name="scope" value="rr_basicprofile"/>
     </bean> 
     
     <bean id="OAuth2YleIdentity"
         class="fi.okm.mpass.idp.authn.impl.YleIdentity">
-        <property name="appId" value="fe66c61b"/>
-        <property name="appKey" value="1d5434575274a01f383f85169791a124"/>
-        <property name="clientId" value="educloud-test-id-12345"/>
-        <property name="clientSecret" value="2pas1lanrait1O!"/>
-        <property name="authorizationEndpoint" value="https://auth.api-test.yle.fi/v1/authorize"/>
-        <property name="tokenEndpoint" value="https://auth.api-test.yle.fi/v1/token?app_id=fe66c61b&amp;app_key=1d5434575274a01f383f85169791a124"/>
-        <property name="userinfoEndpoint" value="https://auth.api-test.yle.fi/v1/tokeninfo?app_id=fe66c61b&amp;app_key=1d5434575274a01f383f85169791a124"/>
+        <property name="appId" value="put_here"/>
+        <property name="appKey" value="put_here"/>
+        <property name="clientId" value="put_here"/>
+        <property name="clientSecret" value="put_here"/>
+        <property name="authorizationEndpoint" value="put_here"/>
+        <property name="tokenEndpoint" value="put_here"/>
+        <property name="userinfoEndpoint" value="put_here"/>
         <property name="scope">
          <list>
             <value>sub</value>
@@ -111,15 +111,13 @@
         </property>
     </bean>
     
-    
-    <!--  No example authentication flow is provided for this generic bean -->
     <bean id="ExampleOauth2Identity"
         class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
-        <property name="clientId" value=""/>
-        <property name="clientSecret" value=""/>
-        <property name="authorizationEndpoint" value="https://accounts.google.com/o/oauth2/auth"/>
-        <property name="tokenEndpoint" value="https://www.googleapis.com/oauth2/v3/token"/>
-        <property name="userinfoEndpoint" value="https://www.googleapis.com/oauth2/v1/userinfo"/>
+        <property name="clientId" value="put_here"/>
+        <property name="clientSecret" value="put_here"/>
+        <property name="authorizationEndpoint" value="put_here"/>
+        <property name="tokenEndpoint" value="put_here"/>
+        <property name="userinfoEndpoint" value="put_here"/>
         <property name="scope">
          <list>
             <value>profile</value>
@@ -133,21 +131,21 @@
          </map>
         </property>
     </bean>
-    
-    <!--  No example authentication flow is provided for this generic bean -->
+   
     <bean id="ExampleOpenIdConnectIdentity"
         class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
-        <property name="clientId" value=""/>
-        <property name="clientSecret" value=""/>
-        <property name="authorizationEndpoint" value=""/>
+        <property name="clientId" value="put_here"/>
+        <property name="clientSecret" value="put_here"/>
+        <property name="authorizationEndpoint" value="put_here"/>
         <property name="tokenEndpoint" value=""/>
         
         <!-- userinfo and revocation not applied yet  
-        <property name="userinfoEndpoint" value=""/>
-        <property name="revocationEndpoint" value=""/>
+        <property name="userinfoEndpoint" value="put_here"/>
+        <property name="revocationEndpoint" value="put_here"/>
         -->
        
-        <!--  oidc scope values. OPENID is set by default
+        <!--  oidc scope values. OPENID is set by default -->
+        <!--
         <property name="scope">
          <list>
             <value></value>
@@ -156,14 +154,15 @@
         -->
         
         <!-- oidc prompt value 
-        <property name="prompt" value=""/>
+        <property name="prompt" value="put_here"/>
         -->
         
         <!-- oidc display value 
-        <property name="prompt" value=""/>
+        <property name="prompt" value="put_here"/>
         -->
         
-        <!--  oidc acr values
+        <!--  oidc acr values -->
+        <!-- 
         <property name="acr">
          <list>
             <value></value>
@@ -172,6 +171,7 @@
         -->
         
         <!--  Mapping of claims to principals -->
+        
         <property name="claimsPrincipals">
          <map>
             <!--  first oidc claim is always treated also as usernameprincipal -->
@@ -185,7 +185,7 @@
          </map>
         </property>
     </bean>
-    
+     
     <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
       <property name="attributes">
           <map>
