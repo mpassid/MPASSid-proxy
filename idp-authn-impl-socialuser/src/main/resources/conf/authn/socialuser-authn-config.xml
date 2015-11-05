@@ -44,7 +44,7 @@
     
     <!-- Servlet context-relative path to wherever your implementation lives. -->
     <bean id="shibboleth.authn.SocialUserLinkedIn.externalAuthnPath" class="java.lang.String"
-        c:_0="contextRelative:Authn/SocialUser/Google">
+        c:_0="contextRelative:Authn/SocialUser/LinkedIn">
     </bean>
     
     <!-- Servlet context-relative path to wherever your implementation lives. -->
@@ -67,6 +67,8 @@
     TODO: The value here are not used. Define and apply relevant values!!
     Current version of the module does not handle error cases
     -->
+    
+    <!--  NOT USED, LEFT AS A REMIDER FOR DEVELOPMENT -->
     <util:map id="shibboleth.authn.SocialUser.ClassifiedMessageMap">
         <entry key="NoCredentials">
             <list>
