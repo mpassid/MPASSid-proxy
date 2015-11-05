@@ -35,11 +35,14 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+
 public class OpenIdConnectIdentityTest {
 
     private OpenIdConnectIdentity openIdConnectIdentity;
     private String client_id = "client_id_123";
     private String authorize_endpoint = "https://testsite123.com/authorize";
+    private String token_endpoint = "https://testsite123.com/token";
     private String auth_client_server = "mockclient.test.com";
     private String auth_client_uri = "/auth";
 
@@ -95,7 +98,30 @@ public class OpenIdConnectIdentityTest {
         }
 
     }
-
+    
+    @Test
+    public void failNoServletGetSubject() throws Exception {
+        Assert.assertNull(openIdConnectIdentity.getSubject(null));
+    }
+    
+    @Test
+    public void failsNoReturnParamatersNoEndpointsGetSubject() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = getRequest();
+        Assert.assertNull(openIdConnectIdentity.getSubject(mockHttpServletRequest));
+    }
+    
+    @Test
+    public void failsAuthenticationErrorGetSubject() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = getRequest();
+        mockHttpServletRequest.setQueryString("error=invalid_request");
+        openIdConnectIdentity.setTokenEndpoint(token_endpoint);
+        try {
+            openIdConnectIdentity.getSubject(mockHttpServletRequest);
+        }catch(SocialRedirectAuthenticationException e){
+            Assert.assertEquals(e.getMessage(),"invalid_request");    
+        }
+    }
+    
     private MockHttpServletRequest getRequest() {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         mockHttpServletRequest.setProtocol("https");
