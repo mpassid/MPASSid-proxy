@@ -186,6 +186,10 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     public Subject getSubject(HttpServletRequest httpRequest)
             throws SocialRedirectAuthenticationException {
         log.trace("Entering");
+        if (httpRequest == null) {
+            log.trace("Leaving");
+            return null;
+        }
         TokenRequest request = getTokenRequest(httpRequest);
         if (request == null) {
             log.debug("User is not authenticated yet");
