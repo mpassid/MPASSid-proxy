@@ -35,6 +35,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.nimbusds.oauth2.sdk.id.State;
+
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
 
 public class OpenIdConnectIdentityTest {
@@ -121,6 +123,38 @@ public class OpenIdConnectIdentityTest {
             Assert.assertEquals(e.getMessage(),"invalid_request");    
         }
     }
+    
+    @Test
+    public void failsAuthenticationNoStateGetSubject() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = getRequest();
+        mockHttpServletRequest.setQueryString("code=1234abcd");
+        openIdConnectIdentity.setTokenEndpoint(token_endpoint);
+        mockHttpServletRequest.getSession().setAttribute("fi.okm.mpass.state", new State("234abcd"));
+        openIdConnectIdentity.setClientId("oauth2ClientId");
+        openIdConnectIdentity.setClientSecret("oauth2ClientSecret");
+        try {
+            openIdConnectIdentity.getSubject(mockHttpServletRequest);
+        }catch(SocialRedirectAuthenticationException e){
+            Assert.assertEquals(e.getMessage(),"State parameter not satisfied");    
+        }
+        
+    }
+
+    @Test
+    public void failsAuthenticationStateMismatchGetSubject() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = getRequest();
+        mockHttpServletRequest.setQueryString("code=1234abcd&state=1234abcd");
+        mockHttpServletRequest.getSession().setAttribute("fi.okm.mpass.state", new State("234abcd"));
+        openIdConnectIdentity.setTokenEndpoint(token_endpoint);
+        openIdConnectIdentity.setClientId("oauth2ClientId");
+        openIdConnectIdentity.setClientSecret("oauth2ClientSecret");
+        try {
+            openIdConnectIdentity.getSubject(mockHttpServletRequest);
+        }catch(SocialRedirectAuthenticationException e){
+            Assert.assertEquals(e.getMessage(),"State parameter not satisfied");    
+        }
+    }
+
     
     private MockHttpServletRequest getRequest() {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
