@@ -76,7 +76,7 @@ public class ExtractAuthenticationFlowDecisionTest extends PopulateAuthenticatio
     public void testValid() {
         ((MockHttpServletRequest) action.getHttpServletRequest()).addParameter(authnFlowField, authnFlowDecision);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertProceedEvent(event);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.RESELECT_FLOW);
         AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
         Assert.assertNotNull(authCtx);
         Assert.assertEquals(authCtx.getSignaledFlowId(), authnFlowDecision);

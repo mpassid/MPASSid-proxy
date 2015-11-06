@@ -90,5 +90,6 @@ public class ExtractAuthenticationFlowDecision extends AbstractExtractionAction 
         }
         log.debug("{} User selected authnFlow {}", getLogPrefix(), authnFlow);
         authenticationContext.setSignaledFlowId(authnFlow);
+        ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.RESELECT_FLOW);
     }   
 }
