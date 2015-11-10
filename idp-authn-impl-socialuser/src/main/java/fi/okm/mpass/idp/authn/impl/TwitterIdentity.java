@@ -62,6 +62,20 @@ public class TwitterIdentity extends AbstractSpringSocialOAuthIdentity
         }
         log.trace("Leaving");
     }
+    
+    /**
+     * Returns redirect url for authentication.
+     * 
+     * @param httpRequest
+     *            the request
+     * 
+     * @return redirect url
+     */
+    public String getRedirectUrl(HttpServletRequest httpRequest){
+        String url=super.getRedirectUrl(httpRequest);
+        Boolean isForced=(Boolean)httpRequest.getAttribute("forceAuthn");
+        return isForced?url+"&force_login=true":url;
+    }
 
     /*
      * (non-Javadoc)
