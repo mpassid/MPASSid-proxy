@@ -54,11 +54,11 @@
         class="fi.okm.mpass.idp.authn.impl.SocialIdentityFactory" scope="prototype"> 
         <property name="socialImplBeans">
        	 <map>
-            <entry key="/Facebook" value-ref="FacebookIdentity"/>
-            <entry key="/Twitter" value-ref="TwitterIdentity"/>
-            <entry key="/Google" value-ref="GoogleIdentity"/>
-            <entry key="/LinkedIn" value-ref="LinkedInIdentity"/>
-            <entry key="/Yle" value-ref="OAuth2YleIdentity"/>
+            <entry key="/idp/Authn/SocialUser/Facebook" value-ref="FacebookIdentity"/>
+            <entry key="/idp/Authn/SocialUser/Twitter" value-ref="TwitterIdentity"/>
+            <entry key="/idp/Authn/SocialUser/Google" value-ref="GoogleIdentity"/>
+            <entry key="/idp/Authn/SocialUser/LinkedIn" value-ref="LinkedInIdentity"/>
+            <entry key="/idp/Authn/SocialUser/Yle" value-ref="OAuth2YleIdentity"/>
          </map>
         </property>
     </bean>
