@@ -136,6 +136,7 @@ public class RestDataConnector extends AbstractDataConnector {
 
         try {
             final HttpClient httpClient = getHttpClientBuilder().buildClient();
+            log.debug("Calling URL {}", attributeCallUrl);
             final HttpGet getMethod = new HttpGet(attributeCallUrl);
             final HttpContext context = HttpClientContext.create();
             getMethod.addHeader("Authorization", "Token " + token);
@@ -144,9 +145,11 @@ public class RestDataConnector extends AbstractDataConnector {
             restEntity = restResponse.getEntity();
 
             log.debug("Response code from Proxy HTTP " + status);
+            final String restResponseStr = EntityUtils.toString(restEntity);
+            log.trace("Response {}", restResponseStr);
             if (status == HttpStatus.SC_OK) {
                 final Gson gson = new Gson();
-                final UserDTO ecaUser = gson.fromJson(EntityUtils.toString(restEntity), UserDTO.class);
+                final UserDTO ecaUser = gson.fromJson(restResponseStr, UserDTO.class);
                 log.debug("Username found? {}", ecaUser.getUsername() != null);
                 final IdPAttribute idpAttribute = new IdPAttribute(resultAttribute);
                 final List<IdPAttributeValue<String>> values = new ArrayList<>();
@@ -155,7 +158,6 @@ public class RestDataConnector extends AbstractDataConnector {
                 attributes.put(resultAttribute, idpAttribute);
                 log.debug("OID successfully inserted into the attributes");
             } else {
-                log.trace("Response {}", EntityUtils.toString(restEntity));
                 log.warn("No attributes found for session, http status {}", status);
             }
         } catch (Exception e) {
