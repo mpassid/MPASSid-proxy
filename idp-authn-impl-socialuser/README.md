@@ -38,9 +38,9 @@ The copied flows/beans will not work unless you configure them:
 
 ```
 <bean id="authn/SocialUserTwitter" parent="shibboleth.AuthenticationFlow"
-            p:nonBrowserSupported="false" />
+            p:nonBrowserSupported="false" p:forcedAuthenticationSupported="true"/>
 <bean id="authn/SocialUserFacebook" parent="shibboleth.AuthenticationFlow"
-            p:nonBrowserSupported="false" />       
+            p:nonBrowserSupported="false" p:forcedAuthenticationSupported="true"/>       
 <bean id="authn/SocialUserGoogle" parent="shibboleth.AuthenticationFlow"
             p:nonBrowserSupported="false" />
 <bean id="authn/SocialUserLinkedIn" parent="shibboleth.AuthenticationFlow"
