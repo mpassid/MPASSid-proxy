@@ -45,6 +45,9 @@ THE SOFTWARE.
             <includes>
                 <include>*.jar</include>
             </includes>
+            <excludes>
+                <exclude>*-tests.jar</exclude>
+            </excludes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
     </fileSets>
