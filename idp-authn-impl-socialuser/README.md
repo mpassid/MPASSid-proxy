@@ -2,7 +2,47 @@
 
 ## Overview
 
-This module contains implementations of Facebook, Google, LinkedIn and Twitter user authentications for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home).
+This module contains implementations of Facebook, Google, LinkedIn, Twitter, Yle, OAuth2 and OpenID Connect authentication modules for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home).
+
+## Authentication modules
+
+### Authentication concerns
+- By their very nature, these modules do create (if not pre-existing) a authenticated session not only to IdP but also to the social identity provider. Logging out of SP or IdP does not logout user from the social identity provider. 
+- Not all of these modules support forced authentication. We hope to add that to as many as we can. The case of not using forced authentication combined with a browser shared by many is problematic. In such cases users must be instructed to use private browsing and to close that browser in the end. 
+
+### Spring Social modules
+There are four modules implemented using Spring Social.  
+
+#### Facebook
+- Template for bean definition in socialuser-authn-beans.xml: FacebookIdentity
+- This module supports forced authentication.
+
+#### Google
+- Template for bean definition in socialuser-authn-beans.xml: GoogleIdentity
+- This module does not support forced authentication.
+
+#### LinkedIn
+- Template for bean definition in socialuser-authn-beans.xml: LinkedInIdentity
+- This module does not support forced authentication.
+
+#### Twitter
+- Template for bean definition in socialuser-authn-beans.xml: TwitterIdentity
+- This module supports forced authentication.
+
+### Nimbus modules
+There are three modules implemented using Nimbus OAuth2 SDK.  
+
+#### OAuth2 
+- Template for bean definition in socialuser-authn-beans.xml: ExampleOauth2Identity
+- This module does not support forced authentication by default.
+
+#### OpenID Connect
+- Template for bean definition in socialuser-authn-beans.xml: ExampleOpenIdConnectIdentity
+- This module does not support forced authentication by default.
+
+#### Yle (Finnish Broadcasting Company)
+- Template for bean definition in socialuser-authn-beans.xml: OAuth2YleIdentity
+- This module does not support forced authentication.
 
 ## Prequisities and compilation
 
