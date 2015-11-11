@@ -35,6 +35,11 @@ THE SOFTWARE.
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources/views</directory>
+            <outputDirectory>views</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}</directory>
             <outputDirectory>edit-webapp/WEB-INF/lib</outputDirectory>
             <includes>
