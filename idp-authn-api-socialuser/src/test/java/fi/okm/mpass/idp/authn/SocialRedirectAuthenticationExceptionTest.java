@@ -26,7 +26,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * Unit tests for {@link SocialRedirectAuthenticationException}.
+ * Unit tests for {@link SocialUserAuthenticationException}.
  */
 public class SocialRedirectAuthenticationExceptionTest {
 
@@ -35,20 +35,20 @@ public class SocialRedirectAuthenticationExceptionTest {
      */
     @Test public void testExceptionParameters() {
         try {
-            throw new SocialRedirectAuthenticationException(null, null);
-        } catch (SocialRedirectAuthenticationException e) {
+            throw new SocialUserAuthenticationException(null, null);
+        } catch (SocialUserAuthenticationException e) {
             Assert.assertNull(e.getMessage());
             Assert.assertNull(e.getAuthEventId());
         }
         try {
-            throw new SocialRedirectAuthenticationException("", "");
-        } catch (SocialRedirectAuthenticationException e) {
+            throw new SocialUserAuthenticationException("", "");
+        } catch (SocialUserAuthenticationException e) {
             Assert.assertEquals(e.getMessage(),"");
             Assert.assertEquals(e.getAuthEventId(),"");
         }
         try {
-            throw new SocialRedirectAuthenticationException("description", "event");
-        } catch (SocialRedirectAuthenticationException e) {
+            throw new SocialUserAuthenticationException("description", "event");
+        } catch (SocialUserAuthenticationException e) {
             Assert.assertEquals(e.getMessage(),"description");
             Assert.assertEquals(e.getAuthEventId(),"event");
         }
