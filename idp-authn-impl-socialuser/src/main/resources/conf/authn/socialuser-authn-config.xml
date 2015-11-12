@@ -70,29 +70,9 @@
     
     <!--  NOT USED, LEFT AS A REMIDER FOR DEVELOPMENT -->
     <util:map id="shibboleth.authn.SocialUser.ClassifiedMessageMap">
-        <entry key="NoCredentials">
+        <entry key="AuthenticationException">
             <list>
-                <value>ReselectFlow</value>
-            </list>
-        </entry>
-        <entry key="UnknownUsername">
-            <list>
-                <value>UnknownUsername</value>
-            </list>
-        </entry>
-        <entry key="InvalidPassword">
-            <list>
-                <value>InvalidPassword</value>
-            </list>
-        </entry>
-        <entry key="ExpiredPassword">
-            <list>
-                <value>ExpiredPassword</value>
-            </list>
-        </entry>
-        <entry key="ExpiringPassword">
-            <list>
-                <value>ExpiringPassword</value>
+                <value>Exception</value>
             </list>
         </entry>
     </util:map>
