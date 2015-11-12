@@ -36,5 +36,9 @@ public final class SocialUserErrorIds {
      * Generic ID for exception thrown. 
      */
     @Nonnull @NotEmpty public static final String EXCEPTION = "Exception";
+    /**
+     * Generic ID for user canceling the authentication. 
+     */
+    @Nonnull @NotEmpty public static final String USER_CANCELED = "UserCanceled";
     
 }
