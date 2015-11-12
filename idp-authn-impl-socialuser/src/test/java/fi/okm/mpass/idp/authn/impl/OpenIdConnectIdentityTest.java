@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 
 import com.nimbusds.oauth2.sdk.id.State;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 
 public class OpenIdConnectIdentityTest {
 
@@ -119,7 +119,7 @@ public class OpenIdConnectIdentityTest {
         openIdConnectIdentity.setTokenEndpoint(token_endpoint);
         try {
             openIdConnectIdentity.getSubject(mockHttpServletRequest);
-        }catch(SocialRedirectAuthenticationException e){
+        }catch(SocialUserAuthenticationException e){
             Assert.assertEquals(e.getMessage(),"invalid_request");    
         }
     }
@@ -134,7 +134,7 @@ public class OpenIdConnectIdentityTest {
         openIdConnectIdentity.setClientSecret("oauth2ClientSecret");
         try {
             openIdConnectIdentity.getSubject(mockHttpServletRequest);
-        }catch(SocialRedirectAuthenticationException e){
+        }catch(SocialUserAuthenticationException e){
             Assert.assertEquals(e.getMessage(),"State parameter not satisfied");    
         }
         
@@ -150,7 +150,7 @@ public class OpenIdConnectIdentityTest {
         openIdConnectIdentity.setClientSecret("oauth2ClientSecret");
         try {
             openIdConnectIdentity.getSubject(mockHttpServletRequest);
-        }catch(SocialRedirectAuthenticationException e){
+        }catch(SocialUserAuthenticationException e){
             Assert.assertEquals(e.getMessage(),"State parameter not satisfied");    
         }
     }
