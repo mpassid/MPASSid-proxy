@@ -59,20 +59,17 @@
     Define entries here to map error messages returned by external modules and classify them as particular
     kinds of errors for use in your templates and as events in flows.
     
-    The examples here just allow external signaling of an exact condition.
-    
-    If you want to "fall-through" to other login flows, include a mapping to "ReselectFlow".
-    
-    
-    TODO: The value here are not used. Define and apply relevant values!!
-    Current version of the module does not handle error cases
     -->
     
-    <!--  NOT USED, LEFT AS A REMIDER FOR DEVELOPMENT -->
     <util:map id="shibboleth.authn.SocialUser.ClassifiedMessageMap">
         <entry key="AuthenticationException">
             <list>
                 <value>Exception</value>
+            </list>
+        </entry>
+        <entry key="ReselectFlow">
+            <list>
+                <value>UserCanceled</value>
             </list>
         </entry>
     </util:map>
