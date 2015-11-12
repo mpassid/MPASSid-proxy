@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
-import net.shibboleth.idp.authn.AuthnEventIds;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 /**
  * Extracts Social identity and places it in a request attribute to be used by
@@ -85,7 +85,7 @@ public class SocialUserAuthServlet extends HttpServlet {
                 // Authentication not possible, use some other flow;
                 httpRequest.setAttribute(
                         ExternalAuthentication.AUTHENTICATION_ERROR_KEY,
-                        AuthnEventIds.AUTHN_EXCEPTION);
+                        SocialUserErrorIds.EXCEPTION);
                 ExternalAuthentication.finishExternalAuthentication(
                         getAuthenticationKey(httpRequest), httpRequest,
                         httpResponse);

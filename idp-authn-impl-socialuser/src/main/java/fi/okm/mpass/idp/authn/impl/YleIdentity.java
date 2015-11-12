@@ -33,14 +33,13 @@ import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
-import net.shibboleth.idp.authn.AuthnEventIds;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
@@ -163,7 +162,7 @@ public class YleIdentity extends OAuth2Identity implements
                 log.error("error:" + error);
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(error,
-                        AuthnEventIds.AUTHN_EXCEPTION);
+                        SocialUserErrorIds.EXCEPTION);
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
             // Get the access token, the server may also return a refresh token
@@ -188,7 +187,7 @@ public class YleIdentity extends OAuth2Identity implements
                     log.error("error parsing userinfo endpoint");
                     log.trace("Leaving");
                     throw new SocialUserAuthenticationException(
-                            e.getMessage(), AuthnEventIds.AUTHN_EXCEPTION);
+                            e.getMessage(), SocialUserErrorIds.EXCEPTION);
                 }
             }
             addDefaultPrincipals(subject);
@@ -200,7 +199,7 @@ public class YleIdentity extends OAuth2Identity implements
             log.error(e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
 
     }

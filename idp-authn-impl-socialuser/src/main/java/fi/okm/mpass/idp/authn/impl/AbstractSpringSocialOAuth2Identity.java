@@ -37,8 +37,9 @@ import org.springframework.social.oauth2.GrantType;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.web.client.HttpClientErrorException;
+
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
-import net.shibboleth.idp.authn.AuthnEventIds;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 /** Implements methods common to Oauth2 types. */
 public abstract class AbstractSpringSocialOAuth2Identity extends
@@ -171,7 +172,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         if (state == null) {
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
-                    "State parameter missing", AuthnEventIds.AUTHN_EXCEPTION);
+                    "State parameter missing", SocialUserErrorIds.EXCEPTION);
         }
         MessageDigest md;
         try {
@@ -182,7 +183,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "Unable to hash, use some other method",
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
         md.reset();
         md.update(httpRequest.getSession().getId().getBytes());
@@ -191,7 +192,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             log.error("state parameter mismatch");
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
-                    "State parameter mismatch", AuthnEventIds.AUTHN_EXCEPTION);
+                    "State parameter mismatch", SocialUserErrorIds.EXCEPTION);
         }
     }
 
@@ -208,28 +209,28 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         String error = httpRequest.getParameter("error");
         if (error != null && !error.isEmpty()) {
             log.trace("Leaving");
-            String event = AuthnEventIds.AUTHN_EXCEPTION;
+            String event = SocialUserErrorIds.EXCEPTION;
             switch (error) {
             case "invalid_request":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "unauthorized_client":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "access_denied":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "unsupported_response_type":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "invalid_scope":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "server_error":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             case "temporarily_unavailable":
-                event = AuthnEventIds.AUTHN_EXCEPTION;
+                event = SocialUserErrorIds.EXCEPTION;
                 break;
             }
             String errorDescription = httpRequest
@@ -268,7 +269,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         } catch (HttpClientErrorException e) {
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
         log.trace("Leaving");
         return accessGrant;

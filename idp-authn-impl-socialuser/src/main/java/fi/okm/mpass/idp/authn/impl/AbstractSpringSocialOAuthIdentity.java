@@ -25,7 +25,6 @@ package fi.okm.mpass.idp.authn.impl;
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
-import net.shibboleth.idp.authn.AuthnEventIds;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,7 @@ import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 /** Implements methods common to OAuth(1) types. */
 public abstract class AbstractSpringSocialOAuthIdentity extends
@@ -150,7 +150,7 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
         if (denied != null && !denied.isEmpty()) {
             log.trace("Leaving");
             throw new SocialUserAuthenticationException("user denied",
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
         OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
                 .getAttribute("ext_auth_request_token");

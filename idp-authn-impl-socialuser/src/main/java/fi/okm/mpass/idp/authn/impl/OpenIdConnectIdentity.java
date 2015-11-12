@@ -33,7 +33,6 @@ import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
-import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 
 import org.slf4j.Logger;
@@ -41,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
 
@@ -206,7 +206,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(
                         "access token response error",
-                        AuthnEventIds.AUTHN_EXCEPTION);
+                        SocialUserErrorIds.EXCEPTION);
             }
             boolean first = true;
             for (Map.Entry<String, String> entry : getClaimsPrincipals()
@@ -231,7 +231,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             e.printStackTrace();
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
         log.trace("Leaving");
         return subject;

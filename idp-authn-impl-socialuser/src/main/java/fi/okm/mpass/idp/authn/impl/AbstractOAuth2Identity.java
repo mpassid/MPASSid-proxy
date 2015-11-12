@@ -34,7 +34,6 @@ import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
 import net.minidev.json.JSONObject;
-import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 
 import org.slf4j.Logger;
@@ -57,6 +56,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 
 /** Implements OAuth2/OpenId basics for classes using Nimbus library. */
@@ -326,7 +326,7 @@ public abstract class AbstractOAuth2Identity {
                 }
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(error,
-                        AuthnEventIds.AUTHN_EXCEPTION);
+                        SocialUserErrorIds.EXCEPTION);
             }
             AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) response;
             AuthorizationCode code = successResponse.getAuthorizationCode();
@@ -342,7 +342,7 @@ public abstract class AbstractOAuth2Identity {
             if (state == null || !state.equals(successResponse.getState())) {
                 throw new SocialUserAuthenticationException(
                         "State parameter not satisfied",
-                        AuthnEventIds.AUTHN_EXCEPTION);
+                        SocialUserErrorIds.EXCEPTION);
             }
             return request;
         } catch (IllegalArgumentException e) {
@@ -354,7 +354,7 @@ public abstract class AbstractOAuth2Identity {
             e.printStackTrace();
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
-                    AuthnEventIds.AUTHN_EXCEPTION);
+                    SocialUserErrorIds.EXCEPTION);
         }
     }
 
