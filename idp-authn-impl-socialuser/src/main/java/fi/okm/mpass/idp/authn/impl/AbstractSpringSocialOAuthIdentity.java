@@ -34,7 +34,7 @@ import org.springframework.social.oauth1.OAuth1Operations;
 import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 
 /** Implements methods common to OAuth(1) types. */
 public abstract class AbstractSpringSocialOAuthIdentity extends
@@ -143,13 +143,13 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
      * @throws SocialRedirectAuthenticationException
      */
     private OAuthToken getRequestToken(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         // Is this twitter specific
         String denied = httpRequest.getParameter("denied");
         if (denied != null && !denied.isEmpty()) {
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException("user denied",
+            throw new SocialUserAuthenticationException("user denied",
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
         OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
@@ -165,10 +165,10 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
      *            the request
      * 
      * @return Access Token
-     * @throws SocialRedirectAuthenticationException
+     * @throws SocialUserAuthenticationException
      */
     public OAuthToken getAccessToken(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         OAuthToken accessToken = null;
         try {

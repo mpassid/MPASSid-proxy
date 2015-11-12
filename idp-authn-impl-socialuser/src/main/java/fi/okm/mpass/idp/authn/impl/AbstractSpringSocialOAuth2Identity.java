@@ -37,7 +37,7 @@ import org.springframework.social.oauth2.GrantType;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.web.client.HttpClientErrorException;
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import net.shibboleth.idp.authn.AuthnEventIds;
 
 /** Implements methods common to Oauth2 types. */
@@ -165,12 +165,12 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
 
     /* Throws an error if state parameter is not the expected one */
     private void validateState(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         String state = httpRequest.getParameter("state");
         if (state == null) {
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
+            throw new SocialUserAuthenticationException(
                     "State parameter missing", AuthnEventIds.AUTHN_EXCEPTION);
         }
         MessageDigest md;
@@ -180,7 +180,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             log.error("Unable to generate state");
             e.printStackTrace();
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
+            throw new SocialUserAuthenticationException(
                     "Unable to hash, use some other method",
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
@@ -190,7 +190,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         if (!state.equalsIgnoreCase(cmpState)) {
             log.error("state parameter mismatch");
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(
+            throw new SocialUserAuthenticationException(
                     "State parameter mismatch", AuthnEventIds.AUTHN_EXCEPTION);
         }
     }
@@ -203,7 +203,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @throws SocialRedirectAuthenticationException
      */
     private String getAuthorizationCode(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         String error = httpRequest.getParameter("error");
         if (error != null && !error.isEmpty()) {
@@ -238,7 +238,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
                 error += " : " + errorDescription;
             }
             log.debug("Authentication failed: " + error);
-            throw new SocialRedirectAuthenticationException(error, event);
+            throw new SocialUserAuthenticationException(error, event);
         }
         String authorizationCode = httpRequest.getParameter("code");
         log.trace("Leaving");
@@ -251,10 +251,10 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @param httpRequest
      *            the request
      * @return Access Grant
-     * @throws SocialRedirectAuthenticationException
+     * @throws SocialUserAuthenticationException
      */
     public AccessGrant getAccessGrant(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         AccessGrant accessGrant = null;
         try {
@@ -267,7 +267,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
                     httpRequest.getRequestURL().toString(), null);
         } catch (HttpClientErrorException e) {
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(e.getMessage(),
+            throw new SocialUserAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
         log.trace("Leaving");

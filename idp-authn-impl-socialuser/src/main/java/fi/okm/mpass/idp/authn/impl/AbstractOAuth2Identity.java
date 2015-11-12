@@ -56,7 +56,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 
 /** Implements OAuth2/OpenId basics for classes using Nimbus library. */
@@ -304,10 +304,10 @@ public abstract class AbstractOAuth2Identity {
      * @param httpRequest
      *            the request back from the oauth2 server
      * @return returns token request
-     * @throws SocialRedirectAuthenticationException
+     * @throws SocialUserAuthenticationException
      */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         try {
             AuthenticationResponse response = null;
@@ -325,7 +325,7 @@ public abstract class AbstractOAuth2Identity {
                     error += " : " + errorDescription;
                 }
                 log.trace("Leaving");
-                throw new SocialRedirectAuthenticationException(error,
+                throw new SocialUserAuthenticationException(error,
                         AuthnEventIds.AUTHN_EXCEPTION);
             }
             AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) response;
@@ -340,7 +340,7 @@ public abstract class AbstractOAuth2Identity {
             State state = (State) httpRequest.getSession().getAttribute(
                     "fi.okm.mpass.state");
             if (state == null || !state.equals(successResponse.getState())) {
-                throw new SocialRedirectAuthenticationException(
+                throw new SocialUserAuthenticationException(
                         "State parameter not satisfied",
                         AuthnEventIds.AUTHN_EXCEPTION);
             }
@@ -353,7 +353,7 @@ public abstract class AbstractOAuth2Identity {
         } catch (URISyntaxException | ParseException e) {
             e.printStackTrace();
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(e.getMessage(),
+            throw new SocialUserAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
     }

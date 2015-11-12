@@ -39,7 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 import com.nimbusds.jose.util.JSONObjectUtils;
@@ -129,7 +129,7 @@ public class YleIdentity extends OAuth2Identity implements
 
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         try {
             TokenRequest request = getTokenRequest(httpRequest);
@@ -162,7 +162,7 @@ public class YleIdentity extends OAuth2Identity implements
                 }
                 log.error("error:" + error);
                 log.trace("Leaving");
-                throw new SocialRedirectAuthenticationException(error,
+                throw new SocialUserAuthenticationException(error,
                         AuthnEventIds.AUTHN_EXCEPTION);
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
@@ -187,7 +187,7 @@ public class YleIdentity extends OAuth2Identity implements
                 } catch (java.text.ParseException e) {
                     log.error("error parsing userinfo endpoint");
                     log.trace("Leaving");
-                    throw new SocialRedirectAuthenticationException(
+                    throw new SocialUserAuthenticationException(
                             e.getMessage(), AuthnEventIds.AUTHN_EXCEPTION);
                 }
             }
@@ -199,7 +199,7 @@ public class YleIdentity extends OAuth2Identity implements
             e.printStackTrace();
             log.error(e.getMessage());
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(e.getMessage(),
+            throw new SocialUserAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
 

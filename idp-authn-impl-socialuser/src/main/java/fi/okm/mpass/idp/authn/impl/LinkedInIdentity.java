@@ -33,7 +33,7 @@ import org.springframework.social.linkedin.api.LinkedIn;
 import org.springframework.social.linkedin.connect.LinkedInConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 
 /** Implements LnkdN authentication. */
@@ -69,7 +69,7 @@ public class LinkedInIdentity extends AbstractSpringSocialOAuth2Identity
      */
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         AccessGrant accessGrant = null;
         accessGrant = getAccessGrant(httpRequest);

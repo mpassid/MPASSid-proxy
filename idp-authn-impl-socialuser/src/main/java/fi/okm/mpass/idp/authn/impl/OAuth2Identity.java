@@ -35,7 +35,7 @@ import net.shibboleth.idp.authn.AuthnEventIds;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
@@ -92,7 +92,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
 
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         try {
             TokenRequest request = getTokenRequest(httpRequest);
@@ -113,7 +113,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 }
                 log.error("error:" + error);
                 log.trace("Leaving");
-                throw new SocialRedirectAuthenticationException(error,
+                throw new SocialUserAuthenticationException(error,
                         AuthnEventIds.AUTHN_EXCEPTION);
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
@@ -138,7 +138,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 } catch (java.text.ParseException e) {
                     log.error("error parsing userinfo endpoint");
                     log.trace("Leaving");
-                    throw new SocialRedirectAuthenticationException(
+                    throw new SocialUserAuthenticationException(
                             e.getMessage(), AuthnEventIds.AUTHN_EXCEPTION);
                 }
             }
@@ -149,7 +149,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 | ParseException e) {
             e.printStackTrace();
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(e.getMessage(),
+            throw new SocialUserAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
 

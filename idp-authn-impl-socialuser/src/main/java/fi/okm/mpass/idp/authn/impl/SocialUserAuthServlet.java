@@ -39,7 +39,7 @@ import net.shibboleth.idp.authn.ExternalAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 import net.shibboleth.idp.authn.AuthnEventIds;
 
@@ -95,7 +95,7 @@ public class SocialUserAuthServlet extends HttpServlet {
             Subject subject;
             try {
                 subject = socialRedirectAuthenticator.getSubject(httpRequest);
-            } catch (SocialRedirectAuthenticationException e) {
+            } catch (SocialUserAuthenticationException e) {
                 // Authentication has been interrupted;
                 httpRequest.setAttribute(
                         ExternalAuthentication.AUTHENTICATION_ERROR_KEY,

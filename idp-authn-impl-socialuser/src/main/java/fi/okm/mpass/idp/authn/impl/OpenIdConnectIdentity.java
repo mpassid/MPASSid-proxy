@@ -39,7 +39,7 @@ import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.idp.authn.SocialRedirectAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
@@ -184,7 +184,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
 
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException {
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         if (httpRequest == null) {
             log.trace("Leaving");
@@ -204,7 +204,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                     .parse(request.toHTTPRequest().send());
             if (!oidcAccessTokenResponse.indicatesSuccess()) {
                 log.trace("Leaving");
-                throw new SocialRedirectAuthenticationException(
+                throw new SocialUserAuthenticationException(
                         "access token response error",
                         AuthnEventIds.AUTHN_EXCEPTION);
             }
@@ -230,7 +230,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                 | ParseException e) {
             e.printStackTrace();
             log.trace("Leaving");
-            throw new SocialRedirectAuthenticationException(e.getMessage(),
+            throw new SocialUserAuthenticationException(e.getMessage(),
                     AuthnEventIds.AUTHN_EXCEPTION);
         }
         log.trace("Leaving");
