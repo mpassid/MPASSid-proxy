@@ -51,10 +51,10 @@ public interface SocialRedirectAuthenticator {
      *            the request
      * 
      * @return The user subject. If null, user is not authenticated.
-     * @throws SocialRedirectAuthenticationException
+     * @throws SocialUserAuthenticationException
      *             if authentication sequence is not successful
      */
     public abstract Subject getSubject(HttpServletRequest httpRequest)
-            throws SocialRedirectAuthenticationException;
+            throws SocialUserAuthenticationException;
 
 }
