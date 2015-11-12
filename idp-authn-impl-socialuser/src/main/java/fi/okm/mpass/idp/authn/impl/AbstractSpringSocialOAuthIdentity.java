@@ -150,7 +150,7 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
         if (denied != null && !denied.isEmpty()) {
             log.trace("Leaving");
             throw new SocialUserAuthenticationException("user denied",
-                    SocialUserErrorIds.EXCEPTION);
+                    SocialUserErrorIds.USER_CANCELED);
         }
         OAuthToken requestToken = (OAuthToken) httpRequest.getSession()
                 .getAttribute("ext_auth_request_token");
