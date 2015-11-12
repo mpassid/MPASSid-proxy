@@ -69,7 +69,6 @@
         <dependency>
           <groupId>com.nimbusds</groupId>
           <artifactId>oauth2-oidc-sdk</artifactId>
-          <version>4.16.1</version>
         </dependency>
         
         <!-- Test Dependencies, add to parent POM -->
