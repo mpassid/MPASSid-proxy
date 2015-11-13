@@ -135,12 +135,15 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
         return authorizeUrl;
     }
 
-    /*
-     * Throws an error if user authentication has failed Returns Authorization
-     * Code if such exists Returns null if authentication has not been performed
-     * yet
+    /**
+     * Throws an error if user authentication has failed. Returns Authorization
+     * Code if such exists. Returns null if authentication has not been performed
+     * yet.
      * 
-     * @throws SocialRedirectAuthenticationException
+     * @param httpRequest is the request.
+     * 
+     * @return request token or null.
+     * @throws SocialUserAuthenticationException if user has canceled the operation.
      */
     private OAuthToken getRequestToken(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
@@ -165,7 +168,7 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
      *            the request
      * 
      * @return Access Token
-     * @throws SocialUserAuthenticationException
+     * @throws SocialUserAuthenticationException Id token fetch fails due to other reason than user not already having authorized.
      */
     public OAuthToken getAccessToken(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

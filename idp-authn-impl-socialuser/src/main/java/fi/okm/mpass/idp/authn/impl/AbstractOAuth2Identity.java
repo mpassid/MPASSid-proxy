@@ -169,7 +169,7 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            AuthorizationEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     public void setAuthorizationEndpoint(String endPoint)
             throws URISyntaxException {
@@ -192,7 +192,7 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            TokenEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     public void setTokenEndpoint(String endPoint) throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -203,7 +203,7 @@ public abstract class AbstractOAuth2Identity {
      * Getter for token endpoint.
      * 
      * @return TokenEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     protected URI getTokenEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -215,7 +215,7 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            UserinfoEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     public void setUserinfoEndpoint(String endPoint) throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -226,7 +226,7 @@ public abstract class AbstractOAuth2Identity {
      * Getter for userinfo endpoint.
      * 
      * @return UserinfoEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     protected URI getUserinfoEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -238,7 +238,7 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            RevocationEndpoint
-     * @throws URISyntaxException
+     * @throws URISyntaxException If the endpoint is not valid.
      */
     public void setRevocationEndpoint(String endPoint)
             throws URISyntaxException {
@@ -303,8 +303,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param httpRequest
      *            the request back from the oauth2 server
-     * @return returns token request
-     * @throws SocialUserAuthenticationException
+     * @return returns token request or null if the user has not authorized yet.
+     * @throws SocialUserAuthenticationException If tokenrequest fails to other than non-authorization reason.
      */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

@@ -208,6 +208,8 @@ public class YleIdentity extends OAuth2Identity implements
      * Yle authorize server is behind gateway requiring own set of keys as query
      * parameters.
      * 
+     * @return Yle specific addition to redirect url.
+     * 
      */
     private String getYleGatewayCredentialsTrail() {
         return "&app_id=" + appId + "&app_key=" + appKey;
@@ -216,6 +218,7 @@ public class YleIdentity extends OAuth2Identity implements
     /**
      * Yle authorize server insists on having credentials as query parameters.
      * 
+     * @return Yle specific addition to redirect url.
      */
     private String getClientCredentialsTrail() {
         return "&client_id=" + getClientId().getValue() + "&client_secret="

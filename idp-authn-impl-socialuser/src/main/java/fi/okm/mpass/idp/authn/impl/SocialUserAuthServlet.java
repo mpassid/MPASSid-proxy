@@ -129,7 +129,12 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
     }
 
-    /* Returns authentication key. Starts the sequence */
+    /** Returns authentication key. Starts the sequence 
+     * 
+     * @param httpRequest to store the authentication start
+     * 
+     * @throws ExternalAuthenticationException if method fails
+     * */
     private void startAuthentication(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
         log.trace("Entering");
@@ -139,7 +144,13 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
     }
 
-    /* Returns authentication key. Starts the sequence if not already started */
+    /** Returns authentication key. Starts the sequence if not already started 
+     * 
+     * @param httpRequest to store the authentication start or read it.
+     * 
+     * @return authentication key
+     * @throws ExternalAuthenticationException if method fails
+     * */
     private String getAuthenticationKey(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
         log.trace("Entering");
