@@ -68,6 +68,16 @@
         <dependency>
           <groupId>com.nimbusds</groupId>
           <artifactId>oauth2-oidc-sdk</artifactId>
+          <exclusions>
+              <exclusion>
+                  <artifactId>nimbus-jose-jwt</artifactId>
+                  <groupId>com.nimbusds</groupId>
+              </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>com.nimbusds</groupId>
+          <artifactId>nimbus-jose-jwt</artifactId>
         </dependency>
         
         <!-- Test Dependencies, add to parent POM -->
