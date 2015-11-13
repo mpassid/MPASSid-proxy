@@ -41,4 +41,8 @@ public final class SocialUserErrorIds {
      */
     @Nonnull @NotEmpty public static final String USER_CANCELED = "UserCanceled";
     
+    private SocialUserErrorIds(){
+        
+    };
+    
 }

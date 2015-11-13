@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class SocialUserAuthenticationException extends Exception {
 
     /* Authentication event id */
-    private String event;
+    private final String event;
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
