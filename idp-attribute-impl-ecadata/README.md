@@ -11,7 +11,7 @@ resolves the user attributes via a specific REST API, using two attributes as a 
 behind the API. In the ECA Auth standard context, those two attributes are [AuthnID]
 (https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-attribute-impl-authnid) and IdP identifier.
 
-## Prequisities and compilation
+## Prerequisities and compilation
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)

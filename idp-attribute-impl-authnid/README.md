@@ -9,7 +9,7 @@ implements AuthnID-calculation part for the ECA Auth Proxy -module, as defined i
 (https://github.com/educloudalliance/eca-docs/blob/master/auth/index.rst) standard. In short, this module can
 be used for calculating a unique privacy-preserving identifier for the authenticated principals.
 
-## Prequisities and compilation
+## Prerequisities and compilation
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)

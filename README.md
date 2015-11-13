@@ -27,7 +27,7 @@ cd idp-mpass-parent
 mvn package
 ```
 
-Komento kääntää jokaisen moduulin lähdekoodin ja paketoi moodulien _target/_ -hakemistoihin _jar-paketin_.
+Komento kääntää jokaisen moduulin lähdekoodin ja paketoi modulien _target/_ -hakemistoihin _jar-paketin_.
 
 ## Lisenssi / License
 
