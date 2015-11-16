@@ -7,7 +7,7 @@ This module contains interface classes for [idp-authn-impl-shibsp]
 be used for adding SAML -based Identity Providers as authentication methods for [Shibboleth Identity Provider v3]
 (https://wiki.shibboleth.net/confluence/display/IDP30/Home).
 
-## Prequisities and compilation
+## Prerequisities and compilation
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)

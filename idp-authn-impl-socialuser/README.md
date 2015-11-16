@@ -44,7 +44,7 @@ There are three modules implemented using Nimbus OAuth2 SDK.
 - Template for bean definition in socialuser-authn-beans.xml: OAuth2YleIdentity
 - This module does not support forced authentication.
 
-## Prequisities and compilation
+## Prerequisities and compilation
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)
