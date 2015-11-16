@@ -168,7 +168,8 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
      *            the request
      * 
      * @return Access Token
-     * @throws SocialUserAuthenticationException Id token fetch fails due to other reason than user not already having authorized.
+     * @throws SocialUserAuthenticationException Id token fetch fails due to other reason 
+     * than user not already having authorized.
      */
     public OAuthToken getAccessToken(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

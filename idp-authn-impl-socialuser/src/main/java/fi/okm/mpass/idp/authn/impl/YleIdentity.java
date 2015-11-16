@@ -126,6 +126,7 @@ public class YleIdentity extends OAuth2Identity implements
 
     }
 
+ // Checkstyle: CyclomaticComplexity OFF    
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
@@ -137,14 +138,9 @@ public class YleIdentity extends OAuth2Identity implements
                 log.trace("Leaving");
                 return null;
             }
-
-            // Yle server insists on having credentials as query parameters
             HTTPRequest req = request.toHTTPRequest();
-            // We add the credentials but have them still in headers, violation
-            // of RFC
             req.setQuery(request.toHTTPRequest().getQuery()
                     + getClientCredentialsTrail());
-
             TokenResponse tokenResponse = TokenResponse.parse(req.send());
             if (!tokenResponse.indicatesSuccess()) {
                 TokenErrorResponse errorResponse = (TokenErrorResponse) tokenResponse;
@@ -203,7 +199,8 @@ public class YleIdentity extends OAuth2Identity implements
         }
 
     }
-
+ // Checkstyle: CyclomaticComplexity ON
+    
     /**
      * Yle authorize server is behind gateway requiring own set of keys as query
      * parameters.

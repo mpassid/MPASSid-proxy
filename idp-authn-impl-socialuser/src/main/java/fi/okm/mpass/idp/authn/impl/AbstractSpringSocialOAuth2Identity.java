@@ -210,6 +210,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @return authorization code
      * @throws SocialUserAuthenticationException if there is no valid code.
      */
+ // Checkstyle: CyclomaticComplexity OFF    
     private String getAuthorizationCode(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
         log.trace("Entering");
@@ -219,26 +220,17 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             String event = SocialUserErrorIds.EXCEPTION;
             switch (error) {
             case "invalid_request":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "unauthorized_client":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "access_denied":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "unsupported_response_type":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "invalid_scope":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "server_error":
-                event = SocialUserErrorIds.EXCEPTION;
-                break;
             case "temporarily_unavailable":
                 event = SocialUserErrorIds.EXCEPTION;
                 break;
+            default :
+                event = SocialUserErrorIds.EXCEPTION;
+                break;    
             }
             String errorDescription = httpRequest
                     .getParameter("error_description");
@@ -252,6 +244,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         log.trace("Leaving");
         return authorizationCode;
     }
+ // Checkstyle: CyclomaticComplexity ON    
 
     /**
      * Returns Access Grant if user is known, otherwise null.
