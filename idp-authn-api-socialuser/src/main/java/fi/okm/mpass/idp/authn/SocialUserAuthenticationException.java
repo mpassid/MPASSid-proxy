@@ -27,10 +27,11 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** Class for handling social user exceptions. */
 @SuppressWarnings("serial")
 public class SocialUserAuthenticationException extends Exception {
 
-    /* Authentication event id */
+    /** Authentication event id. */
     private final String event;
     /** Class logger. */
     @Nonnull
@@ -40,10 +41,8 @@ public class SocialUserAuthenticationException extends Exception {
     /**
      * If user is not authenticated, user must be redirected to returned url.
      * 
-     * @param description
-     *            Description for exception
-     * @param authEvent
-     *            Authnentication event id
+     * @param description for exception
+     * @param authEvent event id
      *
      */
     public SocialUserAuthenticationException(String description,
