@@ -35,11 +35,11 @@ public final class SocialUserErrorIds {
     /**
      * Generic ID for exception thrown. 
      */
-    @Nonnull @NotEmpty public static final String EXCEPTION = "Exception";
+    @Nonnull @NotEmpty public static final String EXCEPTION = "SocialUserException";
     /**
-     * Generic ID for user canceling the authentication. 
+     * ID for user canceling the authentication. 
      */
-    @Nonnull @NotEmpty public static final String USER_CANCELED = "UserCanceled";
+    @Nonnull @NotEmpty public static final String USER_CANCELED = "SocialUserCanceled";
     
     /** private constructor to prohibit use of it.*/
     private SocialUserErrorIds(){
