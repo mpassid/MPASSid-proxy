@@ -59,19 +59,27 @@
     Define entries here to map error messages returned by external modules and classify them as particular
     kinds of errors for use in your templates and as events in flows.
     
+    These mapping are example mappings that may be used but are not necessary
     -->
+    
+    <!--  
+    
+    first mapping maps suexception to more generic shib auth exception. 
+    The second mapping maps user cancel to reselect 
+    
+    Do not use unless you know what you are doing.
     
     <util:map id="shibboleth.authn.SocialUser.ClassifiedMessageMap">
         <entry key="AuthenticationException">
             <list>
-                <value>Exception</value>
+                <value>SocialUserException</value>
             </list>
         </entry>
         <entry key="ReselectFlow">
             <list>
-                <value>UserCanceled</value>
+                <value>SocialUserCanceled</value>
             </list>
         </entry>
     </util:map>
-    
+    -->
 </beans>
