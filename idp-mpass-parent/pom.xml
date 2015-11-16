@@ -40,6 +40,10 @@
         <opensaml.groupId>org.opensaml</opensaml.groupId>
         <opensaml.version>3.1.1</opensaml.version>
         <gson.version>2.3.1</gson.version>
+        
+        <checkstyle.configLocation>
+            conf/checkstyle.xml
+        </checkstyle.configLocation>
     </properties>
 
     <repositories>
@@ -271,8 +275,54 @@
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.5.5</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
+        
+        <plugins>
+            <!--
+                Checkstyle configuration for checkstyle:* goals called directly
+                from the command line.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${checkstyle.configLocation}</configLocation>
+                </configuration>
+                <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>package</phase>
+                            <configuration>
+                                <configLocation>${checkstyle.configLocation}</configLocation>
+                                <encoding>UTF-8</encoding>
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>true</failsOnError>
+                                <linkXRef>false</linkXRef>
+                            </configuration>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                </executions>
+            </plugin>
+        </plugins>     
     </build>
-
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle.version}</version>
+                <configuration>
+                    <configLocation>${checkstyle.configLocation}</configLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
