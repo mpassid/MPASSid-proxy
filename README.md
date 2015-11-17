@@ -16,6 +16,7 @@ määrittelemän [ECA Authentication](https://github.com/educloudalliance/eca-do
 - _idp-authn-impl-shibsp_: SAML-pohjaisten tunnistusvälineiden integraation toteutus
 - _idp-authn-impl-socialuser_: Sosiaalisen median tunnistusvälineiden adaptereiden toteutus
 - _idp-mpass-parent_: Moduulien käyttämien kirjastojen versiomäärittelyt jne
+- _idp-profile-impl-audit_: Laajennoksia audit-lokitukseen
 
 ## Esivaatimukset ja kääntöohjeet
 
