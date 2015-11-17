@@ -71,7 +71,8 @@ public class AuthnFlowIdAuditExtractor implements Function<ProfileRequestContext
     @Nullable public Collection<String> apply(@Nullable final ProfileRequestContext input) {
         final AuthenticationContext authenticationCtx = authenticationContextLookupStrategy.apply(input);
         if (authenticationCtx != null && authenticationCtx.getAuthenticationResult() != null) {
-            log.debug("Authentication context found, returning {}", authenticationCtx.getAuthenticationResult().getAuthenticationFlowId());
+            log.debug("Authentication context found, returning {}", 
+                    authenticationCtx.getAuthenticationResult().getAuthenticationFlowId());
             final Collection<String> attributeValue = new ArrayList<String>();
             attributeValue.add(authenticationCtx.getAuthenticationResult().getAuthenticationFlowId());
             return attributeValue;
