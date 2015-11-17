@@ -56,6 +56,7 @@ public class AttributeValueAuditExtractor implements Function<ProfileRequestCont
     /** Lookup strategy for AttributeContext to read from. */
     @Nonnull private final Function<ProfileRequestContext,AttributeContext> attributeContextLookupStrategy;
 
+    /** The attribute id whose value will be returned by this {@link Function}. */
     @Nonnull @NotEmpty private final String attributeId;
     
     /**
