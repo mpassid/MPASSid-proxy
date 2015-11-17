@@ -71,10 +71,10 @@ cp -r target/idp-authn-impl-socialuser-\<version\>-bin/idp-authn-impl-socialuser
 
 The second final command will rebuild the _war_-package for the IdP application.
 
-The copied flows/beans will not work unless you configure them:
+The copied bean definitions will need to be configured. 
 
-1. You will need to define the OAUTH1/OAUTH2 parameters for the  authentication beans defined in /opt/shibboleth-idp/flows/authn/SocialUser/socialuser-authn-beans.xml. Those beans will need to be mapped in SocialUserImplementationFactory bean defined in the same file. 
-2. You will need to add the new authentication flows to /opt/shibboleth-idp/conf/authn/general-authn.xml
+1. You will need to define the OAuth parameters for the  authentication beans defined in /opt/shibboleth-idp/flows/authn/SocialUser/socialuser-authn-beans.xml. The activated beans will need to be mapped in SocialUserImplementationFactory bean defined in the same file. Remove mappings that you are not using.
+2. You will need to add the new authentication flow(s) to /opt/shibboleth-idp/conf/authn/general-authn.xml. The following snippet is only an example, your version may be different depending on which authentication flows you have decided to support. See /opt/shibboleth-idp/flows for available SocialUser flows. It makes sense to create new properly named flows atleast in the cases you use oauth2/oidc beans.
 
 ```
 <bean id="authn/SocialUserTwitter" parent="shibboleth.AuthenticationFlow"
@@ -86,5 +86,23 @@ The copied flows/beans will not work unless you configure them:
 <bean id="authn/SocialUserLinkedIn" parent="shibboleth.AuthenticationFlow"
             p:nonBrowserSupported="false" />
 ```
-3. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions
-4. New authentication flow can now be used by defining it to idp.properties file
+
+3. Add following Social User event ids to /opt/shibboleth-idp/conf/authn/authn-events-flow.xml 
+
+```
+<end-state id="SocialUserException" />
+<end-state id="SocialUserCanceled" />
+
+```
+
+4. Add following error mappings to /opt/shibboleth-idp/conf/errors.xml section shibboleth.SAML2StatusMappings
+
+```
+<util:map id="shibboleth.SAML2StatusMappings">
+        <entry key="SocialUserException" value-ref="shibboleth.SAML2Status.AuthnFailed" />
+        <entry key="SocialUserCanceled" value-ref="shibboleth.SAML2Status.AuthnFailed" />
+
+```
+
+5. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions
+6. New authentication flow(s) can now be used by enabling it in idp.properties file
