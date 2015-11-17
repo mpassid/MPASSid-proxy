@@ -68,8 +68,9 @@
     The second mapping maps user cancel to reselect 
     
     Do not use unless you know what you are doing.
-    
+    -->
     <util:map id="shibboleth.authn.SocialUser.ClassifiedMessageMap">
+    <!-- 
         <entry key="AuthenticationException">
             <list>
                 <value>SocialUserException</value>
@@ -80,6 +81,7 @@
                 <value>SocialUserCanceled</value>
             </list>
         </entry>
+     -->    
     </util:map>
-    -->
+    
 </beans>
