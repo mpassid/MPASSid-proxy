@@ -35,7 +35,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
+import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.authn.context.ExternalAuthenticationContext;
 
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,20 +132,7 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
     }
 
-    /** Returns authentication key. Starts the sequence 
-     * 
-     * @param httpRequest to store the authentication start
-     * 
-     * @throws ExternalAuthenticationException if method fails
-     * */
-    private void startAuthentication(final HttpServletRequest httpRequest)
-            throws ExternalAuthenticationException {
-        log.trace("Entering");
-        String key = ExternalAuthentication
-                .startExternalAuthentication(httpRequest);
-        httpRequest.getSession().setAttribute("ext_auth_start_key", key);
-        log.trace("Leaving");
-    }
+  
 
     /** Returns authentication key. Starts the sequence if not already started 
      * 
@@ -157,10 +147,42 @@ public class SocialUserAuthServlet extends HttpServlet {
         String key = (String) httpRequest.getSession().getAttribute(
                 "ext_auth_start_key");
         if (key == null || key.isEmpty()) {
-            key = ExternalAuthentication
-                    .startExternalAuthentication(httpRequest);
-            httpRequest.getSession().setAttribute("ext_auth_start_key", key);
+            key = startAuthentication(httpRequest);
         }
+        log.trace("Leaving");
+        return key;
+    }
+    
+    /** Creates authentication key and starts the sequence. 
+     * 
+     * @param httpRequest to store the authentication start or read it.
+     * 
+     * @return authentication key
+     * @throws ExternalAuthenticationException if method fails
+     * */
+    private String startAuthentication(final HttpServletRequest httpRequest) throws ExternalAuthenticationException{
+        log.trace("Entering");
+        String key = ExternalAuthentication.startExternalAuthentication(httpRequest);
+        httpRequest.getSession().setAttribute("ext_auth_start_key", key);
+        //Try clearing any possible previous authentication result
+        ProfileRequestContext profileRequestContext=(ProfileRequestContext)httpRequest.getAttribute("opensamlProfileRequestContext");
+        if (profileRequestContext==null){
+            log.trace("Leaving");
+            return key;
+        }
+        AuthenticationContext authenticationContext=(AuthenticationContext)profileRequestContext.getSubcontext(AuthenticationContext.class);
+        if (authenticationContext==null){
+            log.trace("Leaving");
+            return key;
+        }
+        //finally
+        ExternalAuthenticationContext externalAuthenticationContext=authenticationContext.getSubcontext(ExternalAuthenticationContext.class);
+        if (externalAuthenticationContext==null){
+            log.trace("Leaving");
+            return key;
+        }
+        externalAuthenticationContext.setAuthnError(null);
+        externalAuthenticationContext.setAuthnException(null);
         log.trace("Leaving");
         return key;
     }
