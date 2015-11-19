@@ -144,6 +144,7 @@ public class RestDataConnectorTest {
                         TestSources.SP_ENTITY_ID);
         final AttributeResolverWorkContext workContext =
                 context.getSubcontext(AttributeResolverWorkContext.class, false);
+        recordWorkContextAttribute("testingAttribute", "testAttributeValue", workContext);
         RestDataConnector mockConnector = Mockito.spy(dataConnector);
 
         Mockito.doReturn(mockBuilder).when(mockConnector).getHttpClientBuilder();
