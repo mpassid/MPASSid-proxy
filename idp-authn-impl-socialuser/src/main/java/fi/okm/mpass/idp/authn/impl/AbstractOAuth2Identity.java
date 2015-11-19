@@ -55,6 +55,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
+import fi.okm.mpass.idp.authn.SocialAuthenticationRequest;
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
@@ -68,19 +69,27 @@ public abstract class AbstractOAuth2Identity {
             .getLogger(AbstractOAuth2Identity.class);
 
     /** Scope. */
+    @Nonnull
     private Scope scope;
     /** Client Id. */
+    @Nonnull
     private ClientID clientID;
     /** Client Secret. */
+    @Nonnull
     private Secret clientSecret;
     /** Authorization Endpoint. */
+    @Nonnull
     private URI authorizationEndpoint;
     /** Token Endpoint. */
+    @Nonnull
     private URI tokenEndpoint;
     /** UserInfo Endpoint. */
     private URI userinfoEndpoint;
     /** Revocation Endpoint. */
     private URI revocationEndpoint;
+
+    /** Authentication request. */
+    private SocialAuthenticationRequest request;
 
     /** map of claims to principals. */
     @Nonnull
@@ -169,7 +178,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            AuthorizationEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     public void setAuthorizationEndpoint(String endPoint)
             throws URISyntaxException {
@@ -192,7 +202,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            TokenEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     public void setTokenEndpoint(String endPoint) throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -203,7 +214,8 @@ public abstract class AbstractOAuth2Identity {
      * Getter for token endpoint.
      * 
      * @return TokenEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     protected URI getTokenEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -215,7 +227,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            UserinfoEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     public void setUserinfoEndpoint(String endPoint) throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -226,7 +239,8 @@ public abstract class AbstractOAuth2Identity {
      * Getter for userinfo endpoint.
      * 
      * @return UserinfoEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     protected URI getUserinfoEndpoint() throws URISyntaxException {
         log.trace("Entering & Leaving");
@@ -238,7 +252,8 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @param endPoint
      *            RevocationEndpoint
-     * @throws URISyntaxException If the endpoint is not valid.
+     * @throws URISyntaxException
+     *             If the endpoint is not valid.
      */
     public void setRevocationEndpoint(String endPoint)
             throws URISyntaxException {
@@ -299,12 +314,34 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
+     * Setter for authentication request.
+     * 
+     * @param authRequest
+     *            Authentication request
+     */
+    public void setAuthenticationRequest(SocialAuthenticationRequest authRequest) {
+        log.trace("Entering & Leaving");
+        this.request = authRequest;
+    }
+
+    /**
+     * Getter for authentication request.
+     * 
+     * @return Authentication request
+     */
+    protected SocialAuthenticationRequest getAuthenticationRequest() {
+        log.trace("Entering & Leaving");
+        return this.request;
+    }
+
+    /**
      * This method forms Token request.
      * 
      * @param httpRequest
      *            the request back from the oauth2 server
      * @return returns token request or null if the user has not authorized yet.
-     * @throws SocialUserAuthenticationException If tokenrequest fails to other than non-authorization reason.
+     * @throws SocialUserAuthenticationException
+     *             If tokenrequest fails to other than non-authorization reason.
      */
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

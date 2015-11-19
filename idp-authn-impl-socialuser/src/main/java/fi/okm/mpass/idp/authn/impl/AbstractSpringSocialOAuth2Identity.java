@@ -164,11 +164,13 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
 
     }
 
-    /** 
+    /**
      * Throws an error if state parameter is not the expected one.
      * 
-     * @param httpRequest is the httpRequest we check for state.
-     * @throws SocialUserAuthenticationException if the parameter is missing or mismatches.
+     * @param httpRequest
+     *            is the httpRequest we check for state.
+     * @throws SocialUserAuthenticationException
+     *             if the parameter is missing or mismatches.
      * */
     private void validateState(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
@@ -206,11 +208,13 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * Code if such exists Returns null if authentication has not been performed
      * yet.
      * 
-     * @param httpRequest is the request
+     * @param httpRequest
+     *            is the request
      * @return authorization code
-     * @throws SocialUserAuthenticationException if there is no valid code.
+     * @throws SocialUserAuthenticationException
+     *             if there is no valid code.
      */
- // Checkstyle: CyclomaticComplexity OFF    
+    // Checkstyle: CyclomaticComplexity OFF
     private String getAuthorizationCode(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
         log.trace("Entering");
@@ -228,9 +232,9 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             case "temporarily_unavailable":
                 event = SocialUserErrorIds.EXCEPTION;
                 break;
-            default :
+            default:
                 event = SocialUserErrorIds.EXCEPTION;
-                break;    
+                break;
             }
             String errorDescription = httpRequest
                     .getParameter("error_description");
@@ -244,7 +248,8 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         log.trace("Leaving");
         return authorizationCode;
     }
- // Checkstyle: CyclomaticComplexity ON    
+
+    // Checkstyle: CyclomaticComplexity ON
 
     /**
      * Returns Access Grant if user is known, otherwise null.
@@ -252,7 +257,8 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @param httpRequest
      *            the request
      * @return Access Grant
-     * @throws SocialUserAuthenticationException if the operation fails.
+     * @throws SocialUserAuthenticationException
+     *             if the operation fails.
      */
     public AccessGrant getAccessGrant(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

@@ -25,7 +25,6 @@ package fi.okm.mpass.idp.authn.impl;
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.oauth1.AuthorizedRequestToken;
@@ -137,13 +136,15 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
 
     /**
      * Throws an error if user authentication has failed. Returns Authorization
-     * Code if such exists. Returns null if authentication has not been performed
-     * yet.
+     * Code if such exists. Returns null if authentication has not been
+     * performed yet.
      * 
-     * @param httpRequest is the request.
+     * @param httpRequest
+     *            is the request.
      * 
      * @return request token or null.
-     * @throws SocialUserAuthenticationException if user has canceled the operation.
+     * @throws SocialUserAuthenticationException
+     *             if user has canceled the operation.
      */
     private OAuthToken getRequestToken(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
@@ -168,8 +169,9 @@ public abstract class AbstractSpringSocialOAuthIdentity extends
      *            the request
      * 
      * @return Access Token
-     * @throws SocialUserAuthenticationException Id token fetch fails due to other reason 
-     * than user not already having authorized.
+     * @throws SocialUserAuthenticationException
+     *             Id token fetch fails due to other reason than user not
+     *             already having authorized.
      */
     public OAuthToken getAccessToken(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {

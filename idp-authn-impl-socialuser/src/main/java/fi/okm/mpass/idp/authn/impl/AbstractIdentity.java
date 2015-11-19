@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UserProfile;
 
+import fi.okm.mpass.idp.authn.SocialAuthenticationRequest;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
 
@@ -41,6 +42,30 @@ public abstract class AbstractIdentity {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AbstractIdentity.class);
+
+    /** Authentication request. */
+    private SocialAuthenticationRequest request;
+
+    /**
+     * Setter for authentication request.
+     * 
+     * @param authRequest
+     *            Authentication request
+     */
+    public void setAuthenticationRequest(SocialAuthenticationRequest authRequest) {
+        log.trace("Entering & Leaving");
+        this.request = authRequest;
+    }
+
+    /**
+     * Getter for authentication request.
+     * 
+     * @return Authentication request
+     */
+    protected SocialAuthenticationRequest getAuthenticationRequest() {
+        log.trace("Entering & Leaving");
+        return this.request;
+    }
 
     /**
      * Returns user Subject based on key and profile.

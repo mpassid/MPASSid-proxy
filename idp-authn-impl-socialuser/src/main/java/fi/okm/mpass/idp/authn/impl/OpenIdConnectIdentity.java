@@ -55,6 +55,7 @@ import com.nimbusds.openid.connect.sdk.OIDCAccessTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.Prompt;
+import com.nimbusds.openid.connect.sdk.Prompt.Type;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
 
 /** Class for implementing OpenId Connect authentication. */
@@ -154,6 +155,23 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
 
     }
 
+    private Prompt getPromptForRedirectUrl(HttpServletRequest httpRequest) {
+        log.trace("Entering");
+        if (getAuthenticationRequest() == null) {
+            log.trace("Leaving");
+            // no need to modify, helper not available
+            return prompt;
+        }
+        if (getAuthenticationRequest().isPassive(httpRequest)) {
+            Prompt newPrompt = new Prompt();
+            newPrompt.add(Type.NONE);
+            log.trace("Leaving");
+            return newPrompt;
+        }
+        log.trace("Leaving");
+        return prompt;
+    }
+
     @Override
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
@@ -164,21 +182,50 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
         httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);
-        String ret = null;
         try {
-            AuthenticationRequest request = new AuthenticationRequest.Builder(
-                    responseType, getScope(), getClientId(), new URI(
-                            httpRequest.getRequestURL().toString()))
-                    .endpointURI(getAuthorizationEndpoint()).display(display)
-                    .acrValues(acrs).prompt(prompt).state(state).build();
-            ret = request.toURI().toString();
+            if (getAuthenticationRequest() == null) {
+                log.trace("Leaving");
+                return new AuthenticationRequest.Builder(responseType,
+                        getScope(), getClientId(), new URI(httpRequest
+                                .getRequestURL().toString()))
+                        .endpointURI(getAuthorizationEndpoint())
+                        .display(display).acrValues(acrs).prompt(prompt)
+                        .state(state).build().toURI().toString();
+            }
+            if (getAuthenticationRequest().isForcedAuth(httpRequest)) {
+                log.trace("Leaving");
+                return new AuthenticationRequest.Builder(responseType,
+                        getScope(), getClientId(), new URI(httpRequest
+                                .getRequestURL().toString()))
+                        .endpointURI(getAuthorizationEndpoint())
+                        .display(display)
+                        .acrValues(acrs)
+                        .prompt(getPromptForRedirectUrl(httpRequest))
+                        .state(state)
+                        .loginHint(
+                                getAuthenticationRequest().getLoginHint(
+                                        httpRequest)).maxAge(0).build().toURI()
+                        .toString();
+            }
+            log.trace("Leaving");
+            return new AuthenticationRequest.Builder(responseType, getScope(),
+                    getClientId(), new URI(httpRequest.getRequestURL()
+                            .toString()))
+                    .endpointURI(getAuthorizationEndpoint())
+                    .display(display)
+                    .acrValues(acrs)
+                    .prompt(getPromptForRedirectUrl(httpRequest))
+                    .state(state)
+                    .loginHint(
+                            getAuthenticationRequest()
+                                    .getLoginHint(httpRequest)).build().toURI()
+                    .toString();
+
         } catch (URISyntaxException | SerializeException e) {
             e.printStackTrace();
             log.trace("Leaving");
             return null;
         }
-        log.trace("Leaving");
-        return ret;
 
     }
 

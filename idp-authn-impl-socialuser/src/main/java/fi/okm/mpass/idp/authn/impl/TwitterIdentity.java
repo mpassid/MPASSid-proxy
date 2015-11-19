@@ -62,7 +62,7 @@ public class TwitterIdentity extends AbstractSpringSocialOAuthIdentity
         }
         log.trace("Leaving");
     }
-    
+
     /**
      * Returns redirect url for authentication.
      * 
@@ -71,10 +71,15 @@ public class TwitterIdentity extends AbstractSpringSocialOAuthIdentity
      * 
      * @return redirect url
      */
-    public String getRedirectUrl(HttpServletRequest httpRequest){
-        String url=super.getRedirectUrl(httpRequest);
-        Boolean isForced=(Boolean)httpRequest.getAttribute("forceAuthn");
-        return isForced?url+"&force_login=true":url;
+    public String getRedirectUrl(HttpServletRequest httpRequest) {
+        String url = super.getRedirectUrl(httpRequest);
+        if (getAuthenticationRequest() != null
+                && getAuthenticationRequest().isForcedAuth(httpRequest)) {
+            log.trace("Leaving");
+            return url + "&force_login=true";
+        }
+        log.trace("Leaving");
+        return url;
     }
 
     /*

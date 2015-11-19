@@ -132,14 +132,15 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
     }
 
-  
-
-    /** Returns authentication key. Starts the sequence if not already started 
+    /**
+     * Returns authentication key. Starts the sequence if not already started
      * 
-     * @param httpRequest to store the authentication start or read it.
+     * @param httpRequest
+     *            to store the authentication start or read it.
      * 
      * @return authentication key
-     * @throws ExternalAuthenticationException if method fails
+     * @throws ExternalAuthenticationException
+     *             if method fails
      * */
     private String getAuthenticationKey(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
@@ -152,32 +153,40 @@ public class SocialUserAuthServlet extends HttpServlet {
         log.trace("Leaving");
         return key;
     }
-    
-    /** Creates authentication key and starts the sequence. 
+
+    /**
+     * Creates authentication key and starts the sequence.
      * 
-     * @param httpRequest to store the authentication start or read it.
+     * @param httpRequest
+     *            to store the authentication start or read it.
      * 
      * @return authentication key
-     * @throws ExternalAuthenticationException if method fails
+     * @throws ExternalAuthenticationException
+     *             if method fails
      * */
-    private String startAuthentication(final HttpServletRequest httpRequest) throws ExternalAuthenticationException{
+    private String startAuthentication(final HttpServletRequest httpRequest)
+            throws ExternalAuthenticationException {
         log.trace("Entering");
-        String key = ExternalAuthentication.startExternalAuthentication(httpRequest);
+        String key = ExternalAuthentication
+                .startExternalAuthentication(httpRequest);
         httpRequest.getSession().setAttribute("ext_auth_start_key", key);
-        //Try clearing any possible previous authentication result
-        ProfileRequestContext profileRequestContext=(ProfileRequestContext)httpRequest.getAttribute("opensamlProfileRequestContext");
-        if (profileRequestContext==null){
+        // Try clearing any possible previous authentication result
+        ProfileRequestContext profileRequestContext = (ProfileRequestContext) httpRequest
+                .getAttribute("opensamlProfileRequestContext");
+        if (profileRequestContext == null) {
             log.trace("Leaving");
             return key;
         }
-        AuthenticationContext authenticationContext=(AuthenticationContext)profileRequestContext.getSubcontext(AuthenticationContext.class);
-        if (authenticationContext==null){
+        AuthenticationContext authenticationContext = (AuthenticationContext) profileRequestContext
+                .getSubcontext(AuthenticationContext.class);
+        if (authenticationContext == null) {
             log.trace("Leaving");
             return key;
         }
-        //finally
-        ExternalAuthenticationContext externalAuthenticationContext=authenticationContext.getSubcontext(ExternalAuthenticationContext.class);
-        if (externalAuthenticationContext==null){
+        // finally
+        ExternalAuthenticationContext externalAuthenticationContext = authenticationContext
+                .getSubcontext(ExternalAuthenticationContext.class);
+        if (externalAuthenticationContext == null) {
             log.trace("Leaving");
             return key;
         }

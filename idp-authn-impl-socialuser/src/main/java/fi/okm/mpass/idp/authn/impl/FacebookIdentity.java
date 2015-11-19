@@ -62,7 +62,7 @@ public class FacebookIdentity extends AbstractSpringSocialOAuth2Identity
         }
         log.trace("Leaving");
     }
-    
+
     /**
      * Returns redirect url for authentication.
      * 
@@ -71,10 +71,16 @@ public class FacebookIdentity extends AbstractSpringSocialOAuth2Identity
      * 
      * @return redirect url
      */
-    public String getRedirectUrl(HttpServletRequest httpRequest){
-        String url=super.getRedirectUrl(httpRequest);
-        Boolean isForced=(Boolean)httpRequest.getAttribute("forceAuthn");
-        return isForced?url+"&auth_type=reauthenticate":url;
+    public String getRedirectUrl(HttpServletRequest httpRequest) {
+        log.trace("Entering");
+        String url = super.getRedirectUrl(httpRequest);
+        if (getAuthenticationRequest() != null
+                && getAuthenticationRequest().isForcedAuth(httpRequest)) {
+            log.trace("Leaving");
+            return url + "&auth_type=reauthenticate";
+        }
+        log.trace("Leaving");
+        return url;
     }
 
     /*

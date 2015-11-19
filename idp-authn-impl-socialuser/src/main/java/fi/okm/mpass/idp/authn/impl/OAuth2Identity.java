@@ -142,8 +142,8 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 } catch (java.text.ParseException e) {
                     log.error("error parsing userinfo endpoint");
                     log.trace("Leaving");
-                    throw new SocialUserAuthenticationException(
-                            e.getMessage(), SocialUserErrorIds.EXCEPTION);
+                    throw new SocialUserAuthenticationException(e.getMessage(),
+                            SocialUserErrorIds.EXCEPTION);
                 }
             }
             addDefaultPrincipals(subject);

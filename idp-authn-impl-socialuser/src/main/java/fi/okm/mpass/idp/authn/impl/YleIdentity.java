@@ -126,7 +126,7 @@ public class YleIdentity extends OAuth2Identity implements
 
     }
 
- // Checkstyle: CyclomaticComplexity OFF    
+    // Checkstyle: CyclomaticComplexity OFF
     @Override
     public Subject getSubject(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
@@ -182,8 +182,8 @@ public class YleIdentity extends OAuth2Identity implements
                 } catch (java.text.ParseException e) {
                     log.error("error parsing userinfo endpoint");
                     log.trace("Leaving");
-                    throw new SocialUserAuthenticationException(
-                            e.getMessage(), SocialUserErrorIds.EXCEPTION);
+                    throw new SocialUserAuthenticationException(e.getMessage(),
+                            SocialUserErrorIds.EXCEPTION);
                 }
             }
             addDefaultPrincipals(subject);
@@ -199,8 +199,9 @@ public class YleIdentity extends OAuth2Identity implements
         }
 
     }
- // Checkstyle: CyclomaticComplexity ON
-    
+
+    // Checkstyle: CyclomaticComplexity ON
+
     /**
      * Yle authorize server is behind gateway requiring own set of keys as query
      * parameters.
