@@ -23,6 +23,8 @@
 
 package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,19 +120,24 @@ public class RestDataConnector extends AbstractDataConnector {
         log.debug("Calling {} for resolving attributes", endpointUrl);
 
         String attributeCallUrl = endpointUrl;
-        log.debug(
-                "AuthnID = {}",
-                collectSingleAttributeValue(attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(),
-                        hookAttribute));
+        String authnIdValue = collectSingleAttributeValue(attributeResolverWorkContext.
+                getResolvedIdPAttributeDefinitions(), hookAttribute);
+        log.debug("AuthnID before URL encoding = {}", authnIdValue);
+        if (authnIdValue == null) {
+            log.error("Could not resolve hookAttribute value");
+            throw new ResolutionException("Could not resolve hookAttribute value");
+        }
+        try {
+            authnIdValue = URLEncoder.encode(collectSingleAttributeValue(
+                    attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), hookAttribute), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Could not use UTF-8 for encoding authnID");
+            throw new ResolutionException("Could not use UTF-8 for encoding authnID", e);
+        }
+        log.debug("AuthnID after URL encoding = {}", authnIdValue);
         final String idpIdValue =
                 collectSingleAttributeValue(attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), idpId);
-        attributeCallUrl =
-                attributeCallUrl
-                        + "?"
-                        + idpIdValue
-                        + "_id="
-                        + collectSingleAttributeValue(
-                                attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), hookAttribute);
+        attributeCallUrl = attributeCallUrl + "?" + idpIdValue + "_id=" + authnIdValue;
 
         HttpEntity restEntity = null;
 
@@ -144,7 +151,7 @@ public class RestDataConnector extends AbstractDataConnector {
             final int status = restResponse.getStatusLine().getStatusCode();
             restEntity = restResponse.getEntity();
 
-            log.debug("Response code from Proxy HTTP " + status);
+            log.debug("Response code from Data: HTTP " + status);
             final String restResponseStr = EntityUtils.toString(restEntity);
             log.trace("Response {}", restResponseStr);
             if (status == HttpStatus.SC_OK) {
