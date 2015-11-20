@@ -7,8 +7,8 @@ This module contains implementations of Facebook, Google, LinkedIn, Twitter, Yle
 ## Authentication modules
 
 ### Authentication concerns
-- By their very nature, these modules do create (if not pre-existing) a authenticated session not only to IdP but also to the social identity provider. Logging out of SP or IdP does not logout user from the social identity provider. 
-- Not all of these modules support forced authentication. We hope to add that to as many as we can. The case of not using forced authentication combined with a browser shared by many is problematic. In such cases users must be instructed to use private browsing and to close that browser in the end. 
+- By their very nature, these modules do create (if not pre-existing) a authenticated session to the social identity provider. Logging out of SP or IdP does not logout user from the social identity provider. 
+- Not all of these modules support forced authentication. We interpret forced authentication here as already authenticated user requiring to enter credentials to social identity provider for reauthentication. We hope to add that to as many as we can. The case of not using forced authentication combined with a browser shared by many is problematic. In such cases users must be instructed to use private browsing and to close that browser in the end. 
 
 ### Spring Social modules
 There are four modules implemented using Spring Social.  
@@ -104,5 +104,6 @@ The copied bean definitions will need to be configured.
 
 ```
 
-5. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions
+5. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions. The SocialUserContext context attributes are email, firstName, lastName, userId, displayName and providerId. In successfull authentication case userId is always populated.
+
 6. New authentication flow(s) can now be used by enabling it in idp.properties file
