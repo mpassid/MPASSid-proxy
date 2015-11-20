@@ -74,7 +74,7 @@ The second final command will rebuild the _war_-package for the IdP application.
 The copied bean definitions will need to be configured. 
 
 1. You will need to define the OAuth parameters for the  authentication beans defined in /opt/shibboleth-idp/flows/authn/SocialUser/socialuser-authn-beans.xml. The activated beans will need to be mapped in SocialUserImplementationFactory bean defined in the same file. Remove mappings that you are not using.
-2. You will need to add the new authentication flow(s) to /opt/shibboleth-idp/conf/authn/general-authn.xml. The following snippet is only an example, your version may be different depending on which authentication flows you have decided to support. See /opt/shibboleth-idp/flows for available SocialUser flows. It makes sense to create new properly named flows atleast in the cases you use oauth2/oidc beans.
+2. You will need to add the new authentication flow(s) to /opt/shibboleth-idp/conf/authn/general-authn.xml. The following snippet is only an example, your version may be different depending on which authentication flows you have decided to support. See /opt/shibboleth-idp/flows for available SocialUser flows. It makes sense to create new properly named flows atleast in the cases of adopting generic oauth2/oidc flow examples.
 
 ```
 <bean id="authn/SocialUserTwitter" parent="shibboleth.AuthenticationFlow"
