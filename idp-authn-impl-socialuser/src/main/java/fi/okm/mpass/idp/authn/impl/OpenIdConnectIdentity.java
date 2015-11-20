@@ -155,6 +155,13 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
 
     }
 
+    /** 
+     * Checks if the initialized prompt has to be changed
+     * due to authentication request.
+     * 
+     * @param httpRequest the request containing auth req data
+     * @return updated prompt
+     */
     private Prompt getPromptForRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
         if (getAuthenticationRequest() == null) {
