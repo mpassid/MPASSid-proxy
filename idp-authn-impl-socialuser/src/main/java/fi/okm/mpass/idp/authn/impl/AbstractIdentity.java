@@ -44,7 +44,7 @@ public abstract class AbstractIdentity {
     private final Logger log = LoggerFactory.getLogger(AbstractIdentity.class);
 
     /** Authentication request. */
-    private SocialAuthenticationRequest request;
+    private SocialAuthenticationRequest socialAuthenticationRequest;
 
     /**
      * Setter for authentication request.
@@ -54,7 +54,7 @@ public abstract class AbstractIdentity {
      */
     public void setAuthenticationRequest(SocialAuthenticationRequest authRequest) {
         log.trace("Entering & Leaving");
-        this.request = authRequest;
+        this.socialAuthenticationRequest = authRequest;
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractIdentity {
      */
     protected SocialAuthenticationRequest getAuthenticationRequest() {
         log.trace("Entering & Leaving");
-        return this.request;
+        return this.socialAuthenticationRequest;
     }
 
     /**
