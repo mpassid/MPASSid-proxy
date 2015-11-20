@@ -32,11 +32,9 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nimbusds.oauth2.sdk.Scope;
-
 import fi.okm.mpass.idp.authn.SocialAuthenticationRequest;
 
-/*This class extracts request parameters from http request attributes set by shibboleth idp 3*/
+/**This class extracts request parameters from http request attributes set by shibboleth idp 3.*/
 public class ShibServletSocialAuthenticationRequestImpl implements
         SocialAuthenticationRequest {
 
@@ -45,15 +43,15 @@ public class ShibServletSocialAuthenticationRequestImpl implements
     private final Logger log = LoggerFactory
             .getLogger(ShibServletSocialAuthenticationRequestImpl.class);
 
-    /** passive attribute name */
+    /** passive attribute name. */
     @Nonnull
     private String passiveAttribute;
 
-    /** forcedauth attribute name */
+    /** forcedauth attribute name. */
     @Nonnull
     private String forcedAuthAttribute;
 
-    /** profileRequestContext attribute name */
+    /** profileRequestContext attribute name. */
     @Nonnull
     private String profileRequestContextAttribute;
 
@@ -71,8 +69,8 @@ public class ShibServletSocialAuthenticationRequestImpl implements
     /**
      * Setter for passive attribute name.
      * 
-     * @param passive
-     *            name for passive attribute
+     * @param forcedAuth
+     *            name for forcedAuth attribute
      */
     public void setForcedAuthAttribute(String forcedAuth) {
         log.trace("Entering & Leaving");
