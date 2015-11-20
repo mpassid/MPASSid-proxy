@@ -25,7 +25,7 @@ package fi.okm.mpass.idp.authn;
 
 import javax.servlet.http.HttpServletRequest;
 
-/** Interface for querying authentication parameters */
+/** Interface for querying authentication parameters. */
 public interface SocialAuthenticationRequest {
 
     /**
