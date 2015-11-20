@@ -89,7 +89,7 @@ public abstract class AbstractOAuth2Identity {
     private URI revocationEndpoint;
 
     /** Authentication request. */
-    private SocialAuthenticationRequest request;
+    private SocialAuthenticationRequest socialAuthenticationRequest;
 
     /** map of claims to principals. */
     @Nonnull
@@ -321,7 +321,7 @@ public abstract class AbstractOAuth2Identity {
      */
     public void setAuthenticationRequest(SocialAuthenticationRequest authRequest) {
         log.trace("Entering & Leaving");
-        this.request = authRequest;
+        this.socialAuthenticationRequest = authRequest;
     }
 
     /**
@@ -331,7 +331,7 @@ public abstract class AbstractOAuth2Identity {
      */
     protected SocialAuthenticationRequest getAuthenticationRequest() {
         log.trace("Entering & Leaving");
-        return this.request;
+        return this.socialAuthenticationRequest;
     }
 
     /**
