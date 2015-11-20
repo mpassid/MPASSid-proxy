@@ -69,6 +69,7 @@
     	class="fi.okm.mpass.idp.authn.impl.FacebookIdentity" scope="prototype">
     	<property name="appId" value="put_here"/>
     	<property name="appSecret" value="put_here"/> 
+    	<property name="authenticationRequest" ref="ShibAuthRequest"/> 
     </bean> 
     
     <bean id="GoogleIdentity"
@@ -81,7 +82,8 @@
     <bean id="TwitterIdentity"
         class="fi.okm.mpass.idp.authn.impl.TwitterIdentity" scope="prototype">
         <property name="consumerKey" value="put_here"/>
-        <property name="consumerSecret" value="put_here"/> 
+        <property name="consumerSecret" value="put_here"/>
+        <property name="authenticationRequest" ref="ShibAuthRequest"/>  
     </bean> 
     
     <bean id="LinkedInIdentity"
@@ -138,7 +140,8 @@
         <property name="clientId" value="put_here"/>
         <property name="clientSecret" value="put_here"/>
         <property name="authorizationEndpoint" value="put_here"/>
-        <property name="tokenEndpoint" value=""/>
+        <property name="tokenEndpoint" value="put_here"/>
+        <property name="authenticationRequest" ref="ShibAuthRequest"/> 
         
         <!-- userinfo and revocation not applied yet  
         <property name="userinfoEndpoint" value="put_here"/>
@@ -185,6 +188,14 @@
             -->
          </map>
         </property>
+    </bean>
+    
+    <!-- This bean provides information of the shib authentication context -->
+    <bean id="ShibAuthRequest"
+        class="fi.okm.mpass.idp.authn.impl.ShibServletSocialAuthenticationRequestImpl" >
+        <property name="passiveAttribute" value="isPassive"/>
+        <property name="forcedAuthAttribute" value="forceAuthn"/>
+        <property name="profileRequestContextAttribute" value="opensamlProfileRequestContext"/>
     </bean>
      
     <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
