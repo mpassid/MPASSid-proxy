@@ -39,6 +39,9 @@
         </property>
     </bean>
 
+    <bean id="ExtractLoginHintFromFormRequest"
+        class="fi.okm.mpass.idp.authn.impl.ExtractLoginHintFromFormRequest" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
 
     <bean id="ExtractSocialPrincipalsFromSubject"
         class="fi.okm.mpass.idp.authn.impl.ExtractSocialPrincipalsFromSubject" scope="prototype"
