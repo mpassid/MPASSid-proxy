@@ -38,7 +38,10 @@ There are three modules implemented using Nimbus OAuth2 SDK.
 
 #### OpenID Connect
 - Template for bean definition in socialuser-authn-beans.xml: ExampleOpenIdConnectIdentity
-- This module does not support forced authentication by default.
+- This module maybe be configured to support forced auhentication, passive authentication and login hint.
+- Forced authentication request is implemented as max_age=0 oidc parameter. Not all providers respect that.
+- Passive authentication request is implemented prompt=none oidc parameter. Check that the provider respects that.
+- Login hint is implemented as login_hint oidc paramter. See example flow in socialuseropenidconnectloginhint-authn-flow.xml
 
 #### Yle (Finnish Broadcasting Company)
 - Template for bean definition in socialuser-authn-beans.xml: OAuth2YleIdentity
@@ -67,6 +70,7 @@ cd /opt/shibboleth-idp
 sh bin/build.sh
 cp -r target/idp-authn-impl-socialuser-\<version\>-bin/idp-authn-impl-socialuser-\<version\>/conf /opt/shibboleth-idp/conf
 cp -r target/idp-authn-impl-socialuser-\<version\>-bin/idp-authn-impl-socialuser-\<version\>/flows /opt/shibboleth-idp/flows
+cp -r target/idp-authn-impl-socialuser-\<version\>-bin/idp-authn-impl-socialuser-\<version\>/views /opt/shibboleth-idp/views
 ```
 
 The second final command will rebuild the _war_-package for the IdP application.
