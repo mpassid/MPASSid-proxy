@@ -53,8 +53,8 @@ public class RestDataConnectorParser extends AbstractDataConnectorParser {
         builder.addPropertyValue("hookAttribute", hookAttribute);
         String idpId = element.getAttributeNS(null, "idpId");
         builder.addPropertyValue("idpId", idpId);
-        String resultAttribute = element.getAttributeNS(null, "resultAttribute");
-        builder.addPropertyValue("resultAttribute", resultAttribute);
+        String resultAttribute = element.getAttributeNS(null, "resultAttributePrefix");
+        builder.addPropertyValue("resultAttributePrefix", resultAttribute);
         String token = element.getAttributeNS(null, "token");
         builder.addPropertyValue("token", token);
         String disregardTLSCertificate = element.getAttributeNS(null, "disregardTLSCertificate");

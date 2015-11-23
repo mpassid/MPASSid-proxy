@@ -41,8 +41,8 @@ public class RestDataConnectorFactoryBean extends AbstractComponentAwareFactoryB
     /** The Identity Provider ID corresponding to the hook. */
     private String idpId;
 
-    /** The result attribute ID of the resolved person ID. */
-    private String resultAttribute;
+    /** The result attribute ID prefix of the resolved attributes. */
+    private String resultAttributePrefix;
 
     /** The token used for authenticating to ECA Data API. */
     private String token;
@@ -63,7 +63,7 @@ public class RestDataConnectorFactoryBean extends AbstractComponentAwareFactoryB
         dataConnector.setEndpointUrl(getEndpointUrl());
         dataConnector.setHookAttribute(getHookAttribute());
         dataConnector.setIdpId(getIdpId());
-        dataConnector.setResultAttribute(getResultAttribute());
+        dataConnector.setResultAttributePrefix(getResultAttributePrefix());
         dataConnector.setToken(getToken());
         dataConnector.setDisregardTLSCertificate("true".equalsIgnoreCase(getDisregardTLSCertificate()));
         return dataConnector;
@@ -118,19 +118,19 @@ public class RestDataConnectorFactoryBean extends AbstractComponentAwareFactoryB
     }
 
     /**
-     * Get the result attribute ID.
-     * @return resultAttribute.
+     * Get the result attribute ID prefix.
+     * @return resultAttributePrefix.
      */
-    public String getResultAttribute() {
-        return resultAttribute;
+    public String getResultAttributePrefix() {
+        return resultAttributePrefix;
     }
 
     /**
-     * Set the result attribute ID.
-     * @param attribute What to set.
+     * Set the result attribute ID prefix.
+     * @param attributePrefix What to set.
      */
-    public void setResultAttribute(String attribute) {
-        this.resultAttribute = attribute;
+    public void setResultAttribute(String attributePrefix) {
+        this.resultAttributePrefix = attributePrefix;
     }
 
     /**

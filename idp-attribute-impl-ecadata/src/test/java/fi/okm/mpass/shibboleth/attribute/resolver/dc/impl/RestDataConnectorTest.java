@@ -92,7 +92,7 @@ public class RestDataConnectorTest {
         expectedEndpointUrl = "testindEndpointUrl";
         expectedHookAttribute = "testingHookAttribute";
         expectedIdpId = "testingIdpId";
-        expectedResultAttribute = "testingResultAttribute";
+        expectedResultAttribute = "testingPrefixusername";
         expectedToken = "testingToken";
         expectedOid = "testUser";
     }
@@ -138,7 +138,7 @@ public class RestDataConnectorTest {
         dataConnector.setEndpointUrl("testingEndpoint");
         dataConnector.setHookAttribute("testingAttribute");
         dataConnector.setIdpId("testingIdpId");
-        dataConnector.setResultAttribute("testingResultAttribute");
+        dataConnector.setResultAttributePrefix("testingPrefix");
         final AttributeResolutionContext context =
                 TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, TestSources.IDP_ENTITY_ID,
                         TestSources.SP_ENTITY_ID);
@@ -151,9 +151,9 @@ public class RestDataConnectorTest {
 
         Map<String, IdPAttribute> attributes = mockConnector.doResolve(context, workContext);
         Assert.assertEquals(attributes.size(), 1);
-        Assert.assertNotNull(attributes.get("testingResultAttribute"));
-        Assert.assertEquals(attributes.get("testingResultAttribute").getValues().size(), 1);
-        Assert.assertEquals(attributes.get("testingResultAttribute").getValues().get(0).getValue(), "testUser");
+        Assert.assertNotNull(attributes.get("testingPrefixusername"));
+        Assert.assertEquals(attributes.get("testingPrefixusername").getValues().size(), 1);
+        Assert.assertEquals(attributes.get("testingPrefixusername").getValues().get(0).getValue(), "testUser");
     }
 
     /**

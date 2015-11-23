@@ -58,6 +58,7 @@ import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContex
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * This class implements a {@link DataConnector} (resolver plugin) that communicates with ECA user data API
@@ -69,6 +70,27 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
  * destAttributeName="authnid"/> 
  */
 public class RestDataConnector extends AbstractDataConnector {
+    
+    /** The attribute id for the username. */
+    public static final String ATTR_ID_USERNAME = "username";
+    
+    /** The attribute id for the first name. */
+    public static final String ATTR_ID_FIRSTNAME = "firstName";
+    
+    /** The attribute id for the last name. */
+    public static final String ATTR_ID_SURNAME = "surname";
+    
+    /** The attribute id for the roles. */
+    public static final String ATTR_ID_ROLES = "roles";
+    
+    /** The attribute id for the municipalities. */
+    public static final String ATTR_ID_MUNICIPALITIES = "municipalities";
+    
+    /** The attribute id for the groups. */
+    public static final String ATTR_ID_GROUPS = "groups";
+    
+    /** The attribute id for the schools. */
+    public static final String ATTR_ID_SCHOOLS = "schools";
 
     /** Class logging. */
     private final Logger log = LoggerFactory.getLogger(RestDataConnector.class);
@@ -82,8 +104,8 @@ public class RestDataConnector extends AbstractDataConnector {
     /** The attribute id containing the ECA IdP id. */
     private String idpId;
 
-    /** The attribute id for the resulting OID. */
-    private String resultAttribute;
+    /** The attribute id prefix for the resulting attributes. */
+    private String resultAttributePrefix;
 
     /** The token used for authenticating to the REST server. */
     private String token;
@@ -157,13 +179,8 @@ public class RestDataConnector extends AbstractDataConnector {
             if (status == HttpStatus.SC_OK) {
                 final Gson gson = new Gson();
                 final UserDTO ecaUser = gson.fromJson(restResponseStr, UserDTO.class);
-                log.debug("Username found? {}", ecaUser.getUsername() != null);
-                final IdPAttribute idpAttribute = new IdPAttribute(resultAttribute);
-                final List<IdPAttributeValue<String>> values = new ArrayList<>();
-                values.add(new StringAttributeValue(ecaUser.getUsername()));
-                idpAttribute.setValues(values);
-                attributes.put(resultAttribute, idpAttribute);
-                log.debug("OID successfully inserted into the attributes");
+                populateAttributes(attributes, ecaUser);
+                log.debug("{} attributes are now populated", attributes.size());
             } else {
                 log.warn("No attributes found for session, http status {}", status);
             }
@@ -173,6 +190,47 @@ public class RestDataConnector extends AbstractDataConnector {
             EntityUtils.consumeQuietly(restEntity);
         }
         return attributes;
+    }
+    
+    /**
+     * Populates the attributes from the given user object to the given result map.
+     * 
+     * @param attributes The result map of attributes.
+     * @param ecaUser The source user object.
+     */
+    protected void populateAttributes(final Map<String, IdPAttribute> attributes, UserDTO ecaUser) {
+        populateAttribute(attributes, ATTR_ID_USERNAME, ecaUser.getUsername());
+        populateAttribute(attributes, ATTR_ID_FIRSTNAME, ecaUser.getFirstName());
+        populateAttribute(attributes, ATTR_ID_SURNAME, ecaUser.getLastName());
+        if (ecaUser.getRoles() != null) {
+            for (int i = 0; i < ecaUser.getRoles().length; i++) {
+                populateAttribute(attributes, ATTR_ID_SCHOOLS, ecaUser.getRoles()[i].getSchool());
+                populateAttribute(attributes, ATTR_ID_GROUPS, ecaUser.getRoles()[i].getGroup());
+                populateAttribute(attributes, ATTR_ID_ROLES, ecaUser.getRoles()[i].getRole());
+                populateAttribute(attributes, ATTR_ID_MUNICIPALITIES, ecaUser.getRoles()[i].getMunicipality());
+            }
+        }
+    }
+    
+    /**
+     * Populates an attribute with the the given id and value to the given result map.
+     * 
+     * @param attributes The result map of attributes.
+     * @param attributeId The attribute id.
+     * @param attributeValue The attribute value.
+     */
+    protected void populateAttribute(final Map<String, IdPAttribute> attributes, 
+            final String attributeId, final String attributeValue) {
+        if (StringSupport.trimOrNull(attributeId) == null || StringSupport.trimOrNull(attributeValue) == null) {
+            log.debug("Ignoring attirbute {}, null value", attributeId);
+            return;
+        }
+        final IdPAttribute idpAttribute = new IdPAttribute(resultAttributePrefix + attributeId);
+        final List<IdPAttributeValue<String>> values = new ArrayList<>();
+        values.add(new StringAttributeValue(attributeValue));
+        idpAttribute.setValues(values);
+        attributes.put(resultAttributePrefix + attributeId, idpAttribute);
+        log.debug("Populated {} with value {}", resultAttributePrefix + attributeId, attributeValue);
     }
 
     /**
@@ -225,19 +283,19 @@ public class RestDataConnector extends AbstractDataConnector {
     }
 
     /**
-     * Sets the attribute id for the resulting OID. 
-     * @param attribute The resultAttribute.
+     * Sets the attribute id prefix for the resulting attributes. 
+     * @param attributePrefix The resultAttributePrefix.
      */
-    public void setResultAttribute(String attribute) {
-        this.resultAttribute = Constraint.isNotEmpty(attribute, "The resultAttribute cannot be empty!");
+    public void setResultAttributePrefix(String attributePrefix) {
+        this.resultAttributePrefix = attributePrefix;
     }
     
     /**
-     * Gets the attribute id for the resulting OID.
-     * @return The resultAttribute.
+     * Gets the attribute id prefix for the resulting attributes.
+     * @return The resultAttributePrefix.
      */
-    public String getResultAttribute() {
-        return this.resultAttribute;
+    public String getResultAttributePrefix() {
+        return this.resultAttributePrefix;
     }
 
     /**
