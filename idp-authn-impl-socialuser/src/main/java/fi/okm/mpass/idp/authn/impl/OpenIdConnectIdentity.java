@@ -143,8 +143,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         try {
             this.display = Display.parse(oidcDisplay);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
         }
         log.trace("Leaving");
     }
@@ -229,7 +228,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                     .toString();
 
         } catch (URISyntaxException | SerializeException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -282,7 +281,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             }
         } catch (SerializeException | IOException | java.text.ParseException
                 | ParseException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
