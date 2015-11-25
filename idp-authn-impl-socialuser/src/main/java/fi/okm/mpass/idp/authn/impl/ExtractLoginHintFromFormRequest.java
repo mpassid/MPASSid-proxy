@@ -23,6 +23,10 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,13 +35,13 @@ import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.logic.Constraint;
-import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fi.okm.mpass.idp.authn.SocialLoginHintCoder;
 
 /**
  * An action that extracts a login hint from an HTTP form body or query string,
@@ -50,47 +54,98 @@ public class ExtractLoginHintFromFormRequest extends AbstractExtractionAction {
     @Nonnull private final Logger log = LoggerFactory.getLogger(ExtractLoginHintFromFormRequest.class);
 
     /** Parameter name for login hint. */
-    @Nonnull @NotEmpty  private String loginHintFieldName;
+    @Nonnull @NotEmpty  private List<String> loginHintFieldNames;
   
-    /** Constructor. */
-    ExtractLoginHintFromFormRequest() {
-        loginHintFieldName = "j_loginhint";
+    /** coder for coding login hint. */
+    private SocialLoginHintCoder socialLoginHintCoder;
+    
+    /**
+     * Set the login hint parameter names.
+     * 
+     * @param fieldNames the login hint field names
+     */
+    public void setLoginHintFieldName(@Nonnull @NotEmpty final List<String> fieldNames) {
+        log.trace("Entering");
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        loginHintFieldNames = fieldNames;
+        log.trace("Leaving");
     }
 
     /**
-     * Set the login hint parameter name.
+     * Set the login hint coder.
      * 
-     * @param fieldName the username parameter name
+     * @param loginHintCoder the login hint coder
      */
-    public void setLoginHintFieldName(@Nonnull @NotEmpty final String fieldName) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        
-        loginHintFieldName = Constraint.isNotNull(
-                StringSupport.trimOrNull(fieldName), "Login Hint field name cannot be null or empty.");
+    public void setLoginHintCoder(SocialLoginHintCoder loginHintCoder) {
+        log.trace("Entering");
+        this.socialLoginHintCoder = loginHintCoder;
+        log.trace("Leaving");
     }
-
     
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
+        log.trace("Entering");
         authenticationContext.setHintedName(null);
         
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
             log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
             return;
         }
         
-        final String loginHint = request.getParameter(loginHintFieldName);
-        if (loginHint == null || loginHint.isEmpty()) {
-            log.debug("{} No loginhint in request", getLogPrefix());
+        if (loginHintFieldNames == null || loginHintFieldNames.size() == 0){
+            log.warn("No login hint field names defined", getLogPrefix());
+            log.trace("Leaving");
+            return;
+        }
+        
+        if (socialLoginHintCoder == null && loginHintFieldNames.size()>1){
+            log.debug("Multiple login hints require encoder", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
             return;
         }
-        authenticationContext.setHintedName(loginHint);
         
+        Map<String,String> loginHints=new HashMap<String, String>();
+        for (String loginHintFieldName:loginHintFieldNames){
+            final String loginHint = request.getParameter(loginHintFieldName);
+            if (loginHint == null || loginHint.isEmpty()) {
+                log.debug("{} No required login hint "+loginHint+" in request", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+            loginHints.put(loginHintFieldName, loginHint);
+        }
+        authenticationContext.setHintedName(getLoginHint(loginHints));
+        log.trace("Leaving");
+        
+    }
+    
+    /**
+     * Returns encoded login hint if encoder exists,
+     * otherwise it returns one noncoded value from the map
+     * (assumes there is only one).
+     * 
+     * @param loginHints map
+     * @return login hint string
+     */
+    private String getLoginHint(Map<String,String> loginHints){
+        log.trace("Entering");
+        if (socialLoginHintCoder == null){
+            for (Map.Entry<String, String> entry : loginHints.entrySet()){
+                /*We return any value*/
+                log.trace("Leaving");
+                return entry.getValue();
+                
+            }
+        }
+        log.trace("Leaving");
+        return socialLoginHintCoder.encode(loginHints);
     }
 }
