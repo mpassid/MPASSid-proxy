@@ -65,8 +65,11 @@ public class UserDTO {
         /** The role attribute. */
         private String role;
 
-        /** The group group corresponding to the role. */
+        /** The group corresponding to the role. */
         private String group;
+        
+        /** The municipality corresponding to the role. */
+        private String municipality;
 
         /**
          * Set school.
@@ -120,6 +123,24 @@ public class UserDTO {
          */
         public String getGroup() {
             return group;
+        }
+        
+        /**
+         * Set municipality.
+         * 
+         * @param newMunicipality The value to be set.
+         */
+        public void setMunicipality(String newMunicipality) {
+            municipality = newMunicipality;
+        }
+        
+        /**
+         * Get municipality.
+         * 
+         * @return The value of municipality.
+         */
+        public String getMunicipality() {
+            return municipality;
         }
     }
 

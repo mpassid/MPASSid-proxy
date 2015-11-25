@@ -64,7 +64,7 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
         expectedEndpointUrl = "testindEndpointUrl";
         expectedHookAttribute = "testingHookAttribute";
         expectedIdpId = "testingIdpId";
-        expectedResultAttribute = "testingResultAttribute";
+        expectedResultAttribute = "testingPrefix";
         expectedToken = "testingToken";
     }
     
@@ -80,7 +80,7 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
         Assert.assertEquals(dataConnector.getEndpointUrl(), expectedEndpointUrl);
         Assert.assertEquals(dataConnector.getHookAttribute(), expectedHookAttribute);
         Assert.assertEquals(dataConnector.getIdpId(), expectedIdpId);
-        Assert.assertEquals(dataConnector.getResultAttribute(), expectedResultAttribute);
+        Assert.assertEquals(dataConnector.getResultAttributePrefix(), expectedResultAttribute);
         Assert.assertEquals(dataConnector.getToken(), expectedToken);
     }
 

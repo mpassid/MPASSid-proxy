@@ -59,10 +59,10 @@ THE SOFTWARE.
                         </documentation>
                     </annotation>
                 </attribute>
-                <attribute name="resultAttribute" type="string" use="required">
+                <attribute name="resultAttributePrefix" type="string" use="required">
                     <annotation>
                         <documentation>
-							The IDP attribute that will store the resolved OID.
+							The IDP attribute id prefix used when storing the resolved attributes.
                         </documentation>
                     </annotation>
                 </attribute>
