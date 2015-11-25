@@ -261,6 +261,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         "access token response error",
                         SocialUserErrorIds.EXCEPTION);
             }
+            log.debug("claims from provider: "+oidcAccessTokenResponse.getIDToken().getJWTClaimsSet());
             boolean first = true;
             for (Map.Entry<String, String> entry : getClaimsPrincipals()
                     .entrySet()) {
