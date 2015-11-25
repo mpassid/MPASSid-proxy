@@ -270,13 +270,13 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                                 Types.valueOf(entry.getValue()),
                                 oidcAccessTokenResponse.getIDToken()
                                         .getJWTClaimsSet()
-                                        .getClaim(entry.getKey()).toString()));
+                                        .getStringClaim(entry.getKey())));
                 // first mapped claim is also username principal
                 if (first) {
                     subject.getPrincipals().add(
                             new UsernamePrincipal(oidcAccessTokenResponse
                                     .getIDToken().getJWTClaimsSet()
-                                    .getClaim(entry.getKey()).toString()));
+                                    .getStringClaim(entry.getKey())));
                     first = false;
                 }
             }
