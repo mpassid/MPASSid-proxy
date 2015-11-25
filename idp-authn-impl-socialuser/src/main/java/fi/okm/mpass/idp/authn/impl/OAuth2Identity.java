@@ -85,7 +85,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                     .endpointURI(getAuthorizationEndpoint()).build();
             ret = request.toURI().toString();
         } catch (URISyntaxException | SerializeException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -151,7 +151,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
