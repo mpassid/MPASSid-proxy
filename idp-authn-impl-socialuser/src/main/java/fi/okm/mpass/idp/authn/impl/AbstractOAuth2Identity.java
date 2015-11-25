@@ -388,7 +388,7 @@ public abstract class AbstractOAuth2Identity {
             return null;
 
         } catch (URISyntaxException | ParseException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
