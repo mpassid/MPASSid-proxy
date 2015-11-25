@@ -39,9 +39,34 @@
         </property>
     </bean>
 
-    <bean id="ExtractLoginHintFromFormRequest"
+     <bean id="ExtractLoginHintFromFormRequest"
         class="fi.okm.mpass.idp.authn.impl.ExtractLoginHintFromFormRequest" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+        <!-- Usually there is only one login hint field.
+             If loginHintCoder is present, there may be several fields.   -->
+        <property name="loginHintFieldName">
+         <list>
+            <value>j_loginhint</value>
+         </list>
+        </property>
+        
+        <!-- Enables coding loginHintField as json/base64 map and thus having several fields -->
+        <!-- 
+        <property name="LoginHintCoder" ref="LoginHintJsonBase64Coder"/>
+        -->
+     </bean>
+
+     <bean id="LoginHintJsonBase64Coder"
+        class="fi.okm.mpass.idp.authn.impl.LoginHintJsonBase64Coder" scope="prototype">
+        <!--  rename mapping keys to json -->
+        <!--  
+        <property name="loginHintRenameMapping">
+         <map>
+            <entry key="j_loginhint" value="loginHint"/>
+         </map>
+        </property>
+        -->
+    </bean>
 
     <bean id="ExtractSocialPrincipalsFromSubject"
         class="fi.okm.mpass.idp.authn.impl.ExtractSocialPrincipalsFromSubject" scope="prototype"
