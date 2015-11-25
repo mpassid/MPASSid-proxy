@@ -117,7 +117,7 @@ public class YleIdentity extends OAuth2Identity implements
             // yle authorize endpoint needs extra credentials to reach
             ret = request.toURI().toString() + getYleGatewayCredentialsTrail();
         } catch (URISyntaxException | SerializeException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -191,7 +191,7 @@ public class YleIdentity extends OAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.error(e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
