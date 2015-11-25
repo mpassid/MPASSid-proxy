@@ -100,6 +100,7 @@ public class SocialUserAuthServlet extends HttpServlet {
                 subject = socialRedirectAuthenticator.getSubject(httpRequest);
             } catch (SocialUserAuthenticationException e) {
                 // Authentication has been interrupted;
+                log.debug("User authentication failed");
                 httpRequest.setAttribute(
                         ExternalAuthentication.AUTHENTICATION_ERROR_KEY,
                         e.getAuthEventId());
