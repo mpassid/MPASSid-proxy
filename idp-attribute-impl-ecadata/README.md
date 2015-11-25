@@ -58,22 +58,23 @@ The following configuration attributes are available for the _DataConnector_ its
 - _endpointUrl_: The REST API URL from where the attributes can be fetched.
 - _hookAttribute_: The resolved IDP attribute that contains the calculated ECA authnID.
 - _idpId_: The resolved IDP attribute that contains the stored IDP identifier for authnID.
-- _resultAttribute_: The IDP attribute that will store the resolved user object identifier.
+- _resultAttributePrefix_: The IDP attribute id prefix that will be used for the resulting attributes.
 - _token_: The authorization token registered to the ECA DATA API.
 - _disregardTLSCertificate_: Set to 'true' to skip endpoint certificate validation.
 
 ### Example configuration
 
 An example snippet of configuration in _attribute-resolver.xml_, which uses _authnid_ and _idpId_ attributes
-as hooks and records the corresponding user object identifier into an attribute _ecaOid_:
+as hooks and records the attributes with prefix _eca_. The _username_ returned by the REST API will be encoded
+to a SAML 2 attribute called _urn:TODO:namespace:username_:
 
 ```
-<resolver:AttributeDefinition id="ecaOid" xsi:type="ad:Simple">
+<resolver:AttributeDefinition id="ecausername" xsi:type="ad:Simple">
     <resolver:Dependency ref="ecaDataApi" />
     <resolver:AttributeEncoder 
       xsi:type="enc:SAML2String" 
-      name="urn:TODO:namespace:OID" 
-      friendlyName="oid" 
+      name="urn:TODO:namespace:username" 
+      friendlyName="username" 
       encodeType="false" />
 </resolver:AttributeDefinition>
 
@@ -83,7 +84,7 @@ as hooks and records the corresponding user object identifier into an attribute 
   endpointUrl="https://eca-data.example.org/api/1/user" 
   hookAttribute="authnid" 
   idpId="idpId" 
-  resultAttribute="ecaOid" 
+  resultAttributePrefix="eca" 
   token="secrettoken12345" 
   disregardTLSCertificate="false">
     <resolver:Dependency ref="authnid" />
