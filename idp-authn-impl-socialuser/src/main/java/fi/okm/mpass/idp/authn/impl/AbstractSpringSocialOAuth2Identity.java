@@ -152,7 +152,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             params.setState(digest);
         } catch (NoSuchAlgorithmException e) {
             log.error("Unable to generate state");
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -186,7 +186,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             log.error("Unable to generate state");
-            e.printStackTrace();
+            log.error("Something bad happened "+e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "Unable to hash, use some other method",
@@ -274,6 +274,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
                     httpRequest.getRequestURL().toString(), null);
         } catch (HttpClientErrorException e) {
             log.trace("Leaving");
+            log.error("Something bad happened "+e.getMessage());
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
         }
