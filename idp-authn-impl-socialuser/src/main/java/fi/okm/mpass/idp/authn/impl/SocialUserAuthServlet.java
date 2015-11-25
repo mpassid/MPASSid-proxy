@@ -118,6 +118,8 @@ public class SocialUserAuthServlet extends HttpServlet {
                 log.trace("Leaving");
                 return;
             }
+            log.debug("User has been authenticated");
+            log.debug("finishing external authentication");
             httpRequest.setAttribute(ExternalAuthentication.SUBJECT_KEY,
                     subject);
             ExternalAuthentication.finishExternalAuthentication(
@@ -167,6 +169,7 @@ public class SocialUserAuthServlet extends HttpServlet {
     private String startAuthentication(final HttpServletRequest httpRequest)
             throws ExternalAuthenticationException {
         log.trace("Entering");
+        log.debug("starting external authentication");
         String key = ExternalAuthentication
                 .startExternalAuthentication(httpRequest);
         httpRequest.getSession().setAttribute("ext_auth_start_key", key);
