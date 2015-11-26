@@ -30,7 +30,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 import fi.okm.mpass.shibboleth.attribute.resolver.dc.impl.RestDataConnector;
-import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
+import net.shibboleth.idp.attribute.resolver.spring.dc.impl.AbstractDataConnectorParser;
 
 /**
  * A configuration parser for ECA Auth Data API data connector.

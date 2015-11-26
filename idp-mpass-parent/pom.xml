@@ -14,7 +14,7 @@
     <parent>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.0</version>
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-mpass-parent</artifactId>
@@ -37,9 +37,7 @@
         <maven.compiler.version>3.2</maven.compiler.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <shib.idp.version>3.1.2</shib.idp.version>
-        <opensaml.groupId>org.opensaml</opensaml.groupId>
-        <opensaml.version>3.1.1</opensaml.version>
+        <shib.idp.version>3.2.0</shib.idp.version>
         <gson.version>2.3.1</gson.version>
         
         <checkstyle.configLocation>
