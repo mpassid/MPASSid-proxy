@@ -33,6 +33,7 @@ import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 
@@ -50,6 +51,7 @@ import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.util.JSONArrayUtils;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
@@ -98,6 +100,33 @@ public abstract class AbstractOAuth2Identity {
     /** map of principal default values. */
     @Nonnull
     private Map<String, String> principalsDefaults;
+    
+    /** map of custom claims types. */
+    private Map<String, String> customClaimsTypes;
+    /** custom claims type. */
+    private final String customClaimTypeJsonArray="jsonarray";
+    
+    /**
+     * This information is used to decide how to interpret custom claim.
+     * 
+     * @param types
+     *            map of custom claims types
+     * */
+    public void setCustomClaimsTypes(Map<String, String> types) {
+        log.trace("Entering");
+        this.customClaimsTypes = types;
+        log.trace("Leaving");
+    }
+
+    /**
+     * This information is used to decide how to interpret custom claim.
+     * 
+     * @return map of custom claims types
+     * */
+    public Map<String, String> getCustomClaimsTypes() {
+        log.trace("Entering & Leaving");
+        return this.customClaimsTypes;
+    }
 
     /**
      * Setter for OAuth2 Scope values.
@@ -438,6 +467,7 @@ public abstract class AbstractOAuth2Identity {
      * @param potClaims
      *            potential claims
      */
+ // Checkstyle: CyclomaticComplexity OFF
     protected void parsePrincipalsFromClaims(Subject subject,
             JSONObject potClaims) {
 
@@ -453,20 +483,59 @@ public abstract class AbstractOAuth2Identity {
                 first = false;
                 continue;
             }
+            //Read raw string
             String value = potClaims.get(claim) != null ? potClaims.get(claim)
                     .toString() : null;
             if (value == null || value.isEmpty()) {
                 first = false;
                 continue;
             }
-            subject.getPrincipals().add(
-                    new SocialUserPrincipal(entry.getValue(), value));
-            if (first) {
-                subject.getPrincipals().add(new UsernamePrincipal(value));
-                first = false;
+            
+            String[] values=null;
+            if (customClaimsTypes == null || !customClaimsTypes.containsKey(claim) ){
+                /*There is no type definition*/
+                values=new String[1];
+                values[0]=value;
+            }else{
+                /*All other types except jsonarray are handled as string currently*/
+                switch(customClaimsTypes.get(claim)){
+                case customClaimTypeJsonArray:
+                    try {
+                        JSONArray array=JSONArrayUtils.parse(value);
+                        values=new String[array.size()];
+                        for (int i=0;i<array.size();i++){
+                            values[i]=array.get(i).toString();
+                        }
+                    } catch (ParseException e) {
+                        /*json parsing failed, we revert to string type*/
+                        log.warn("claim type set as jsonarray but parsing failed. claim:"+value);
+                        values=new String[1];
+                        values[0]=value;
+                    }
+                    break;
+                default:
+                    /*type definition is unkown to us, we revert to string type*/
+                    log.warn("unknown type definition for claim, type is "+value);
+                    values=new String[1];
+                    values[0]=value;
+                }
+                
             }
+            
+           for (String newValue:values){
+               log.debug("Adding socialuserprincipal "+newValue+" of type "+entry.getValue());
+               subject.getPrincipals().add(
+                       new SocialUserPrincipal(entry.getValue(), newValue));
+               //First value is treated as usernameprincipal
+               if (first) {
+                   log.debug("Setting userprincipal to "+newValue);
+                   subject.getPrincipals().add(new UsernamePrincipal(newValue));
+                   first = false;
+               }
+               
+           }
         }
         log.trace("Leaving");
     }
-
+ // Checkstyle: CyclomaticComplexity ON
 }
