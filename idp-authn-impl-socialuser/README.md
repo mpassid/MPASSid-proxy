@@ -13,6 +13,9 @@ This module contains implementations of Facebook, Google, LinkedIn, Twitter, Yle
 ### Spring Social modules
 There are four modules implemented using Spring Social.  
 
+#### Attributes
+Spring social modules all try to populate email, firstName, lastName, userId, displayName and providerId. In successful authentication case userId is always populated. See examples in attribute-resolver.xml on how to read them from SocialUserContext.
+
 #### Facebook
 - Template for bean definition in socialuser-authn-beans.xml: FacebookIdentity
 - This module supports forced authentication.
@@ -31,6 +34,9 @@ There are four modules implemented using Spring Social.
 
 ### Nimbus modules
 There are three modules implemented using Nimbus OAuth2 SDK.  
+
+#### Attributes
+All Nimbus based modules have principal population configured in the respective beans (see the examples in socialuser-authn-beans.xml). Which claims are which principals is configured with claimsPrincipals-property. If you want a claim to be interpreted as (json)array you need to instruct that with customClaimsTypes-property. If you name the principals as other than email, firstName, lastName, userId, displayName or providerId, you will need to read the values from principal map. Also, if the claim is an array having more than one field, the only way to read all fields is by principal map.
 
 #### OAuth2 
 - Template for bean definition in socialuser-authn-beans.xml: ExampleOauth2Identity
@@ -108,6 +114,6 @@ The copied bean definitions will need to be configured.
 
 ```
 
-5. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has example attribute definitions. The SocialUserContext context attributes are email, firstName, lastName, userId, displayName and providerId. In successfull authentication case userId is always populated.
+5. /opt/shibboleth-idp/conf/attribute-resolver-social.xml has some example attribute definitions. 
 
 6. New authentication flow(s) can now be used by enabling it in idp.properties file
