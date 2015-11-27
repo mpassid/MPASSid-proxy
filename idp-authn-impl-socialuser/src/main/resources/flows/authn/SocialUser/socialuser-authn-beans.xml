@@ -211,11 +211,20 @@
             <entry key="sub" value="userId"/>
             <entry key="iss" value="providerId"/>
             <!-- 
-            <entry key="" value="email"/>
+            <entry key="cclaim" value="email"/>
             <entry key="" value="firstName"/>
             <entry key="" value="lastName"/>
             -->
          </map>
+         
+         <!--  If custom claim is not string it can be set here -->
+         <property name="customClaimsTypes">
+         <map>
+            <!-- 
+            <entry key="cclaim" value="jsonarray"/>
+            -->
+         </map>
+         
         </property>
     </bean>
     
