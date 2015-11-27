@@ -88,11 +88,15 @@ public class ExtractSocialPrincipalsFromSubject extends
         final Set<SocialUserPrincipal> principals = subject
                 .getPrincipals(SocialUserPrincipal.class);
         for (SocialUserPrincipal sprin : principals) {
+            //Add all to map
+            suCtx.addPrincipal(sprin.getType(), sprin.getValue());
+            //Add specific principals
             SocialUserPrincipal.Types type = sprin.getTypesType();
             if (type == null) {
                 continue;
             }
             switch (type) {
+            /*These mapped values support only one principal value.*/
             case providerId:
                 suCtx.setProviderId(sprin.getValue());
                 break;
