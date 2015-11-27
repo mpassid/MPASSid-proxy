@@ -25,7 +25,7 @@ package fi.okm.mpass.shibboleth.attribute.resolver.spring.dc;
 
 import javax.xml.namespace.QName;
 
-import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
+import net.shibboleth.idp.attribute.resolver.spring.dc.impl.AbstractDataConnectorParser;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.slf4j.Logger;
