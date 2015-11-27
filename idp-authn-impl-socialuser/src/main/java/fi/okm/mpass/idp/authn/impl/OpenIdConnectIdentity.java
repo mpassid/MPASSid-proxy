@@ -27,23 +27,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
-
-import net.shibboleth.idp.authn.principal.UsernamePrincipal;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 import fi.okm.mpass.idp.authn.SocialRedirectAuthenticator;
 import fi.okm.mpass.idp.authn.SocialUserErrorIds;
-import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
-import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal.Types;
-
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.SerializeException;
@@ -74,6 +67,10 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     /** OIDC Display. */
     private Display display;
 
+   
+    
+    
+    
     /**
      * Setter for OpenId Scope values.
      * 
@@ -262,24 +259,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         SocialUserErrorIds.EXCEPTION);
             }
             log.debug("claims from provider: "+oidcAccessTokenResponse.getIDToken().getJWTClaimsSet());
-            boolean first = true;
-            for (Map.Entry<String, String> entry : getClaimsPrincipals()
-                    .entrySet()) {
-                subject.getPrincipals().add(
-                        new SocialUserPrincipal(
-                                Types.valueOf(entry.getValue()),
-                                oidcAccessTokenResponse.getIDToken()
-                                        .getJWTClaimsSet()
-                                        .getStringClaim(entry.getKey())));
-                // first mapped claim is also username principal
-                if (first) {
-                    subject.getPrincipals().add(
-                            new UsernamePrincipal(oidcAccessTokenResponse
-                                    .getIDToken().getJWTClaimsSet()
-                                    .getStringClaim(entry.getKey())));
-                    first = false;
-                }
-            }
+            parsePrincipalsFromClaims(subject, oidcAccessTokenResponse.getIDToken().getJWTClaimsSet().toJSONObject());
         } catch (SerializeException | IOException | java.text.ParseException
                 | ParseException e) {
             log.error("Something bad happened "+e.getMessage());
@@ -291,5 +271,6 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         return subject;
 
     }
+   
 
 }
