@@ -22,6 +22,11 @@
  */
 package fi.okm.mpass.idp.authn.context;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -63,6 +68,37 @@ public class SocialUserContext extends BaseContext {
     @Nullable
     private String providerId;
 
+    
+    private Map<String, List<String>> principalMap;
+    
+    /**
+     * Gets the principal map.
+     * 
+     * @return principal map
+     */
+    @Nullable
+    public Map<String, List<String>> getPrincipalMap(){
+        log.trace("Entering & Leaving");
+        return principalMap;
+    }
+    
+    /**
+     * Adds a principal to principal map.
+     * 
+     * @param key to principal
+     * @param value of principal
+     */
+    public void addPrincipal(String key, String value){
+        log.trace("Entering");
+        if (principalMap == null){
+            principalMap = new HashMap<String, List<String>>();
+        }
+        if (!principalMap.containsKey(key)){
+            principalMap.put(key, new ArrayList<String>());   
+        }
+        principalMap.get(key).add(value);
+    }
+       
     /**
      * Gets the email.
      * 
