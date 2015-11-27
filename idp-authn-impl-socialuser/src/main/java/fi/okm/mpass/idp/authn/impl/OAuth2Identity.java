@@ -125,6 +125,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             AccessToken accessToken = tokenSuccessResponse.getAccessToken();
             // try reading stuff from accesstoken
             Subject subject = new Subject();
+            log.debug("claims from provider: "+accessToken.toJSONString());
             parsePrincipalsFromClaims(subject, accessToken.toJSONObject());
             if (getUserinfoEndpoint() != null
                     && !getUserinfoEndpoint().toString().isEmpty()) {
