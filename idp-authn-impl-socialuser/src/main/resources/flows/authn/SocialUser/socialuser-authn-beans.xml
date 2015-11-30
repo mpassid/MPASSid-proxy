@@ -95,7 +95,7 @@
     <bean id="LinkedInIdentity" class="fi.okm.mpass.idp.authn.impl.LinkedInIdentity" scope="prototype">
         <property name="appId" value="put_here" />
         <property name="appSecret" value="put_here" />
-        <property name="scope" value="rr_basicprofile" />
+        <property name="scope" value="r_basicprofile" />
     </bean>
 
     <bean id="OAuth2YleIdentity" class="fi.okm.mpass.idp.authn.impl.YleIdentity">
