@@ -69,18 +69,37 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
     }
     
     /**
-     * Tests parsing of the {@link RestDataConnector} from XML configuration.
+     * Tests parsing of the {@link RestDataConnector} from XML configuration with only required configuration
+     * parameters set.
      * 
      * @throws ComponentInitializationException If data connector initialization fails.
      */
-    @Test public void testParsing() throws ComponentInitializationException {
+    @Test public void testMinimum() throws ComponentInitializationException {
         final RestDataConnector dataConnector = initializeDataConnector("restdc-min.xml");
         Assert.assertEquals(dataConnector.getId(), expectedId);
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
         Assert.assertEquals(dataConnector.getEndpointUrl(), expectedEndpointUrl);
         Assert.assertEquals(dataConnector.getHookAttribute(), expectedHookAttribute);
         Assert.assertEquals(dataConnector.getIdpId(), expectedIdpId);
+        Assert.assertEquals(dataConnector.getResultAttributePrefix(), "");
+        Assert.assertFalse(dataConnector.isDisregardTLSCertificate());
+        Assert.assertEquals(dataConnector.getToken(), expectedToken);
+    }
+
+    /**
+     * Tests parsing of the {@link RestDataConnector} from XML configuration with optional parameters set.
+     *
+     * @throws ComponentInitializationException If data connector initialization fails.
+     */
+    @Test public void testFull() throws ComponentInitializationException {
+        final RestDataConnector dataConnector = initializeDataConnector("restdc-full.xml");
+        Assert.assertEquals(dataConnector.getId(), expectedId);
+        Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertEquals(dataConnector.getEndpointUrl(), expectedEndpointUrl);
+        Assert.assertEquals(dataConnector.getHookAttribute(), expectedHookAttribute);
+        Assert.assertEquals(dataConnector.getIdpId(), expectedIdpId);
         Assert.assertEquals(dataConnector.getResultAttributePrefix(), expectedResultAttribute);
+        Assert.assertTrue(dataConnector.isDisregardTLSCertificate());
         Assert.assertEquals(dataConnector.getToken(), expectedToken);
     }
 
