@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 
 import fi.okm.mpass.shibboleth.attribute.resolver.dc.impl.RestDataConnector;
 import net.shibboleth.idp.attribute.resolver.spring.dc.impl.AbstractDataConnectorParser;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * A configuration parser for ECA Auth Data API data connector.
@@ -58,6 +59,10 @@ public class RestDataConnectorParser extends AbstractDataConnectorParser {
         String token = element.getAttributeNS(null, "token");
         builder.addPropertyValue("token", token);
         String disregardTLSCertificate = element.getAttributeNS(null, "disregardTLSCertificate");
-        builder.addPropertyValue("disregardTLSCertificate", disregardTLSCertificate);
+        if (StringSupport.trimOrNull(disregardTLSCertificate) != null) {
+            builder.addPropertyValue("disregardTLSCertificate", disregardTLSCertificate);
+        } else {
+            builder.addPropertyValue("disregardTLSCertificate", "false");
+        }
     }
 }

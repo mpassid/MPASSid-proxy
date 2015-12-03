@@ -59,10 +59,10 @@ THE SOFTWARE.
                         </documentation>
                     </annotation>
                 </attribute>
-                <attribute name="resultAttributePrefix" type="string" use="required">
+                <attribute name="resultAttributePrefix" type="string" use="optional">
                     <annotation>
                         <documentation>
-							The IDP attribute id prefix used when storing the resolved attributes.
+							The IDP attribute id prefix used when storing the resolved attributes. Default empty.
                         </documentation>
                     </annotation>
                 </attribute>
@@ -73,10 +73,10 @@ THE SOFTWARE.
                         </documentation>
                     </annotation>
                 </attribute>
-                <attribute name="disregardTLSCertificate" type="string" use="required">
+                <attribute name="disregardTLSCertificate" type="string" use="optional">
                     <annotation>
                         <documentation>
-							Set to 'true' to skip endpoint certificate validation.
+							Set to 'true' to skip endpoint certificate validation. Default 'false'.
                         </documentation>
                     </annotation>
                 </attribute>
