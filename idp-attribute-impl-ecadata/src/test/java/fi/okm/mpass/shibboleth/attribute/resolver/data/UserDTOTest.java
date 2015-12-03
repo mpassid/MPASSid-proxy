@@ -23,6 +23,9 @@
 
 package fi.okm.mpass.shibboleth.attribute.resolver.data;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -34,18 +37,24 @@ import com.google.gson.Gson;
 public class UserDTOTest {
 
     /**
-     * Tests parsing of a single user data transfer object.
+     * Tests parsing of a single user data transfer object without roles nor attributes.
      */
     @Test
-    public void test() {
-        Gson gson = new Gson();
-        String test =
-                "{\"username\": \"OID1\", \"first_name\": \"John\", "
-                + "\"last_name\": \"Doe\", \"roles\": "
-                + "[{\"role\": \"teacher\", \"school\": \"12345\", \"group\": \"7C\"}], "
-                + "\"attributes\": [{\"name\": \"google\", "
-                + "\"value\": \"11XxjGZOeAyNqwTdq0Xec9ydDhYoq5CHrTQXHHSfGWM=\"}]}";
-        UserDTO user = gson.fromJson(test, UserDTO.class);
+    public void testNoRolesNoAttributes() {
+        UserDTO user = getUser("user-0role-0attr.json");
+        Assert.assertEquals(user.getUsername(), "OID1");
+        Assert.assertEquals(user.getFirstName(), "John");
+        Assert.assertEquals(user.getLastName(), "Doe");
+        Assert.assertNull(user.getRoles());
+        Assert.assertNull(user.getAttributes());
+    }
+    
+    /**
+     * Tests parsing of a single user data transfer object with one role and one attribute.
+     */
+    @Test
+    public void testOneRoleOneAttribute() {
+        UserDTO user = getUser("user-1role-1attr.json");
         Assert.assertEquals(user.getUsername(), "OID1");
         Assert.assertEquals(user.getFirstName(), "John");
         Assert.assertEquals(user.getLastName(), "Doe");
@@ -53,8 +62,46 @@ public class UserDTOTest {
         Assert.assertEquals(user.getRoles()[0].getRole(), "teacher");
         Assert.assertEquals(user.getRoles()[0].getSchool(), "12345");
         Assert.assertEquals(user.getRoles()[0].getGroup(), "7C");
+        Assert.assertEquals(user.getRoles()[0].getMunicipality(), "Great City");
         Assert.assertEquals(user.getAttributes().length, 1);
         Assert.assertEquals(user.getAttributes()[0].getName(), "google");
         Assert.assertEquals(user.getAttributes()[0].getValue(), "11XxjGZOeAyNqwTdq0Xec9ydDhYoq5CHrTQXHHSfGWM=");
+    }
+
+    /**
+     * Tests parsing of a single user data transfer object with two roles and two attributes.
+     */
+    @Test
+    public void testTwoRoleTwoAttribute() {
+        UserDTO user = getUser("user-2role-2attr.json");
+        Assert.assertEquals(user.getUsername(), "OID1");
+        Assert.assertEquals(user.getFirstName(), "John");
+        Assert.assertEquals(user.getLastName(), "Doe");
+        Assert.assertEquals(user.getRoles().length, 2);
+        Assert.assertEquals(user.getRoles()[0].getRole(), "teacher");
+        Assert.assertEquals(user.getRoles()[0].getSchool(), "12345");
+        Assert.assertEquals(user.getRoles()[0].getGroup(), "7C");
+        Assert.assertEquals(user.getRoles()[0].getMunicipality(), "Great City");
+        Assert.assertEquals(user.getRoles()[1].getRole(), "teacher");
+        Assert.assertEquals(user.getRoles()[1].getSchool(), "23456");
+        Assert.assertEquals(user.getRoles()[1].getGroup(), "9B");
+        Assert.assertEquals(user.getRoles()[1].getMunicipality(), "Rival City");
+        Assert.assertEquals(user.getAttributes().length, 2);
+        Assert.assertEquals(user.getAttributes()[0].getName(), "google");
+        Assert.assertEquals(user.getAttributes()[0].getValue(), "11XxjGZOeAyNqwTdq0Xec9ydDhYoq5CHrTQXHHSfGWM=");
+        Assert.assertEquals(user.getAttributes()[1].getName(), "twitter");
+        Assert.assertEquals(user.getAttributes()[1].getValue(), "88XxjGZOeAyNqwTdq0Xec9ydDhYoq5CHrTQXHHSfGWM=");
+    }
+
+    /**
+     * Parses a user object from the given class path resource.
+     * 
+     * @param classResource The resource containing user JSON.
+     * @return The user object.
+     */
+    protected UserDTO getUser(String classResource) {
+        Gson gson = new Gson();
+        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream(classResource));
+        return gson.fromJson(reader, UserDTO.class);
     }
 }
