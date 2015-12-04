@@ -219,6 +219,10 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             throws SocialUserAuthenticationException {
         log.trace("Entering");
         String error = httpRequest.getParameter("error");
+        //TODO .. this needs some bean injection magic. FB for instance has error_code
+        if (error==null){
+            error = httpRequest.getParameter("error_code");
+        }
         if (error != null && !error.isEmpty()) {
             log.trace("Leaving");
             String event = SocialUserErrorIds.EXCEPTION;
@@ -238,6 +242,10 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             }
             String errorDescription = httpRequest
                     .getParameter("error_description");
+            if (errorDescription==null){
+              //TODO .. this needs some bean injection magic. FB for instance has error_message
+                errorDescription = httpRequest.getParameter("error_message");
+            }
             if (errorDescription != null && !errorDescription.isEmpty()) {
                 error += " : " + errorDescription;
             }
