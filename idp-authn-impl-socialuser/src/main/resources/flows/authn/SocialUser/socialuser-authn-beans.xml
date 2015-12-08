@@ -68,6 +68,7 @@
                 <entry key="/idp/Authn/SocialUser/LinkedIn" value-ref="LinkedInIdentity" />
                 <entry key="/idp/Authn/SocialUser/Yle" value-ref="OAuth2YleIdentity" />
                 <entry key="/idp/Authn/SocialUser/OIDCLH" value-ref="ExampleOpenIdConnectIdentity" />
+                <entry key="/idp/Authn/SocialUser/LiveID" value-ref="LiveID" />
             </map>
         </property>
     </bean>
@@ -177,6 +178,29 @@
 
         </property>
     </bean>
+    
+    <!--  Live ID example -->
+    <bean id="LiveIdentity"
+        class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
+        <property name="clientId" value=""/>
+        <property name="clientSecret" value=""/>
+        <property name="authorizationEndpoint" value="https://login.live.com/oauth20_authorize.srf"/>
+        <property name="tokenEndpoint" value="https://login.live.com/oauth20_token.srf"/>
+        <property name="userinfoEndpoint" value="https://apis.live.net/v5.0/me"/>
+        <property name="scope">
+         <list>
+            <value>wl.basic</value>
+         </list>
+        </property>
+        <property name="claimsPrincipals">
+         <map>
+            <entry key="id" value="userId"/>
+            <entry key="first_name" value="firstName"/>
+            <entry key="last_name" value="lastName"/>
+         </map>
+        </property>
+    </bean>
+    
 
     <!-- This bean provides information of the shib authentication context -->
     <bean id="ShibAuthRequest" class="fi.okm.mpass.idp.authn.impl.ShibServletSocialAuthenticationRequestImpl">
