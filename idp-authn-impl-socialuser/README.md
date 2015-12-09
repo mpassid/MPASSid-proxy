@@ -41,6 +41,7 @@ All Nimbus based modules have principal population configured in the respective 
 #### OAuth2 
 - Template for bean definition in socialuser-authn-beans.xml: ExampleOauth2Identity
 - This module does not support forced authentication by default.
+- Windows Live ID example configuration in socialuser-authn-beans.xml.
 
 #### OpenID Connect
 - Template for bean definition in socialuser-authn-beans.xml: ExampleOpenIdConnectIdentity
@@ -52,6 +53,7 @@ All Nimbus based modules have principal population configured in the respective 
 #### Yle (Finnish Broadcasting Company)
 - Template for bean definition in socialuser-authn-beans.xml: OAuth2YleIdentity
 - This module does not support forced authentication.
+
 
 ## Prerequisities and compilation
 
@@ -95,6 +97,8 @@ The copied bean definitions will need to be configured.
             p:nonBrowserSupported="false" />
 <bean id="authn/SocialUserLinkedIn" parent="shibboleth.AuthenticationFlow"
             p:nonBrowserSupported="false" />
+<bean id="authn/SocialUserLiveID" parent="shibboleth.AuthenticationFlow"
+            p:nonBrowserSupported="false" />            
 ```
 
 3. Add following Social User event ids to /opt/shibboleth-idp/conf/authn/authn-events-flow.xml 

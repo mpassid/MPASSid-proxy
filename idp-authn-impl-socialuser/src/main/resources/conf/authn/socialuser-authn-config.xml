@@ -57,6 +57,11 @@
         c:_0="contextRelative:Authn/SocialUser/OIDCLH">
     </bean>
     
+     <!-- Servlet context-relative path to wherever your implementation lives. -->
+    <bean id="shibboleth.authn.SocialUserLiveID.externalAuthnPath" class="java.lang.String"
+        c:_0="contextRelative:Authn/SocialUser/LiveID">
+    </bean>
+    
     <!-- Populate RP UI info from metadata? -->
     <util:constant id="shibboleth.authn.SocialUser.populateUIInfo" static-field="java.lang.Boolean.FALSE" />
 
