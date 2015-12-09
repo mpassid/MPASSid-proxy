@@ -23,8 +23,8 @@
 
 package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +77,6 @@ public class RestDataConnectorTest {
     /** The expected token value. */
     private String expectedToken;
 
-    /** The expected disregardTLSCertificate value. */
-    private boolean expectedDisregardTLSCertificate;
-
     /** The expected resolved OID after successful resolution. */
     private String expectedOid;
 
@@ -92,78 +89,97 @@ public class RestDataConnectorTest {
         expectedEndpointUrl = "testindEndpointUrl";
         expectedHookAttribute = "testingHookAttribute";
         expectedIdpId = "testingIdpId";
-        expectedResultAttribute = "testingPrefixusername";
+        expectedResultAttribute = "username";
         expectedToken = "testingToken";
-        expectedOid = "testUser";
+        expectedOid = "OID1";
     }
 
     /**
-     * Tests {@link RestDataConnector} with minimum configuration.
+     * Tests {@link RestDataConnector} with minimum configuration, without roles for the user.
      * 
      * @throws ComponentInitializationException If component cannot be initialized.
      * @throws ResolutionException If attribute resolution fails.
      */
     @Test
-    public void testMinimum() throws ComponentInitializationException, ResolutionException, Exception {
-        HttpClientBuilder mockBuilder = initializeMockBuilder(expectedOid);
-        final RestDataConnector dataConnector = RestDataConnectorParserTest.initializeDataConnector("restdc-min.xml");
-        final AttributeResolutionContext context =
-                TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, TestSources.IDP_ENTITY_ID,
-                        TestSources.SP_ENTITY_ID);
-        final AttributeResolverWorkContext workContext =
-                context.getSubcontext(AttributeResolverWorkContext.class, false);
-        recordWorkContextAttribute(expectedHookAttribute, "hookAttributeValue", workContext);
-        recordWorkContextAttribute(expectedIdpId, "idpIdValue", workContext);
-        RestDataConnector mockConnector = Mockito.spy(dataConnector);
-        Mockito.doReturn(mockBuilder).when(mockConnector).getHttpClientBuilder();
-        final Map<String, IdPAttribute> resolvedAttributes = mockConnector.doResolve(context, workContext);
-        Assert.assertEquals(dataConnector.getId(), expectedId);
-        Assert.assertEquals(dataConnector.getEndpointUrl(), expectedEndpointUrl);
-        Assert.assertEquals(dataConnector.getToken(), expectedToken);
-        Assert.assertEquals(dataConnector.isDisregardTLSCertificate(), expectedDisregardTLSCertificate);
-        Assert.assertEquals(resolvedAttributes.size(), 1);
+    public void testDefaultNoRoles() throws ComponentInitializationException, ResolutionException, Exception {
+        final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-0role-0attr.json", 
+                "restdc-min.xml");
+        Assert.assertEquals(resolvedAttributes.size(), 3);
         Assert.assertEquals(resolvedAttributes.get(expectedResultAttribute).getValues().get(0).getValue(), expectedOid);
     }
 
     /**
-     * Tests full resolution.
+     * Tests {@link RestDataConnector} with minimum configuration, with 1 role for the user.
      * 
-     * @throws Exception
+     * @throws ComponentInitializationException If component cannot be initialized.
+     * @throws ResolutionException If attribute resolution fails.
      */
     @Test
-    public void test() throws Exception {
-        HttpClientBuilder mockBuilder = initializeMockBuilder(expectedOid);
-        RestDataConnector dataConnector = new RestDataConnector();
-        dataConnector.setId("testingId");
-        dataConnector.setEndpointUrl("testingEndpoint");
-        dataConnector.setHookAttribute("testingAttribute");
-        dataConnector.setIdpId("testingIdpId");
-        dataConnector.setResultAttributePrefix("testingPrefix");
-        final AttributeResolutionContext context =
-                TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, TestSources.IDP_ENTITY_ID,
-                        TestSources.SP_ENTITY_ID);
-        final AttributeResolverWorkContext workContext =
-                context.getSubcontext(AttributeResolverWorkContext.class, false);
-        recordWorkContextAttribute("testingAttribute", "testAttributeValue", workContext);
-        RestDataConnector mockConnector = Mockito.spy(dataConnector);
-
-        Mockito.doReturn(mockBuilder).when(mockConnector).getHttpClientBuilder();
-
-        Map<String, IdPAttribute> attributes = mockConnector.doResolve(context, workContext);
-        Assert.assertEquals(attributes.size(), 1);
-        Assert.assertNotNull(attributes.get("testingPrefixusername"));
-        Assert.assertEquals(attributes.get("testingPrefixusername").getValues().size(), 1);
-        Assert.assertEquals(attributes.get("testingPrefixusername").getValues().get(0).getValue(), "testUser");
+    public void testDefaultOneRole() throws ComponentInitializationException, ResolutionException, Exception {
+        final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-1role-1attr.json", 
+                "restdc-min.xml");
+        Assert.assertEquals(resolvedAttributes.size(), 8);
+        Assert.assertEquals(resolvedAttributes.get(expectedResultAttribute).getValues().get(0).getValue(), expectedOid);
     }
 
     /**
+     * Tests {@link RestDataConnector} with minimum configuration, with two roles for the user.
+     * 
+     * @throws ComponentInitializationException If component cannot be initialized.
+     * @throws ResolutionException If attribute resolution fails.
+     */
+    @Test
+    public void testDefaultTwoRoles() throws ComponentInitializationException, ResolutionException, Exception {
+        final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-2role-2attr.json", 
+                "restdc-min.xml");
+        Assert.assertEquals(resolvedAttributes.size(), 8);
+        Assert.assertEquals(resolvedAttributes.get(expectedResultAttribute).getValues().get(0).getValue(), expectedOid);
+    }
+
+    /**
+     * Tests wheter dataconnector settings are valid.
+     * @param dataConnector The data connector.
+     * @param disregard Whether TLS should be disregarded or not.
+     * @param prefix The attribute prefix.
+     */
+    protected void testSettings(final RestDataConnector dataConnector, final boolean disregard, final String prefix) {
+        Assert.assertEquals(dataConnector.getId(), expectedId);
+        Assert.assertEquals(dataConnector.getEndpointUrl(), expectedEndpointUrl);
+        Assert.assertEquals(dataConnector.getToken(), expectedToken);        
+        Assert.assertEquals(dataConnector.isDisregardTLSCertificate(), disregard);
+        Assert.assertEquals(dataConnector.getResultAttributePrefix(), prefix);
+    }
+    
+    /**
+     * Resolves the attributes with the given settings.
+     * @param userJson The User object response simulation from the REST endpoint.
+     * @param connectorSettings The settings.
+     * @return The map of resolved attributes.
+     * @throws Exception
+     */
+    protected Map<String, IdPAttribute> resolveAttributes(String userJson, String connectorSettings) throws Exception {
+        HttpClientBuilder mockBuilder = initializeMockBuilder(userJson);
+        final RestDataConnector dataConnector = RestDataConnectorParserTest.initializeDataConnector(connectorSettings);
+        final AttributeResolutionContext context = TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, 
+                TestSources.IDP_ENTITY_ID, TestSources.SP_ENTITY_ID);
+        final AttributeResolverWorkContext workContext =
+        context.getSubcontext(AttributeResolverWorkContext.class, false);
+        recordWorkContextAttribute(expectedHookAttribute, "hookAttributeValue", workContext);
+        recordWorkContextAttribute(expectedIdpId, "idpIdValue", workContext);
+        RestDataConnector mockConnector = Mockito.spy(dataConnector);
+        Mockito.doReturn(mockBuilder).when(mockConnector).getHttpClientBuilder();
+        testSettings(dataConnector, false, "");
+        return mockConnector.doResolve(context, workContext);
+    }
+    
+    /**
      * Initializes a mocked {@link HttpClientBuilder}.
      * 
-     * @param expectedUsername The username value in the simulated JSON response stream.
+     * @param userJson The user object JSON declaration.
      * @return Mocked {@link HttpClientBuilder}.
      * @throws Exception
      */
-    public HttpClientBuilder initializeMockBuilder(String expectedUsername) throws Exception {
+    public HttpClientBuilder initializeMockBuilder(String userJson) throws Exception {
         HttpClientBuilder mockBuilder = Mockito.mock(HttpClientBuilder.class);
         CloseableHttpResponse mockResponse = Mockito.mock(CloseableHttpResponse.class);
         StatusLine mockStatusLine = Mockito.mock(StatusLine.class);
@@ -172,14 +188,21 @@ public class RestDataConnectorTest {
         HttpClient mockClient = Mockito.mock(HttpClient.class);
         HttpEntity mockEntity = Mockito.mock(HttpEntity.class);
         Mockito.when(mockResponse.getEntity()).thenReturn(mockEntity);
-        ByteArrayInputStream inputStream =
-                new ByteArrayInputStream(
-                        ("{ \"username\":\"" + expectedUsername + "\" }").getBytes(StandardCharsets.UTF_8));
-        Mockito.when(mockEntity.getContent()).thenReturn(inputStream);
+        Mockito.when(mockEntity.getContent()).thenReturn(getUserObjectStream(userJson));
         Mockito.when(mockClient.execute(Matchers.any(HttpUriRequest.class), Matchers.any(HttpContext.class)))
                 .thenReturn(mockResponse);
         Mockito.when(mockBuilder.buildClient()).thenReturn(mockClient);
         return mockBuilder;
+    }
+    
+    /**
+     * Helper method to point JSON file declaration to correct directory and convert it to {@link InputStream}.
+     * @param userJson The JSON filename, without directory prefix.
+     * @return The stream corresponding to the file.
+     * @throws Exception
+     */
+    protected InputStream getUserObjectStream(String userJson) throws Exception {
+        return new FileInputStream("src/test/resources/fi/okm/mpass/shibboleth/attribute/resolver/data/" + userJson);
     }
 
     /**
