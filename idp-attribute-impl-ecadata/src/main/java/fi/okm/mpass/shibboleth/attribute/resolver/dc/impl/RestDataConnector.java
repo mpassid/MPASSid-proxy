@@ -91,6 +91,9 @@ public class RestDataConnector extends AbstractDataConnector {
     
     /** The attribute id for the schools. */
     public static final String ATTR_ID_SCHOOLS = "schools";
+    
+    /** The attribute id for the structured roles. */
+    public static final String ATTR_ID_STRUCTURED_ROLES = "structuredRoles";
 
     /** Class logging. */
     private final Logger log = LoggerFactory.getLogger(RestDataConnector.class);
@@ -159,7 +162,7 @@ public class RestDataConnector extends AbstractDataConnector {
         log.debug("AuthnID after URL encoding = {}", authnIdValue);
         final String idpIdValue =
                 collectSingleAttributeValue(attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), idpId);
-        attributeCallUrl = attributeCallUrl + "?" + idpIdValue + "_id=" + authnIdValue;
+        attributeCallUrl = attributeCallUrl + "?" + idpIdValue + "=" + authnIdValue;
 
         HttpEntity restEntity = null;
 
@@ -208,12 +211,30 @@ public class RestDataConnector extends AbstractDataConnector {
                 populateAttribute(attributes, ATTR_ID_GROUPS, ecaUser.getRoles()[i].getGroup());
                 populateAttribute(attributes, ATTR_ID_ROLES, ecaUser.getRoles()[i].getRole());
                 populateAttribute(attributes, ATTR_ID_MUNICIPALITIES, ecaUser.getRoles()[i].getMunicipality());
+                populateStructuredRole(attributes, ecaUser.getRoles()[i]);
             }
         }
     }
+
+    /**
+     * Populates an attribute containing a structured role information from the given object. The value is
+     * populated to the given map, or appended to its values if the attribute already exists.
+     * 
+     * @param attributes The result map of attributes.
+     * @param role The role object whose values are added.
+     */
+    protected void populateStructuredRole(final Map<String, IdPAttribute> attributes, final UserDTO.RolesDTO role) {
+        final String school = role.getSchool() != null ? role.getSchool() : "";
+        final String group = role.getGroup() != null ? role.getGroup() : "";
+        final String aRole = role.getRole() != null ? role.getRole() : "";
+        final String municipality = role.getMunicipality() != null ? role.getMunicipality() : "";
+        final String structuredRole = municipality + ";" + school + ";" + group + ";" + aRole;
+        populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES, structuredRole);
+    }
     
     /**
-     * Populates an attribute with the the given id and value to the given result map.
+     * Populates an attribute with the the given id and value to the given result map. If the id already
+     * exists, the value will be appended to its values.
      * 
      * @param attributes The result map of attributes.
      * @param attributeId The attribute id.
@@ -225,12 +246,18 @@ public class RestDataConnector extends AbstractDataConnector {
             log.debug("Ignoring attirbute {}, null value", attributeId);
             return;
         }
-        final IdPAttribute idpAttribute = new IdPAttribute(resultAttributePrefix + attributeId);
-        final List<IdPAttributeValue<String>> values = new ArrayList<>();
-        values.add(new StringAttributeValue(attributeValue));
-        idpAttribute.setValues(values);
-        attributes.put(resultAttributePrefix + attributeId, idpAttribute);
-        log.debug("Populated {} with value {}", resultAttributePrefix + attributeId, attributeValue);
+        if (attributes.get(resultAttributePrefix + attributeId) != null) {
+            final IdPAttribute idpAttribute = attributes.get(resultAttributePrefix + attributeId);
+            idpAttribute.getValues().add(new StringAttributeValue(attributeValue));
+            log.debug("Added value {} to attribute {}", attributeValue, resultAttributePrefix + attributeId);
+        } else {
+            final IdPAttribute idpAttribute = new IdPAttribute(resultAttributePrefix + attributeId);
+            final List<IdPAttributeValue<String>> values = new ArrayList<>();
+            values.add(new StringAttributeValue(attributeValue));
+            idpAttribute.setValues(values);
+            attributes.put(resultAttributePrefix + attributeId, idpAttribute);
+            log.debug("Populated {} with value {}", resultAttributePrefix + attributeId, attributeValue);
+        }
     }
 
     /**
