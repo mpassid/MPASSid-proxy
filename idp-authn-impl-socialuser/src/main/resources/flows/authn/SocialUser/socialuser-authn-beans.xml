@@ -68,7 +68,7 @@
                 <entry key="/idp/Authn/SocialUser/LinkedIn" value-ref="LinkedInIdentity" />
                 <entry key="/idp/Authn/SocialUser/Yle" value-ref="OAuth2YleIdentity" />
                 <entry key="/idp/Authn/SocialUser/OIDCLH" value-ref="ExampleOpenIdConnectIdentity" />
-                <entry key="/idp/Authn/SocialUser/LiveID" value-ref="LiveID" />
+                <entry key="/idp/Authn/SocialUser/LiveID" value-ref="LiveIDIdentity" />
             </map>
         </property>
     </bean>
@@ -180,7 +180,7 @@
     </bean>
     
     <!--  Live ID example -->
-    <bean id="LiveIdentity"
+    <bean id="LiveIDIdentity"
         class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
         <property name="clientId" value=""/>
         <property name="clientSecret" value=""/>
