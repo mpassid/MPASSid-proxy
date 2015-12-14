@@ -36,7 +36,7 @@ Spring social modules all try to populate email, firstName, lastName, userId, di
 There are three modules implemented using Nimbus OAuth2 SDK.  
 
 #### Attributes
-All Nimbus based modules have principal population configured in the respective beans (see the examples in socialuser-authn-beans.xml). Which claims are which principals is configured with claimsPrincipals-property. If you want a claim to be interpreted as (json)array you need to instruct that with customClaimsTypes-property. If you name the principals as other than email, firstName, lastName, userId, displayName or providerId, you will need to read the values from principal map. Also, if the claim is an array having more than one field, the only way to read all fields is by principal map.
+All Nimbus based modules have population of principals configured in the respective beans (see the examples in socialuser-authn-beans.xml). Which claims are which principals is configured with claimsPrincipals-property. If you want a claim to be interpreted as (json)array you need to instruct that with customClaimsTypes-property. If you name the principals as other than email, firstName, lastName, userId, displayName or providerId, you will need to read the values from principal map. Also, if the claim is an array having more than one field, the only way to read all fields is by principal map.
 
 #### OAuth2 
 - Template for bean definition in socialuser-authn-beans.xml: ExampleOauth2Identity
