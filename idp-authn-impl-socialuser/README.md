@@ -62,7 +62,7 @@ All Nimbus based modules have principal population configured in the respective 
 - Currently [idp-mpass-parent](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-mpass-parent) -module in the Maven repository or in the relative path _../idp-mpass-parent_.
 
 ```
-cd idp-authn-impl-socialuser
+cd idp-mpass-parent
 mvn package
 ```
 
