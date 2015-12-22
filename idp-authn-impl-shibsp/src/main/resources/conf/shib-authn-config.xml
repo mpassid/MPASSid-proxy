@@ -34,7 +34,7 @@ THE SOFTWARE.
        default-init-method="initialize"
        default-destroy-method="destroy">
 
-    <bean id="shibboleth.authn.Shib.externalAuthnPath" class="java.lang.String"
+    <bean id="shibboleth.authn.ShibExample.externalAuthnPath" class="java.lang.String"
         c:_0="https://example.org/Shibboleth.sso/Login?entityID=https://example.org/idp/shibboleth" />
 
     <!--
