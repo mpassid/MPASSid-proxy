@@ -24,12 +24,8 @@ THE SOFTWARE.
 <flow xmlns="http://www.springframework.org/schema/webflow"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
-      parent="authn.abstract">
+      abstract="true" parent="authn.abstract">
 
-    <view-state id="ExternalTransfer" view="externalRedirect:#{flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.authn.Shib.externalAuthnPath')}&amp;forceAuthn=#{opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).isForceAuthn()}&amp;isPassive=#{opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).isPassive()}&amp;target=#{flowExecutionUrl}%26_eventId_proceed%3D1">
-        <transition to="ValidateExternalAuthentication" />
-    </view-state>
-    
     <action-state id="ValidateExternalAuthentication">
         <evaluate expression="ExtractShibbolethHeadersFromRequest" />
         <evaluate expression="ValidateShibbolethAuthentication" />
