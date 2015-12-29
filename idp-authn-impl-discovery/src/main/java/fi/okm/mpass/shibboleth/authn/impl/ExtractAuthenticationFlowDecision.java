@@ -43,10 +43,10 @@ import org.slf4j.LoggerFactory;
  * and sets it as signaled authentication flow in {@link AuthenticationContext}. The signaled flow is
  * set without any validations: it is assumed that the upcoming actions (like for instance the default
  * {@link SelectAuthenticationFlow}) verifies whether the signaled flow meets the requirements in the
- * context.
+ * context. Finally, the action builds {@link AuthnEventIds.RESELECT_FLOW} event.
  * 
- * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
  * @event {@link AuthnEventIds#REQUEST_UNSUPPORTED}
+ * @event {@link AuthnEventIds#RESELECT_FLOW}
  * @pre <pre>ProfileRequestContext.getSubcontext(AuthenticationContext.class, false) != null</pre>
  */
 @SuppressWarnings("rawtypes")
