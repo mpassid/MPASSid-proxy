@@ -68,7 +68,7 @@ public class SocialUserContext extends BaseContext {
     @Nullable
     private String providerId;
 
-    
+    /** Map of principals. */
     private Map<String, List<String>> principalMap;
     
     /**
