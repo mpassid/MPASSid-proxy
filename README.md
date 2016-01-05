@@ -1,24 +1,25 @@
-# MPASS -kirjautumisjärjestelmän toteutus: Proxy
+# MPASS-proxy
 
-## Yleiskuvaus
+MPASS-proxy consists of several modules for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home), providing
+extensions for authentication, attribute resolution and audit logging. They can be used individually, but together they provide an open source 
+implementation for the [ECA Authentication](http://docs.educloudalliance.org/en/latest/auth/index.html) standard's
+[Auth proxy](http://docs.educloudalliance.org/en/latest/auth/proxy/index.html) component. The standard is specified by the 
+[EduCloud Alliance](https://portal.educloudalliance.org/).
 
-Tämä toteutus koostuu useista [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home)
-arkkitehtuurin päälle toteutetuista moduuleista, jotka muodostavat toteutuksen [EduCloud Alliancen](https://portal.educloudalliance.org/)
-määrittelemän [ECA Authentication](https://github.com/educloudalliance/eca-docs/blob/master/auth/index.rst) -standardin Proxy-komponentille.
+For more information about the MPASS project, see http://www.mpass.fi/ (currently only in Finnish).
 
+## Module descriptions
 
-## Moduulien kuvaus
+- _idp-attribute-impl-authnid_: AuthnID -calculation implementation as specified by the ECA Auth standard.
+- _idp-attribute-impl-ecadata_: ECA Auth Data -connection implementation.
+- _idp-authn-api-shibsp_: Interface module for integrating SAML-based auth sources.
+- _idp-authn-api-socialuser_: Interface module for integrating OAuth2/OIDC-based auth sources.
+- _idp-authn-impl-shibsp_: Implementation module for integrating SAML-based auth sources.
+- _idp-authn-impl-socialuser_: Implementation module for integrating OAuth2/OIDC-based auth sources.
+- _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
+- _idp-profile-impl-audit_: Some extensions for audit logging.
 
-- _idp-attribute-impl-authnid_: ECA Auth standardin mukainen AuthID-laskentatoteutus
-- _idp-attribute-impl-ecadata_: ECA Auth standardin mukainen yhteys Data-moduuliin
-- _idp-authn-api-shibsp_: SAML-pohjaisten tunnistusvälineiden integraation rajapintamääritykset
-- _idp-authn-api-socialuser_: Sosiaalisen median tunnistusvälineiden adaptereiden rajapintamääritykset
-- _idp-authn-impl-shibsp_: SAML-pohjaisten tunnistusvälineiden integraation toteutus
-- _idp-authn-impl-socialuser_: Sosiaalisen median tunnistusvälineiden adaptereiden toteutus
-- _idp-mpass-parent_: Moduulien käyttämien kirjastojen versiomäärittelyt jne
-- _idp-profile-impl-audit_: Laajennoksia audit-lokitukseen
-
-## Esivaatimukset ja kääntöohjeet
+## Prerequisities and build instructions
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)
@@ -28,9 +29,9 @@ cd idp-mpass-parent
 mvn package
 ```
 
-Komento kääntää jokaisen moduulin lähdekoodin ja paketoi modulien _target/_ -hakemistoihin _jar-paketin_.
+The command compiles all the source code and builds a JAR-package for each module (see _target/_ directories).
 
-## Lisenssi / License
+## License
 
 The MIT License
 Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
