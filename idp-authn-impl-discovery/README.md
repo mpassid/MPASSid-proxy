@@ -28,8 +28,8 @@ with the following sequence:
 
 ```
 cp target/idp-authn-impl-discovery-1.0-SNAPSHOT.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib
-cp -r target/idp-authn-impl-discovery-\<version\>-bin/idp-authn-impl-discovery-\<version\>/flows /opt/shibboleth-idp/flows
-cp -r target/idp-authn-impl-discovery-\<version\>-bin/idp-authn-impl-discovery-\<version\>/views /opt/shibboleth-idp/views
+cp -r target/idp-authn-impl-discovery-\<version\>-bin/idp-authn-impl-discovery-\<version\>/flows/* /opt/shibboleth-idp/flows
+cp -r target/idp-authn-impl-discovery-\<version\>-bin/idp-authn-impl-discovery-\<version\>/views/* /opt/shibboleth-idp/views
 cd /opt/shibboleth-idp
 sh bin/build.sh
 ```

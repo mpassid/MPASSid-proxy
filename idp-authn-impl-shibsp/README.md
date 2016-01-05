@@ -31,7 +31,7 @@ with the following sequence:
 
 ```
 cp target/idp-authn-impl-shibsp-<version>-bin/idp-authn-impl-shibsp-<version>/edit-webapp/WEB-INF/lib/* /opt/shibboleth-idp/edit-webapp/WEB-INF/lib
-cp -r target/idp-authn-impl-shibsp-<version>-bin/idp-authn-impl-shibsp-<version>/flows /opt/shibboleth-idp/flows
+cp -r target/idp-authn-impl-shibsp-<version>-bin/idp-authn-impl-shibsp-<version>/flows/* /opt/shibboleth-idp/flows
 cp target/idp-authn-impl-shibsp-<version>-bin/idp-authn-impl-shibsp-<version>/conf/* /opt/shibboleth-idp/conf/authn
 cd /opt/shibboleth-idp
 sh bin/build.sh
