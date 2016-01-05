@@ -34,7 +34,7 @@ THE SOFTWARE.
        default-init-method="initialize"
        default-destroy-method="destroy">
        
-   <import resource="shib-authn-config.xml" />
+   <import resource="../../../conf/authn/shib-authn-config.xml" />
 
    <bean id="ValidateShibbolethAuthentication"
             class="fi.okm.mpass.shibboleth.authn.impl.ValidateShibbolethAuthentication" scope="prototype"
