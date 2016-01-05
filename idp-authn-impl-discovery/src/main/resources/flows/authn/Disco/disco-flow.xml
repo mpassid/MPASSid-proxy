@@ -55,6 +55,6 @@ THE SOFTWARE.
         <transition on="proceed" to="proceed" />
     </action-state>
 
-    <bean-import resource="Disco-beans.xml" />
+    <bean-import resource="disco-beans.xml" />
 
 </flow>

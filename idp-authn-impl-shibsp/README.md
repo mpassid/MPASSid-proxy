@@ -42,7 +42,7 @@ The final command will rebuild the _war_-package for the IdP application.
 The desired [Shibboleth SP Handler](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPHandler)
 location and its parameters are configured in the file _/opt/shibboleth-idp/conf/authn/shib-authn-config.xml_.
 The default configuration is referred as _shibboleth.authn.ShibExample.externalAuthnPath_, which is also referred by
-the flow definition file (_/opt/shibboleth-idp/flows/authn/ShibExample/ShibExample-flow.xml_). It's possible to configure
+the flow definition file (_/opt/shibboleth-idp/flows/authn/ShibExample/shibexample-flow.xml_). It's possible to configure
 multiple flows with different SP Handler configurations, or support multiple IdPs for instance via
 [Shibboleth Embedded Discovery Service]
 (https://wiki.shibboleth.net/confluence/display/EDS10/Embedded+Discovery+Service).
