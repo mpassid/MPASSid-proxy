@@ -19,7 +19,7 @@ For more information about the MPASS project, see http://www.mpass.fi/ (currentl
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
 - _idp-profile-impl-audit_: Some extensions for audit logging.
 
-## Prerequisities and build instructions
+## Prerequisities and build instructions [![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy)
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)
