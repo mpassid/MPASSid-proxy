@@ -48,8 +48,6 @@ public class LoginHintJsonBase64CoderTest {
     @Test
     public void successEncode() throws Exception {
         String encoded = loginHintJsonBase64Coder.encode(loginHintMap);
-        Assert.assertEquals(encoded,
-                "eyJrZXkxIjoidmFsdWUxIiwia2V5MiI6InZhbHVlMiIsImtleTMiOiJ2YWx1ZTMifQ==");
         Map<String, String> decoded = loginHintJsonBase64Coder.decode(encoded);
         Assert.assertTrue(decoded.equals(loginHintMap));
     }
