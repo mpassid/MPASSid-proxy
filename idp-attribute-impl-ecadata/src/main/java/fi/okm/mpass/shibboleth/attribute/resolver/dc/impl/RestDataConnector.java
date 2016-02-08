@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -175,8 +176,14 @@ public class RestDataConnector extends AbstractDataConnector {
             final HttpResponse restResponse = httpClient.execute(getMethod, context);
             final int status = restResponse.getStatusLine().getStatusCode();
             restEntity = restResponse.getEntity();
-
             log.debug("Response code from Data: HTTP " + status);
+            
+            if (log.isTraceEnabled()) {
+                for (Header header : restResponse.getAllHeaders()) {
+                    log.trace("Header {}: {}", header.getName(), header.getValue());
+                }
+            }
+            
             final String restResponseStr = EntityUtils.toString(restEntity);
             log.trace("Response {}", restResponseStr);
             if (status == HttpStatus.SC_OK) {
