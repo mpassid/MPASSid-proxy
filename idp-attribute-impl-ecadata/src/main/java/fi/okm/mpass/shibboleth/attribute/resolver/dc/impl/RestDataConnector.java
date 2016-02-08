@@ -179,8 +179,10 @@ public class RestDataConnector extends AbstractDataConnector {
             log.debug("Response code from Data: HTTP " + status);
             
             if (log.isTraceEnabled()) {
-                for (Header header : restResponse.getAllHeaders()) {
-                    log.trace("Header {}: {}", header.getName(), header.getValue());
+                if (restResponse.getAllHeaders() != null) {
+                    for (Header header : restResponse.getAllHeaders()) {
+                        log.trace("Header {}: {}", header.getName(), header.getValue());
+                    }
                 }
             }
             
