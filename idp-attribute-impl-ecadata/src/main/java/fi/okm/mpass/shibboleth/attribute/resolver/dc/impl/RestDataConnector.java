@@ -186,7 +186,7 @@ public class RestDataConnector extends AbstractDataConnector {
                 }
             }
             
-            final String restResponseStr = EntityUtils.toString(restEntity);
+            final String restResponseStr = EntityUtils.toString(restEntity, "UTF-8");
             log.trace("Response {}", restResponseStr);
             if (status == HttpStatus.SC_OK) {
                 final Gson gson = new Gson();
