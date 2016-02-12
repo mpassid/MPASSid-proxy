@@ -81,8 +81,7 @@ public class SocialUserPrincipal implements Principal {
         try {
             typesType = Types.valueOf(type);
         } catch (IllegalArgumentException | NullPointerException e) {
-            log.error("Something bad happened "+e.getMessage());
-            // should never happen
+            //This is normal operation, custom principal type
         }
         log.trace("Entering");
 
