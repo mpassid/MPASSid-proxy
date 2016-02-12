@@ -258,7 +258,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                 }
             }
 
-            // TODO no signature check?
+            // No signature check
             // If the ID Token is received via direct communication between the
             // Client and the Token Endpoint (which it is in this flow), the TLS
             // server validation MAY be used to validate the issuer in place of
@@ -282,13 +282,12 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         SocialUserErrorIds.EXCEPTION);
             }
 
-            // TODO: nonce & iat?
+            // NOT USING NONCE & IAT (yet?)
             // The iat Claim can be used to reject tokens that were issued too
             // far away from the current time, limiting the amount of time that
             // nonces need to be stored to prevent attacks. The acceptable range
             // is Client specific.
 
-            // TODO: Create & Check nonce?
             // If a nonce value was sent in the Authentication Request, a nonce
             // Claim MUST be present and its value checked to verify that it is
             // the same value as the one that was sent in the Authentication
