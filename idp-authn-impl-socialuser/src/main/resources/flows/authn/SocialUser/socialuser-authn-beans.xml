@@ -145,7 +145,8 @@
         <property name="authorizationEndpoint" value="put_here" />
         <property name="tokenEndpoint" value="put_here" />
         <property name="authenticationRequest" ref="ShibAuthRequest" />
-
+        <property name="issuer" value="put_here" />
+        
         <!-- userinfo and revocation not applied yet <property name="userinfoEndpoint" value="put_here"/> <property name="revocationEndpoint" 
             value="put_here"/> -->
 
