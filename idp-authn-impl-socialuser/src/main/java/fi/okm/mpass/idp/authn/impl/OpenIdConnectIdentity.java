@@ -65,6 +65,8 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     private final Logger log = LoggerFactory
             .getLogger(OpenIdConnectIdentity.class);
 
+    /** OP Issuer identifier. */
+    private String issuer;
     /** OIDC Prompt. */
     private Prompt prompt;
     /** OIDC Authentication Class Reference values. */
@@ -104,6 +106,18 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     }
 
     /**
+     * Setter for OpenId Provider Issuer identifier value.
+     * 
+     * @param oidcIssuer
+     *            OpenId Provider Issuer identifier
+     */
+    public void setIssuer(String oidcIssuer) {
+        log.trace("Entering");
+        this.issuer = oidcIssuer;
+        log.trace("Leaving");
+    }
+
+    /**
      * Setter for OpenId Prompt value.
      * 
      * @param oidcPrompt
@@ -125,8 +139,8 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         log.trace("Entering");
         for (String oidcAcr : oidcAcrs) {
             ACR acr = new ACR(oidcAcr);
-            if (this.acrs == null){
-                this.acrs=new ArrayList<ACR>();
+            if (this.acrs == null) {
+                this.acrs = new ArrayList<ACR>();
             }
             this.acrs.add(acr);
         }
@@ -185,13 +199,14 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
      * 
      * @param iDToken
      *            to be verified
-     * @param  httpRequest
-     *            to check attribute values          
+     * @param httpRequest
+     *            to check attribute values
      * @throws SocialUserAuthenticationException
      *             if validity check is not passed
      */
- // Checkstyle: CyclomaticComplexity OFF
-    private void verifyIDToken(JWT iDToken, HttpServletRequest httpRequest) throws SocialUserAuthenticationException {
+    // Checkstyle: CyclomaticComplexity OFF
+    private void verifyIDToken(JWT iDToken, HttpServletRequest httpRequest)
+            throws SocialUserAuthenticationException {
         log.trace("Entering");
         if (iDToken == null) {
             throw new SocialUserAuthenticationException("IDToken is null",
@@ -203,10 +218,19 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         }
         try {
 
-            // TODO Check issuer
             // The Issuer Identifier for the OpenID Provider (which is typically
             // obtained during Discovery) MUST exactly match the value of the
             // iss (issuer) Claim.
+            if (issuer == null) {
+                log.warn("Issuer not set, cannot be verified");
+            } else {
+                if (!issuer.equals(iDToken.getJWTClaimsSet().getIssuer())) {
+                    log.error("issuer mismatch");
+                    throw new SocialUserAuthenticationException(
+                            "issuer mismatch", SocialUserErrorIds.EXCEPTION);
+
+                }
+            }
 
             // The Client MUST validate that the aud (audience) Claim contains
             // its client_id value registered at the Issuer identified by the
@@ -246,19 +270,19 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             // Check time
             // The current time MUST be before the time represented by the exp
             // Claim.
-            Date currentDate=new Date();
-            //if exp is not present throws nullpointer Exception
-            //we give no leeway. 
-            if (currentDate.after(iDToken.getJWTClaimsSet().getExpirationTime())){
-                log.error("current date "+currentDate);
-                log.error("exp "+iDToken.getJWTClaimsSet().getExpirationTime());
-                throw new SocialUserAuthenticationException(
-                        "exp expired",
-                        SocialUserErrorIds.EXCEPTION);   
+            Date currentDate = new Date();
+            // if exp is not present throws nullpointer Exception
+            // we give no leeway.
+            if (currentDate
+                    .after(iDToken.getJWTClaimsSet().getExpirationTime())) {
+                log.error("current date " + currentDate);
+                log.error("exp "
+                        + iDToken.getJWTClaimsSet().getExpirationTime());
+                throw new SocialUserAuthenticationException("exp expired",
+                        SocialUserErrorIds.EXCEPTION);
             }
-            
 
-            // TODO: nonce &  iat?
+            // TODO: nonce & iat?
             // The iat Claim can be used to reject tokens that were issued too
             // far away from the current time, limiting the amount of time that
             // nonces need to be stored to prevent attacks. The acceptable range
@@ -276,21 +300,21 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             // If the acr Claim was requested, the Client SHOULD check that the
             // asserted Claim Value is appropriate. The meaning and processing
             // of acr Claim Values is out of scope for this specification.
-            if (acrs != null && acrs.size()>0){
-                String acr=iDToken.getJWTClaimsSet().getStringClaim("acr");
-                if (acr == null){
+            if (acrs != null && acrs.size() > 0) {
+                String acr = iDToken.getJWTClaimsSet().getStringClaim("acr");
+                if (acr == null) {
                     log.error("acr requested but not received");
                     throw new SocialUserAuthenticationException(
                             "acr requested but not received",
-                            SocialUserErrorIds.EXCEPTION);   
+                            SocialUserErrorIds.EXCEPTION);
                 }
-                if (!acrs.contains(acr)){
-                    log.error("acr received does not match requested:" +acr);
+                if (!acrs.contains(acr)) {
+                    log.error("acr received does not match requested:" + acr);
                     throw new SocialUserAuthenticationException(
                             "acr requested does not match the received value",
-                            SocialUserErrorIds.EXCEPTION);      
+                            SocialUserErrorIds.EXCEPTION);
                 }
-                
+
             }
 
             // Check auth time
@@ -299,26 +323,28 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             // Client SHOULD check the auth_time Claim value and request
             // re-authentication if it determines too much time has elapsed
             // since the last End-User authentication.
-            if ((boolean)httpRequest.getSession().getAttribute("fi.okm.mpass.forced")){
+            if ((boolean) httpRequest.getSession().getAttribute(
+                    "fi.okm.mpass.forced")) {
                 log.debug("forced is on");
-                //for forced authentication we have set max_age = 0
-                Date authTime=iDToken.getJWTClaimsSet().getDateClaim("auth_time");
-                if (authTime == null){
+                // for forced authentication we have set max_age = 0
+                Date authTime = iDToken.getJWTClaimsSet().getDateClaim(
+                        "auth_time");
+                if (authTime == null) {
                     log.error("max age set but no auth_time received");
                     throw new SocialUserAuthenticationException(
                             "max age set but no auth_time received",
-                            SocialUserErrorIds.EXCEPTION);      
-                    
+                            SocialUserErrorIds.EXCEPTION);
+
                 }
-                //TODO: 30000, make it as leeway init param
-                if (currentDate.getTime()-authTime.getTime()>30000){
-                    log.error("current time " +currentDate.getTime());
-                    log.error("authentication time " +currentDate.getTime());
+                // TODO: 30000, make it as leeway init param
+                if (currentDate.getTime() - authTime.getTime() > 30000) {
+                    log.error("current time " + currentDate.getTime());
+                    log.error("authentication time " + currentDate.getTime());
                     throw new SocialUserAuthenticationException(
                             "auth_time not acceptable",
-                            SocialUserErrorIds.EXCEPTION);      
+                            SocialUserErrorIds.EXCEPTION);
                 }
-                
+
             }
 
         } catch (java.text.ParseException e) {
@@ -327,8 +353,9 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         }
         log.trace("Leaving");
     }
- // Checkstyle: CyclomaticComplexity ON
-    
+
+    // Checkstyle: CyclomaticComplexity ON
+
     @Override
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
@@ -339,7 +366,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
         httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);
-        //we set attribute to store the forced value
+        // we set attribute to store the forced value
         httpRequest.getSession().setAttribute("fi.okm.mpass.forced", false);
         String ret = null;
         try {
@@ -350,11 +377,12 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         .endpointURI(getAuthorizationEndpoint())
                         .display(display).acrValues(acrs).prompt(prompt)
                         .state(state).build().toURI().toString();
-                log.debug("Constructed redirect string "+ret);
+                log.debug("Constructed redirect string " + ret);
                 return ret;
             }
             if (getAuthenticationRequest().isForcedAuth(httpRequest)) {
-                httpRequest.getSession().setAttribute("fi.okm.mpass.forced", true);
+                httpRequest.getSession().setAttribute("fi.okm.mpass.forced",
+                        true);
                 ret = new AuthenticationRequest.Builder(responseType,
                         getScope(), getClientId(), new URI(httpRequest
                                 .getRequestURL().toString()))
@@ -366,12 +394,12 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         .maxAge(0)
                         .loginHint(
                                 getAuthenticationRequest().getLoginHint(
-                                        httpRequest))
-                        .build().toURI().toString();
-                log.debug("Constructed redirect string "+ret);
+                                        httpRequest)).build().toURI()
+                        .toString();
+                log.debug("Constructed redirect string " + ret);
                 return ret;
             }
-            ret =  new AuthenticationRequest.Builder(responseType, getScope(),
+            ret = new AuthenticationRequest.Builder(responseType, getScope(),
                     getClientId(), new URI(httpRequest.getRequestURL()
                             .toString()))
                     .endpointURI(getAuthorizationEndpoint())
@@ -383,7 +411,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                             getAuthenticationRequest()
                                     .getLoginHint(httpRequest)).build().toURI()
                     .toString();
-            log.debug("Constructed redirect string "+ret);
+            log.debug("Constructed redirect string " + ret);
             return ret;
 
         } catch (URISyntaxException | SerializeException e) {
@@ -391,7 +419,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             log.trace("Leaving");
             return null;
         }
-      
+
     }
 
     @Override
