@@ -1,0 +1,3 @@
+---
+# tasks file for mpass-app
+- include: mpass-app.yml

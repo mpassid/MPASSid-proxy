@@ -1,0 +1,12 @@
+- hosts: all
+  become: true
+  become_method: sudo
+
+  vars_files:
+   - vars/default.yml
+
+  roles:
+    - { role: basic-env, tags: ["basic-env"] }
+    - { role: httpd, tags: ["httpd"] }
+    - { role: shibboleth-sp, tags: ["shibboleth-sp"] }
+    - { role: mpass-app, tags: ["mpass-app"] }

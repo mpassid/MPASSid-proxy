@@ -1,0 +1,13 @@
+---
+    - name: Install apache, mod_ssl, wget, vim, nano, telnet
+      yum: pkg={{item}} state=installed
+      with_items:
+      - vim-enhanced
+      - httpd
+      - mod_ssl
+      - wget
+      - nano
+      - telnet
+
+    - name: Create secure directory
+      file: path=/var/www/html/secure state=directory

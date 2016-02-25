@@ -1,0 +1,24 @@
+---
+    - name: Copy shibboleth2.xml
+      template: src=shibboleth2.xml.template
+                dest=/etc/shibboleth/shibboleth2.xml
+
+    - name: Copy mpass proxy IdP metadata
+      template: src=mpass-proxy-idp-metadata.xml.template
+                dest=/etc/shibboleth/mpass-proxy-idp-metadata.xml
+
+    - name: Copy attribute-map.xml
+      copy: src={{ item }} dest="/etc/shibboleth"
+      with_fileglob:
+        - attribute-map.xml
+
+    - name: Restart service shibd
+      service: name=shibd enabled=yes state=restarted
+
+    - name: Install php
+      yum: pkg={{item}} state=installed
+      with_items:
+      - php
+
+    - name: Restart service httpd
+      service: name=httpd enabled=yes state=restarted

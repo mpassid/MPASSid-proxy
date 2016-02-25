@@ -1,0 +1,10 @@
+<Attributes xmlns="urn:mace:shibboleth:2.0:attribute-map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <Attribute name="urn:oid:2.5.4.4" id="MPASS-surname"/>
+    <Attribute name="urn:oid:2.5.4.42" id="MPASS-givenName"/>
+    <Attribute name="urn:educloudalliance.org:OID" id="MPASS-OID"/>
+    <Attribute name="urn:educloudalliance.org:structuredRole" id="MPASS-structuredRole"/>
+    <Attribute name="urn:educloudalliance.org:municipality" id="MPASS-municipality"/>
+    <Attribute name="urn:educloudalliance.org:school" id="MPASS-school"/>
+
+</Attributes>
