@@ -22,11 +22,27 @@
  */
 package fi.okm.mpass.shibboleth.authn.impl;
 
+import java.security.Principal;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.opensaml.profile.action.EventIds;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+
+import junit.framework.Assert;
+import net.shibboleth.idp.authn.AuthenticationResult;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 import net.shibboleth.idp.profile.ActionTestingSupport;
@@ -42,12 +58,22 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
     /** The configuration for the attribute containing username. */
     private String uidConfig;
     
+    private String sharedSecret;
+    
+    private String uid;
+    
+    private String jwtParameterName;
+    
     /** {@inheritDoc} */
     @BeforeMethod public void setUp() throws Exception {
         super.setUp();
         uidConfig = "username";
-        action = new ValidateJwtTokenAuthentication("csdijijpsfohdihioa123hiods324324iho3hiih", "jwt");
+        uid = "mockUser";
+        jwtParameterName = "jwt";
+        sharedSecret = "csdijijpsfohdihioa123hiods324324iho3hiih";
+        action = new ValidateJwtTokenAuthentication(sharedSecret, jwtParameterName);
         action.setUsernameId(uidConfig);
+        action.setHttpServletRequest((HttpServletRequest) src.getExternalContext().getNativeRequest());
     }
 
     /**
@@ -70,10 +96,57 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
     }
 
     /**
+     * Runs action with the incoming JWT token that cannot be parsed.
+     */
+    @Test public void testInvalidJwt() throws Exception {
+        final JWSSigner signer = new MACSigner(sharedSecret);
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "\" : \"" + uid + "\" }"));
+        jwsObject.sign(signer);
+        final String rawJwt = "invalid" + jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
+     * Runs action with the incoming JWT token signed with different secret.
+     */
+    @Test public void testInvalidJwtSignature() throws Exception {
+        final JWSSigner signer = new MACSigner("abc12" + sharedSecret.substring(5));
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "\" : \"" + uid + "\" }"));
+        jwsObject.sign(signer);
+        final String rawJwt = jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
      * Runs action with username in the incoming JWT token.
      */
-    @Test public void testAttribute() throws Exception {
-        //TODO: write the test with real JWT token.
+    @Test public void testSuccess() throws Exception {
+        final JWSSigner signer = new MACSigner(sharedSecret);
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "\" : \"" + uid + "\" }"));
+        jwsObject.sign(signer);
+        final String rawJwt = jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        Assert.assertNull(event);
+        final AuthenticationContext authnCtx = prc.getSubcontext(AuthenticationContext.class);
+        final AuthenticationResult authnResult = authnCtx.getAuthenticationResult();
+        Assert.assertNotNull(authnResult.getSubject());
+        final Set<Principal> principals = authnResult.getSubject().getPrincipals();
+        Assert.assertNotNull(principals);
+        Assert.assertEquals(1, principals.size());
+        Assert.assertEquals(uid, principals.iterator().next().getName());
     }
-    
 }
