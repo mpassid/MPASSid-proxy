@@ -139,23 +139,26 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
         if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
             return false;
         }
-        
+        log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
+
         if (authenticationContext.getAttemptedFlow() == null) {
-            log.debug("{} No attempted flow within authentication context", getLogPrefix());
+            log.error("{} No attempted flow within authentication context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
         final HttpServletRequest servletRequest = getHttpServletRequest();
         if (servletRequest == null) {
-            log.debug("{} No HttpServletRequst available within profile context", getLogPrefix());
+            log.error("{} No HttpServletRequst available within profile context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
         if (StringSupport.trimOrNull(servletRequest.getParameter(jwtParameter)) == null) {
-            log.debug("{} No JWT token available in the request with parameter {}", getLogPrefix(), jwtParameter);
+            log.warn("{} No JWT token available in the request with parameter {}", getLogPrefix(), jwtParameter);
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;            
         }
+
+        log.trace("{}: doPreExecute returning true", getLogPrefix());
         return true;
     }
     
@@ -178,6 +181,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
         }
+        log.trace("{}: Building authentication result", getLogPrefix());
         buildAuthenticationResult(profileRequestContext, authenticationContext);
     }    
     
@@ -186,6 +190,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
     @Nonnull protected Subject populateSubject(@Nonnull final Subject subject) {
         subject.getPrincipals().add(
                 new UsernamePrincipal((String)jwt.getPayload().toJSONObject().get(usernameId)));
+        log.trace("{}: Subject successfully populated", getLogPrefix());
         return subject;
     }    
 }
