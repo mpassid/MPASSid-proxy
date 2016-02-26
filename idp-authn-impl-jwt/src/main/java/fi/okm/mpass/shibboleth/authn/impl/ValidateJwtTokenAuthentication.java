@@ -169,7 +169,12 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
         final HttpServletRequest servletRequest = getHttpServletRequest();
         try {
             jwt = SignedJWT.parse(servletRequest.getParameter(jwtParameter));
-            jwt.verify(jmsVerifier);
+            if (!jwt.verify(jmsVerifier)) {
+                log.warn("{}: Invalid signature in the incoming JWT token!", getLogPrefix());
+                handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
+                        AuthnEventIds.NO_CREDENTIALS);
+                return;                            
+            }
         } catch (ParseException | JOSEException e) {
             log.warn("Could not parse or verify the incoming JWT token", e);
             handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
