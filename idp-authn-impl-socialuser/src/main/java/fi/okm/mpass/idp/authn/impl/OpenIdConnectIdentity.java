@@ -46,15 +46,17 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.SerializeException;
 import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.Display;
-import com.nimbusds.openid.connect.sdk.OIDCAccessTokenResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.Prompt.Type;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
+
 
 /** Class for implementing OpenId Connect authentication. */
 public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
@@ -435,23 +437,24 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
             log.trace("Leaving");
             return null;
         }
-        OIDCAccessTokenResponse oidcAccessTokenResponse = null;
+        OIDCTokenResponse oidcTokenResponse = null;
         Subject subject = new Subject();
         try {
             // add mapped claims as principals
-            oidcAccessTokenResponse = (OIDCAccessTokenResponse) OIDCTokenResponseParser
+            oidcTokenResponse = (OIDCTokenResponse)OIDCTokenResponseParser
                     .parse(request.toHTTPRequest().send());
-            if (!oidcAccessTokenResponse.indicatesSuccess()) {
+            if (!oidcTokenResponse.indicatesSuccess()) {
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(
                         "access token response error",
                         SocialUserErrorIds.EXCEPTION);
             }
+            
             log.debug("claims from provider: "
-                    + oidcAccessTokenResponse.getIDToken().getJWTClaimsSet());
-            verifyIDToken(oidcAccessTokenResponse.getIDToken(), httpRequest);
-            parsePrincipalsFromClaims(subject, oidcAccessTokenResponse
-                    .getIDToken().getJWTClaimsSet().toJSONObject());
+                    + oidcTokenResponse.getOIDCTokens().getIDToken().getJWTClaimsSet());
+            verifyIDToken(oidcTokenResponse.getOIDCTokens().getIDToken(), httpRequest);
+            parsePrincipalsFromClaims(subject, oidcTokenResponse
+                    .getOIDCTokens().getIDToken().getJWTClaimsSet().toJSONObject());
         } catch (SerializeException | IOException | java.text.ParseException
                 | ParseException e) {
             log.error("Something bad happened " + e.getMessage());

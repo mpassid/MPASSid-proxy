@@ -122,7 +122,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
             // Get the access token, the server may also return a refresh token
-            AccessToken accessToken = tokenSuccessResponse.getAccessToken();
+            AccessToken accessToken = tokenSuccessResponse.getTokens().getAccessToken();
             // try reading stuff from accesstoken
             Subject subject = new Subject();
             log.debug("claims from provider: "+accessToken.toJSONString());
