@@ -14,6 +14,7 @@ For more information about the MPASS project, see http://www.mpass.fi/ (currentl
 - _idp-attribute-impl-ecadata_: ECA Auth Data -connection implementation.
 - _idp-authn-api-shibsp_: Interface module for integrating SAML-based auth sources.
 - _idp-authn-api-socialuser_: Interface module for integrating OAuth2/OIDC-based auth sources.
+- _idp_authn_impl_jwt_: Implementation module for integrating (Opinsys) JWT auth sources.
 - _idp-authn-impl-shibsp_: Implementation module for integrating SAML-based auth sources.
 - _idp-authn-impl-socialuser_: Implementation module for integrating OAuth2/OIDC-based auth sources.
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
