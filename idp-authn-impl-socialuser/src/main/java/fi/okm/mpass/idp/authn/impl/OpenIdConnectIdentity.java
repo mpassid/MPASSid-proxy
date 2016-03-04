@@ -24,8 +24,10 @@
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +57,7 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.Prompt.Type;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
-
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 /** Class for implementing OpenId Connect authentication. */
 public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
@@ -74,6 +76,38 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
     private List<ACR> acrs;
     /** OIDC Display. */
     private Display display;
+    /** OIDC provider metadata. */
+    private OIDCProviderMetadata oIDCProviderMetadata;
+
+    /**
+     * Setter for OpenId Provider Metadata location.
+     * 
+     * @param metadataLocation
+     *            OpenId Provider Metadata location
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public void setProviderMetadataLocation(String metadataLocation)
+            throws URISyntaxException, IOException, ParseException {
+        log.trace("Entering");
+        URI issuerURI = new URI(metadataLocation);
+        URL providerConfigurationURL = issuerURI.resolve(
+                "/.well-known/openid-configuration").toURL();
+        InputStream stream = providerConfigurationURL.openStream();
+        String providerInfo = null;
+        try (java.util.Scanner s = new java.util.Scanner(stream)) {
+            providerInfo = s.useDelimiter("\\A").hasNext() ? s.next() : "";
+        }
+        oIDCProviderMetadata = OIDCProviderMetadata.parse(providerInfo);
+        setIssuer(oIDCProviderMetadata.getIssuer().getValue());
+        setAuthorizationEndpoint(oIDCProviderMetadata
+                .getAuthorizationEndpointURI().toString());
+        setTokenEndpoint(oIDCProviderMetadata.getTokenEndpointURI().toString());
+        setUserinfoEndpoint(oIDCProviderMetadata.getUserInfoEndpointURI()
+                .toString());
+        log.trace("Leaving");
+    }
 
     /**
      * Setter for OpenId Scope values.
@@ -440,7 +474,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         Subject subject = new Subject();
         try {
             // add mapped claims as principals
-            oidcTokenResponse = (OIDCTokenResponse)OIDCTokenResponseParser
+            oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser
                     .parse(request.toHTTPRequest().send());
             if (!oidcTokenResponse.indicatesSuccess()) {
                 log.trace("Leaving");
@@ -448,12 +482,15 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
                         "access token response error",
                         SocialUserErrorIds.EXCEPTION);
             }
-            
+
             log.debug("claims from provider: "
-                    + oidcTokenResponse.getOIDCTokens().getIDToken().getJWTClaimsSet());
-            verifyIDToken(oidcTokenResponse.getOIDCTokens().getIDToken(), httpRequest);
+                    + oidcTokenResponse.getOIDCTokens().getIDToken()
+                            .getJWTClaimsSet());
+            verifyIDToken(oidcTokenResponse.getOIDCTokens().getIDToken(),
+                    httpRequest);
             parsePrincipalsFromClaims(subject, oidcTokenResponse
-                    .getOIDCTokens().getIDToken().getJWTClaimsSet().toJSONObject());
+                    .getOIDCTokens().getIDToken().getJWTClaimsSet()
+                    .toJSONObject());
         } catch (SerializeException | IOException | java.text.ParseException
                 | ParseException e) {
             log.error("Something bad happened " + e.getMessage());
