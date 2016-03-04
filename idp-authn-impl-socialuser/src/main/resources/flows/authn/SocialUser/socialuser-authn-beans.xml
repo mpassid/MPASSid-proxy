@@ -122,9 +122,13 @@
     <bean id="ExampleOauth2Identity" class="fi.okm.mpass.idp.authn.impl.OAuth2Identity">
         <property name="clientId" value="put_here" />
         <property name="clientSecret" value="put_here" />
+        <property name="providerMetadataLocation" value="put_here"/>
+        <!-- 
+        <property name="issuer" value="put_here" />
         <property name="authorizationEndpoint" value="put_here" />
         <property name="tokenEndpoint" value="put_here" />
         <property name="userinfoEndpoint" value="put_here" />
+        -->
         <property name="scope">
             <list>
                 <value>profile</value>
