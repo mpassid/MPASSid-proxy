@@ -181,7 +181,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
         }
-        if (StringSupport.trimOrNull((String)jwt.getPayload().toJSONObject().get(usernameId)) == null) {
+        if (StringSupport.trimOrNull(String.valueOf(jwt.getPayload().toJSONObject().get(usernameId))) == null) {
             handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
@@ -194,7 +194,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
     @Override
     @Nonnull protected Subject populateSubject(@Nonnull final Subject subject) {
         subject.getPrincipals().add(
-                new UsernamePrincipal((String)jwt.getPayload().toJSONObject().get(usernameId)));
+                new UsernamePrincipal(String.valueOf(jwt.getPayload().toJSONObject().get(usernameId))));
         log.trace("{}: Subject successfully populated", getLogPrefix());
         return subject;
     }    

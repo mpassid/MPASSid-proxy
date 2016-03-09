@@ -62,6 +62,8 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
     
     private String uid;
     
+    private int uidNumber;
+    
     private String jwtParameterName;
     
     /** {@inheritDoc} */
@@ -69,6 +71,7 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
         super.setUp();
         uidConfig = "username";
         uid = "mockUser";
+        uidNumber = 123;
         jwtParameterName = "jwt";
         sharedSecret = "csdijijpsfohdihioa123hiods324324iho3hiih";
         action = new ValidateJwtTokenAuthentication(sharedSecret, jwtParameterName);
@@ -128,9 +131,9 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
     }
 
     /**
-     * Runs action with username in the incoming JWT token.
+     * Runs action with username string in the incoming JWT token.
      */
-    @Test public void testSuccess() throws Exception {
+    @Test public void testSuccessString() throws Exception {
         final JWSSigner signer = new MACSigner(sharedSecret);
         final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
                 new Payload("{ \"" + uidConfig + "\" : \"" + uid + "\" }"));
@@ -149,4 +152,28 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
         Assert.assertEquals(1, principals.size());
         Assert.assertEquals(uid, principals.iterator().next().getName());
     }
+    
+    /**
+     * Runs action with username number in the incoming JWT token.
+     */
+    @Test public void testSuccessNumber() throws Exception {
+        final JWSSigner signer = new MACSigner(sharedSecret);
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "\" : " + uidNumber + " }"));
+        jwsObject.sign(signer);
+        final String rawJwt = jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        Assert.assertNull(event);
+        final AuthenticationContext authnCtx = prc.getSubcontext(AuthenticationContext.class);
+        final AuthenticationResult authnResult = authnCtx.getAuthenticationResult();
+        Assert.assertNotNull(authnResult.getSubject());
+        final Set<Principal> principals = authnResult.getSubject().getPrincipals();
+        Assert.assertNotNull(principals);
+        Assert.assertEquals(1, principals.size());
+        Assert.assertEquals("" + uidNumber, principals.iterator().next().getName());
+    }
+
 }
