@@ -126,13 +126,13 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         if (key.equals(ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER)) {
             log.debug("{} Added value for Identity Provider", getLogPrefix());
             shibbolethContext.setIdp(applyTransforms(value));            
-        } else if (key.equals(variablePrefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT)) {
+        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT)) {
             log.debug("{} Added value for Authentication Instant", getLogPrefix());
             shibbolethContext.setInstant(applyTransforms(value));
-        } else if (key.equals(variablePrefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD)) {
+        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD)) {
             log.debug("{} Added value for Authentication Method", getLogPrefix());
             shibbolethContext.setMethod(applyTransforms(value));
-        } else if (key.equals(variablePrefix + ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS)) {
+        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS)) {
             log.debug("{} Added value for Authentication Context Class", getLogPrefix());
             shibbolethContext.setContextClass(applyTransforms(value));
         } else {       

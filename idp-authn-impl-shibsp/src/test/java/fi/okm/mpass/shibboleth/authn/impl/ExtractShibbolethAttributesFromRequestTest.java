@@ -63,12 +63,11 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
     
     /** The HTTP header. */
     private String expectedHeader;
-
+    
     /** {@inheritDoc} */
     @BeforeMethod
     public void setUp() throws Exception {
         super.setUp();
-        action = new ExtractShibbolethAttributesFromRequest("");
     }
 
     /**
@@ -91,27 +90,49 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
      */
     @Test
     public void testNoServlet() throws ComponentInitializationException {
+        action = new ExtractShibbolethAttributesFromRequest("");
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
     /**
-     * Tests successful construction of {@link ShibbolethAuthnContext}.
+     * Tests successful construction of {@link ShibbolethAuthnContext} with prefix in headers.
      * 
      * @throws ComponentInitializationException 
      */
     @Test
-    public void testSuccess() throws ComponentInitializationException {
+    public void testSuccessWithPrefix() throws ComponentInitializationException {
+        testSuccess("AJP_");
+    }
+    
+    /**
+     * Tests successful construction of {@link ShibbolethAuthnContext} without prefix in headers.
+     * 
+     * @throws ComponentInitializationException 
+     */
+    @Test
+    public void testSuccessWithoutPrefix() throws ComponentInitializationException {
+        testSuccess("");
+    }
+    
+    /**
+     * Tests successful construction of {@link ShibbolethAuthnContext}.
+     * 
+     * @param prefix The prefix for the headers.
+     * @throws ComponentInitializationException 
+     */
+    public void testSuccess(final String prefix) throws ComponentInitializationException {
+        action = new ExtractShibbolethAttributesFromRequest(prefix);
         action.setHttpServletRequest(new MockHttpServletRequest());
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant);
+            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod);
+            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
+            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
+            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
         ((MockHttpServletRequest) action.getHttpServletRequest()).addHeader(expectedHeader, expectedHeader);
         ((MockHttpServletRequest) action.getHttpServletRequest()).setAttribute(expectedAttribute, expectedAttribute);
         action.initialize();
