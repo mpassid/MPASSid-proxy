@@ -140,7 +140,8 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
         
         shibbolethContext = authenticationContext.getSubcontext(ShibbolethAuthnContext.class);
         if (shibbolethContext == null) {
-            log.debug("{} No ShibbolethAuthenticationContext available within authentication context", getLogPrefix());
+            log.debug("{} No ShibbolethAuthenticationContext available within authentication context", 
+                    getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
             return false;
         }
@@ -152,7 +153,7 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Username in attributes={}, headers={}", 
+        log.trace("{}: Username in attributes={}, headers={}", getLogPrefix(), 
                 getUsernameFromMap(shibbolethContext.getAttributes()) != null,
                 getUsernameFromMap(shibbolethContext.getHeaders()) != null);            
         if (getUsernameFromMap(shibbolethContext.getAttributes()) == null &&
@@ -171,14 +172,19 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
      */
     protected String getUsernameFromMap(final Map<String, String> map) {
         if (usernameAttribute.contains(USERNAME_DELIMITER)) {
+            log.trace("{}: Multiple username attributes configured, browsing through the set", 
+                    getLogPrefix());
             final StringTokenizer tokenizer = new StringTokenizer(usernameAttribute, USERNAME_DELIMITER);
             while (tokenizer.hasMoreElements()) {
                 final String username = tokenizer.nextToken();
+                log.trace("{}: Checking whether {} exists in the map", getLogPrefix(), username);
                 if (map.containsKey(username)) {
                     return map.get(username);
                 }
             }
         } else {
+            log.trace("{}: Single username attribute configured, returning its value from the map", 
+                    getLogPrefix());
             return map.get(usernameAttribute);
         } 
         return null;
