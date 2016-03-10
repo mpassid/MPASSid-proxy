@@ -25,6 +25,7 @@ package fi.okm.mpass.shibboleth.authn.impl;
 import javax.security.auth.Subject;
 
 import org.opensaml.profile.action.EventIds;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -38,6 +39,7 @@ import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.profile.ActionTestingSupport;
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 /**
  * Unit tests for {@link ValidateShibbolethAuthentication}.
@@ -134,5 +136,27 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
         Assert.assertEquals(subject.getPrincipals(UsernamePrincipal.class).iterator().next().getName(), uidValue);   
         Assert.assertEquals(subject.getPrincipals(ShibHeaderPrincipal.class).iterator().hasNext(), false);
         Assert.assertEquals(subject.getPrincipals(ShibAttributePrincipal.class).iterator().hasNext(), false);
+    }
+    
+    /**
+     * Runs {@link ExtractShibbolethAttributesFromRequest) and {@link ValidateShibbolethAuthentication} together
+     * and verify the authenticated user.
+     * 
+     * @throws ComponentInitializationException
+     */
+    @Test public void testCombinedUsernameResolution() throws ComponentInitializationException {
+        final String prefix = "AJP_";
+        final ExtractShibbolethAttributesFromRequest action1 = new ExtractShibbolethAttributesFromRequest(prefix);
+        action1.setHttpServletRequest(new MockHttpServletRequest());
+        ((MockHttpServletRequest) action1.getHttpServletRequest()).addHeader(prefix + uid, uidValue);
+        action1.initialize();
+        final Event event = action1.execute(src);
+        Assert.assertNull(event);
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class, false);
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        final Event event2 = action.execute(src);
+        Assert.assertNull(event2);
+        final Subject subject = ac.getAuthenticationResult().getSubject();
+        Assert.assertEquals(subject.getPrincipals(UsernamePrincipal.class).iterator().next().getName(), uidValue);   
     }
 }
