@@ -66,7 +66,9 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
         uidValue = "mockUser";
         action = new ValidateShibbolethAuthentication();
         action.setUsernameAttribute(uidConfig);
+        Assert.assertEquals(action.getUsernameAttribute(), uidConfig);
         action.setPopulateAttributes(true);
+        action.setPopulateHeaders(true);
         action.initialize();
     }
 
@@ -100,9 +102,10 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     }
     
     /**
-     * Runs action with username in attribute map.
+     * Runs action with username in attribute map with.
+     * @param action Already initialized {@link ValidateShibbolethAuthentication} action.
      */
-    @Test public void testAttribute() {
+    public void testAttribute(final ValidateShibbolethAuthentication action) {
         final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class, false);
         ac.setAttemptedFlow(authenticationFlows.get(0));
         final ShibbolethAuthnContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
@@ -120,6 +123,26 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     }
     
     /**
+     * Runs action with username in attribute map with multiple usernames in configuration.
+     */
+    @Test public void testAttribute() {
+        testAttribute(action);
+    }
+
+    /**
+     * Runs action with username in attribute map with single username in configuration.
+     */
+    @Test public void testAttributeSingle() throws Exception{
+        action = new ValidateShibbolethAuthentication();
+        action.setUsernameAttribute(uid);
+        Assert.assertEquals(action.getUsernameAttribute(), uid);
+        action.setPopulateAttributes(true);
+        action.setPopulateHeaders(true);
+        action.initialize();
+        testAttribute(action);
+    }
+    
+    /**
      * Runs action with username in HTTP headers map.
      */
     @Test public void testHeader() {
@@ -134,8 +157,9 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
         Assert.assertNotNull(ac.getAuthenticationResult());
         final Subject subject = ac.getAuthenticationResult().getSubject();
         Assert.assertEquals(subject.getPrincipals(UsernamePrincipal.class).iterator().next().getName(), uidValue);   
-        Assert.assertEquals(subject.getPrincipals(ShibHeaderPrincipal.class).iterator().hasNext(), false);
         Assert.assertEquals(subject.getPrincipals(ShibAttributePrincipal.class).iterator().hasNext(), false);
+        final ShibHeaderPrincipal principal = subject.getPrincipals(ShibHeaderPrincipal.class).iterator().next();
+        Assert.assertEquals(principal.getValue(), uidValue);
     }
     
     /**
