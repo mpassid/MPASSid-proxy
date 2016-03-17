@@ -63,7 +63,7 @@ public class ShibHeaderPrincipal extends KeyValuePrincipal {
         }
 
         if (other instanceof ShibHeaderPrincipal) {
-            return getName().equals(((ShibHeaderPrincipal) other).getName())
+            return getKey().equals(((ShibHeaderPrincipal) other).getKey())
                     && getValue().equals(((ShibHeaderPrincipal) other).getValue());
         }
 

@@ -62,7 +62,7 @@ public class ShibAttributePrincipal extends KeyValuePrincipal {
         }
 
         if (other instanceof ShibAttributePrincipal) {
-            return getName().equals(((ShibAttributePrincipal) other).getName())
+            return getKey().equals(((ShibAttributePrincipal) other).getKey())
                     && getValue().equals(((ShibAttributePrincipal) other).getValue());
         }
 
