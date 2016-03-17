@@ -218,7 +218,7 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
      * @return The set containing all HTTP headers.
      */
     protected Set<Principal> populateHeaderPrincipals() {
-        return populatePrincipals(shibbolethContext.getHeaders(), false);
+        return populatePrincipals(shibbolethContext.getHeaders(), true);
     }
     
     /**
