@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.opensaml.profile.action.EventIds;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -40,12 +41,12 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
 
-import junit.framework.Assert;
 import net.shibboleth.idp.authn.AuthenticationResult;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 import net.shibboleth.idp.profile.ActionTestingSupport;
+import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
 
 /**
  * Unit tests for {@link ValidateJwtTokenAuthentication}.
@@ -76,6 +77,7 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
         sharedSecret = "csdijijpsfohdihioa123hiods324324iho3hiih";
         action = new ValidateJwtTokenAuthentication(sharedSecret, jwtParameterName);
         action.setUsernameId(uidConfig);
+        Assert.assertEquals(uidConfig, action.getUsernameId());
         action.setHttpServletRequest((HttpServletRequest) src.getExternalContext().getNativeRequest());
     }
 
@@ -87,11 +89,34 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, EventIds.INVALID_PROFILE_CTX);
     }
-    
+
+    /**
+     * Attempts to initialize action with invalid shared secret.
+     */
+    @Test public void testInvalidSecret() throws Exception {
+        boolean catched = false;
+        try {
+            action = new ValidateJwtTokenAuthentication("not_working");
+        } catch (ConstraintViolationException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
+    }
     /**
      * Runs action without JWT token.
      */
     @Test public void testMissingContext() throws Exception {
+        action.initialize();
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, EventIds.INVALID_PROFILE_CTX);
+    }
+    
+    /**
+     * Runs action without {@link HttpServletRequest}.
+     */
+    @Test public void testMissingServlet() throws Exception {
+        action.setHttpServletRequest(null);
         action.initialize();
         prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
         final Event event = action.execute(src);
@@ -121,6 +146,38 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
         final JWSSigner signer = new MACSigner("abc12" + sharedSecret.substring(5));
         final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
                 new Payload("{ \"" + uidConfig + "\" : \"" + uid + "\" }"));
+        jwsObject.sign(signer);
+        final String rawJwt = jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+    
+    /**
+     * Runs action without desired username in the incoming JWT.
+     */
+    @Test public void testMissingUsername() throws Exception {
+        final JWSSigner signer = new MACSigner(sharedSecret);
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "invalid\" : \"" + uid + "\" }"));
+        jwsObject.sign(signer);
+        final String rawJwt = jwsObject.serialize();
+        ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);
+        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
+     * Runs action with empty username in the incoming JWT.
+     */
+    @Test public void testEmptyUsername() throws Exception {
+        final JWSSigner signer = new MACSigner(sharedSecret);
+        final JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), 
+                new Payload("{ \"" + uidConfig + "\" : \"\" }"));
         jwsObject.sign(signer);
         final String rawJwt = jwsObject.serialize();
         ((MockHttpServletRequest)action.getHttpServletRequest()).addParameter(jwtParameterName, rawJwt);

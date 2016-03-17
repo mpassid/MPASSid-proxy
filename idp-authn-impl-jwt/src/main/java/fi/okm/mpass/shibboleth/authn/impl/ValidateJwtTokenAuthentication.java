@@ -176,12 +176,13 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
         }
-        if (StringSupport.trimOrNull(String.valueOf(jwt.getPayload().toJSONObject().get(usernameId))) == null) {
+        final Object username = jwt.getPayload().toJSONObject().get(usernameId);
+        if (username == null || StringSupport.trimOrNull(String.valueOf(username)) == null) {
             handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
         }
-        log.trace("{}: Building authentication result", getLogPrefix());
+        log.trace("{}: Building authentication result for user {}", getLogPrefix(), username);
         buildAuthenticationResult(profileRequestContext, authenticationContext);
     }    
     
