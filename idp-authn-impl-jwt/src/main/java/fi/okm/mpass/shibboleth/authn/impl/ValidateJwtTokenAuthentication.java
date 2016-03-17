@@ -141,11 +141,6 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
         }
         log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
 
-        if (authenticationContext.getAttemptedFlow() == null) {
-            log.error("{} No attempted flow within authentication context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         final HttpServletRequest servletRequest = getHttpServletRequest();
         if (servletRequest == null) {
             log.error("{} No HttpServletRequst available within profile context", getLogPrefix());

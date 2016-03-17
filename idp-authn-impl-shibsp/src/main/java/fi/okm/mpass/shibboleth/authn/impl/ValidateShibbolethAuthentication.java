@@ -131,12 +131,7 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
         if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
             return false;
         }
-        
-        if (authenticationContext.getAttemptedFlow() == null) {
-            log.debug("{} No attempted flow within authentication context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
+        log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
         
         shibbolethContext = authenticationContext.getSubcontext(ShibbolethAuthnContext.class);
         if (shibbolethContext == null) {
