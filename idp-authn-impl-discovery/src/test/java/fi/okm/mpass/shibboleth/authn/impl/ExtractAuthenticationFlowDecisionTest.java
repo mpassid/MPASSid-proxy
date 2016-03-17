@@ -57,14 +57,24 @@ public class ExtractAuthenticationFlowDecisionTest extends PopulateAuthenticatio
         action = new ExtractAuthenticationFlowDecision();
         action.setAuthnFlowFieldName(authnFlowField);
         action.setHttpServletRequest(new MockHttpServletRequest());
-        action.initialize();
     }
 
+    /**
+     * Runs the action without {@link HttpServletRequest}.
+     */
+    @Test public void testMissingServlet() throws Exception {
+        action.setHttpServletRequest(null);
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.REQUEST_UNSUPPORTED);
+    }
+    
     /**
      * Runs the action with invalid input.
      */
     @Test
-    public void testNoDecision() {
+    public void testNoDecision() throws Exception {
+        action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.REQUEST_UNSUPPORTED);
     }
@@ -73,7 +83,8 @@ public class ExtractAuthenticationFlowDecisionTest extends PopulateAuthenticatio
      * Runs the action with valid input.
      */
     @Test
-    public void testValid() {
+    public void testValid() throws Exception {
+        action.initialize();
         ((MockHttpServletRequest) action.getHttpServletRequest()).addParameter(authnFlowField, authnFlowDecision);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.RESELECT_FLOW);
