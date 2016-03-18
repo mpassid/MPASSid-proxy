@@ -12,7 +12,7 @@ after_failure:
   - cat target/surefire-reports/*.txt
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn clean cobertura:cobertura coveralls:report && mvn -DVERSIONEYE_API_KEY=$VERSIONEYE_API_KEY versioneye:update
 
 notifications:
   slack: hakafederation:MtSKauyCZcYkfkaLhFlL9Ecx
