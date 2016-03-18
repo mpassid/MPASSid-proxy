@@ -24,6 +24,7 @@
 package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.resolver.AttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.ResolutionException;
+import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
 import net.shibboleth.idp.saml.impl.TestSources;
@@ -82,6 +84,84 @@ public class EcaAuthnIdDataConnectorTest {
     }
     
     /**
+     * Tests invalid skipCalculationSrc definition.
+     */
+    @Test public void testInvalidSkipCalc() {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-min.xml");
+        Assert.assertTrue(dataConnector.getSkipCalculation().isEmpty());
+        dataConnector.setSkipCalculation("invalid"); // not something=sth
+        Assert.assertTrue(dataConnector.getSkipCalculation().isEmpty());
+    }
+    
+    /**
+     * Tests collectSingleAttributeValue from List -method
+     */
+    @Test public void testCollectSingleAttributeFromList() {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-min.xml");
+        final List<IdPAttributeValue<?>> values = new ArrayList<IdPAttributeValue<?>>();
+        Assert.assertNull(dataConnector.collectSingleAttributeValue(values));
+        values.add(new StringAttributeValue("mock"));
+        Assert.assertNotNull(dataConnector.collectSingleAttributeValue(values));
+        values.add(new StringAttributeValue("mock2"));
+        Assert.assertNull(dataConnector.collectSingleAttributeValue(values));
+    }
+
+    /**
+     * Tests collectSingleAttributeValue from Map -method
+     */
+    @Test public void testCollectSingleAttributeFromMap() throws ComponentInitializationException {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-min.xml");
+        final String attribute = "mock";
+        final AttributeDefinition definition = 
+                TestSources.populatedStaticAttribute(attribute, attribute, 1);
+        final Map<String, ResolvedAttributeDefinition> attributeDefinitions =
+                new HashMap<String, ResolvedAttributeDefinition>();
+        Assert.assertNull(dataConnector.collectSingleAttributeValue(attributeDefinitions, attribute));
+        ResolvedAttributeDefinition resolved = new ResolvedAttributeDefinition(definition, null);
+        attributeDefinitions.put(attribute, resolved);
+        Assert.assertNull(dataConnector.collectSingleAttributeValue(attributeDefinitions, attribute));
+
+        final IdPAttribute idpAttribute = new IdPAttribute(attribute);
+        final List<IdPAttributeValue<String>> values = new ArrayList<>();
+        values.add(new StringAttributeValue(attribute));
+        idpAttribute.setValues(values);
+        resolved = new ResolvedAttributeDefinition(definition, idpAttribute);
+        attributeDefinitions.put(attribute, resolved);
+        Assert.assertNotNull(dataConnector.collectSingleAttributeValue(attributeDefinitions, attribute));
+        
+        values.add(new StringAttributeValue(attribute + "2"));
+        idpAttribute.setValues(values);
+        resolved = new ResolvedAttributeDefinition(definition, idpAttribute);
+        attributeDefinitions.put(attribute, resolved);
+        Assert.assertNull(dataConnector.collectSingleAttributeValue(attributeDefinitions, attribute));
+    }
+    
+    /**
+     * Tests sourceExistsInAnother -method.
+     */
+    @Test public void testSourceExists() {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-min.xml");
+        List<String> source = new ArrayList<>();
+        List<IdPAttributeValue<?>> target = new ArrayList<>();
+        Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));
+        source.add("mock1");
+        Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));
+        source.add("mock2");
+        source.add("mock3");
+        source.add("mock4");
+        Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));
+        target.add(new StringAttributeValue("mock5"));
+        target.add(new StringAttributeValue("mock6"));
+        Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));
+        target.add(new StringAttributeValue("mock3"));
+        Assert.assertTrue(dataConnector.sourceExistsInAnother(source, target));
+    }
+    
+    /**
      * Tests {@link EcaAuthnIdDataConnector} with minimum configuration.
      * @throws ComponentInitializationException If component cannot be initialized.
      * @throws ResolutionException If attribute resolution fails.
@@ -98,6 +178,10 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertNull(dataConnector.getSkipCalculationSrc());
+        Assert.assertEquals(dataConnector.getMinInputLength(), EcaAuthnIdDataConnector.DEFAULT_MINIMUM_INPUT_LENGTH);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "");
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 "9MRUli6t2hQIhLKlVK/n2IAwVzZpCreaZ6dAyE7CHL8=");
@@ -122,6 +206,10 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertNull(dataConnector.getSkipCalculationSrc());
+        Assert.assertEquals(dataConnector.getMinInputLength(), EcaAuthnIdDataConnector.DEFAULT_MINIMUM_INPUT_LENGTH);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "");
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 "w/AW7WOwjcS/8ibBkbD91eVhb7Kh73tRZhHS+u6AVkM=");
@@ -145,6 +233,10 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertEquals(dataConnector.getMinInputLength(), EcaAuthnIdDataConnector.DEFAULT_MINIMUM_INPUT_LENGTH);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "testPost");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "testPre");
+        Assert.assertNull(dataConnector.getSkipCalculationSrc());
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 "/koIA2Xy/utNm9/f6c4HPnGb2bZ/0nRKOTd2BAQfFL8=");
@@ -168,6 +260,10 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertEquals(dataConnector.getSkipCalculationSrc(), srcAttributeName);
+        Assert.assertEquals(dataConnector.getMinInputLength(), 15);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "testPost");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "testPre");
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 srcAttributeValues.get(0));
@@ -192,6 +288,10 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertNull(dataConnector.getSkipCalculationSrc());
+        Assert.assertEquals(dataConnector.getMinInputLength(), EcaAuthnIdDataConnector.DEFAULT_MINIMUM_INPUT_LENGTH);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "");
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 srcAttributeValues.get(0));
@@ -215,9 +315,32 @@ public class EcaAuthnIdDataConnectorTest {
         final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
         Assert.assertEquals(dataConnector.getId(), "authnid");
         Assert.assertNull(dataConnector.getFailoverDataConnectorId());
+        Assert.assertNull(dataConnector.getSkipCalculationSrc());
+        Assert.assertEquals(dataConnector.getMinInputLength(), EcaAuthnIdDataConnector.DEFAULT_MINIMUM_INPUT_LENGTH);
+        Assert.assertEquals(dataConnector.getPostfixSalt(), "");
+        Assert.assertEquals(dataConnector.getPrefixSalt(), "");
         Assert.assertEquals(resolvedAttributes.size(), 1);
         Assert.assertEquals(resolvedAttributes.get(destAttributeName).getValues().get(0).getValue(), 
                 srcAttributeValues.get(0));
+    }
+    
+    /**
+     * Tests {@link EcaAuthnIdDataConnector} with configuration that has too short authnId.
+     * @throws ComponentInitializationException If component cannot be initialized.
+     * @throws ResolutionException If attribute resolution fails.
+     */
+    @Test public void testTooShortId() throws ComponentInitializationException, ResolutionException {
+        final EcaAuthnIdDataConnector dataConnector = 
+                EcaAuthnIdDataConnectorParserTest.initializeDataConnector("authnid-full.xml");
+        final AttributeResolutionContext context =
+                TestSources.createResolutionContext(TestSources.PRINCIPAL_ID, TestSources.IDP_ENTITY_ID,
+                        TestSources.SP_ENTITY_ID);
+        final AttributeResolverWorkContext workContext = 
+                context.getSubcontext(AttributeResolverWorkContext.class, false);
+        recordWorkContextAttribute(srcAttributeName, srcAttributeValues.get(0), workContext);
+        dataConnector.setMinInputLength("" + (srcAttributeValues.get(0).length() + 1));
+        final Map<String, IdPAttribute> resolvedAttributes = dataConnector.resolve(context);
+        Assert.assertEquals(resolvedAttributes.size(), 0);
     }
     
     /**
