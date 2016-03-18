@@ -66,9 +66,8 @@ public class AttributeValueAuditExtractor implements Function<ProfileRequestCont
      */
     public AttributeValueAuditExtractor(@Nonnull @NotEmpty final String attrId) {
         // Defaults to ProfileRequestContext -> RelyingPartyContext -> AttributeContext.
-        attributeContextLookupStrategy = Functions.compose(new ChildContextLookup<>(AttributeContext.class),
-                new ChildContextLookup<ProfileRequestContext,RelyingPartyContext>(RelyingPartyContext.class));
-        attributeId = Constraint.isNotEmpty(attrId, "attrId cannot be null nor empty!");
+        this(Functions.compose(new ChildContextLookup<>(AttributeContext.class),
+                new ChildContextLookup<ProfileRequestContext,RelyingPartyContext>(RelyingPartyContext.class)), attrId);
     }
     
     /**

@@ -43,6 +43,7 @@ import com.google.common.base.Function;
  * A {@link Function} that returns the value of authentication flow id from the {@link AuthenticationResult}
  * in the {@link AuthenticationContext}.
  */
+@SuppressWarnings("rawtypes")
 public class AuthnFlowIdAuditExtractor implements Function<ProfileRequestContext,Collection<String>> {
     
     /** Class logger. */
@@ -52,8 +53,9 @@ public class AuthnFlowIdAuditExtractor implements Function<ProfileRequestContext
     @Nonnull private final Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy;
 
     /** Constructor. */
+    @SuppressWarnings("unchecked")
     public AuthnFlowIdAuditExtractor() {
-        authenticationContextLookupStrategy = new ChildContextLookup<>(AuthenticationContext.class);
+        this((Function)new ChildContextLookup<>(AuthenticationContext.class));
     }
     
     /**
