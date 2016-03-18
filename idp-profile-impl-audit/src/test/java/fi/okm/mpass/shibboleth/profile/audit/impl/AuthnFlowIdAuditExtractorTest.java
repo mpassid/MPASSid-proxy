@@ -31,6 +31,7 @@ import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
 
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.RequestContext;
@@ -72,6 +73,19 @@ public class AuthnFlowIdAuditExtractorTest {
     @BeforeMethod public void populateContext() throws ComponentInitializationException {        
         src = new RequestContextBuilder().buildRequestContext();
         prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
+    }
+    
+    /**
+     * Verifies that the construction fails with null function.
+     */
+    @Test public void initNullFunction() {
+        boolean catched = false;
+        try {
+            authnFlowIdExtractor = new AuthnFlowIdAuditExtractor(null);
+        } catch (ConstraintViolationException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
     }
     
     /**

@@ -33,6 +33,7 @@ import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
 
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.RequestContext;
@@ -82,6 +83,32 @@ public class AttributeValueAuditExtractorTest {
         src = new RequestContextBuilder().buildRequestContext();
         prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
         rp = prc.getSubcontext(RelyingPartyContext.class, true);
+    }
+    
+    /**
+     * Verifies that the construction fails with null function.
+     */
+    @Test public void initNullFunction() {
+        boolean catched = false;
+        try {
+            auditExtractor = new AttributeValueAuditExtractor(null, attributeId);
+        } catch (ConstraintViolationException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
+    }
+    
+    /**
+     * Verifies that the construction fails with null attributeId.
+     */
+    @Test public void initNullAttributeId() {
+        boolean catched = false;
+        try {
+            auditExtractor = new AttributeValueAuditExtractor(null);
+        } catch (ConstraintViolationException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
     }
     
     /**

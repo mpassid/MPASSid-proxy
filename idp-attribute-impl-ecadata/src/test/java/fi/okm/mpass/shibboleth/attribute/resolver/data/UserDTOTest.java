@@ -31,10 +31,95 @@ import org.testng.annotations.Test;
 
 import com.google.gson.Gson;
 
+import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO.AttributesDTO;
+import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO.RolesDTO;
+
 /**
  * Unit testing for {@link UserDTO} using Gson.
  */
 public class UserDTOTest {
+    
+    /**
+     * Tests class methods directly without JSON parsing.
+     */
+    @Test
+    public void testWithoutJson() {
+        final UserDTO user = new UserDTO();
+        Assert.assertNull(user.getFirstName());
+        Assert.assertNull(user.getLastName());
+        Assert.assertNull(user.getUsername());
+        Assert.assertNull(user.getAttributes());
+        Assert.assertNull(user.getRoles());
+        
+        final AttributesDTO attributes = user.new AttributesDTO();
+        Assert.assertNull(attributes.getName());
+        Assert.assertNull(attributes.getValue());
+        
+        final RolesDTO roles = user.new RolesDTO();
+        Assert.assertNull(roles.getGroup());
+        Assert.assertNull(roles.getMunicipality());
+        Assert.assertNull(roles.getRole());
+        Assert.assertNull(roles.getSchool());
+        
+        final String firstName = "mockFirstName";
+        final String lastName = "mockLastName";
+        final String username = "mockUsername";
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        Assert.assertEquals(user.getFirstName(), firstName);
+        Assert.assertEquals(user.getLastName(), lastName);
+        Assert.assertEquals(user.getUsername(), username);
+
+        final String name = "mockName";
+        final String value = "mockValue";
+        attributes.setName(name);
+        attributes.setValue(value);
+        assertAttribute(attributes, name, value);
+        
+        final String group = "mockGroup";
+        final String municipality = "mockMunicipality";
+        final String role = "mockRole";
+        final String school = "mockSchool";
+        roles.setGroup(group);
+        roles.setMunicipality(municipality);
+        roles.setRole(role);
+        roles.setSchool(school);
+        assertRole(roles, group, municipality, role, school);
+        
+        user.setAttributes(new AttributesDTO[] { attributes });
+        user.setRoles(new RolesDTO[] { roles });
+        Assert.assertEquals(user.getAttributes().length, 1);
+        Assert.assertEquals(user.getRoles().length, 1);
+        assertAttribute(user.getAttributes()[0], name, value);
+        assertRole(user.getRoles()[0], group, municipality, role, school);
+    }
+    
+    /**
+     * Verifies attribute's contents.
+     * @param attribute
+     * @param name
+     * @param value
+     */
+    public void assertAttribute(final AttributesDTO attribute, final String name, final String value) {
+        Assert.assertEquals(attribute.getName(), name);
+        Assert.assertEquals(attribute.getValue(), value);        
+    }
+    
+    /**
+     * Verifies role's contents.
+     * @param role
+     * @param group
+     * @param municipality
+     * @param roleStr
+     * @param school
+     */
+    public void assertRole(final RolesDTO role, final String group, final String municipality, final String roleStr, final String school) {
+        Assert.assertEquals(role.getGroup(), group);
+        Assert.assertEquals(role.getMunicipality(), municipality);
+        Assert.assertEquals(role.getRole(), roleStr);
+        Assert.assertEquals(role.getSchool(), school);        
+    }
 
     /**
      * Tests parsing of a single user data transfer object without roles nor attributes.
