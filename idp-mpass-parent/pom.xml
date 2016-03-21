@@ -366,7 +366,8 @@ THE SOFTWARE.
                 <artifactId>versioneye-maven-plugin</artifactId>
                 <configuration>
                     <apiKey>${VERSIONEYE_API_KEY}</apiKey>
-                    <projectId>56ebbbee05cd97000a57b6d6</projectId>
+                    <projectId>56efd997053a52000ac0d7e0</projectId>
+                    <updatePropertiesAfterCreate>false</updatePropertiesAfterCreate>
                 </configuration>
             </plugin>
         </plugins>

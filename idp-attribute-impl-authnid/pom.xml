@@ -220,10 +220,18 @@ THE SOFTWARE.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.versioneye</groupId>
+                <artifactId>versioneye-maven-plugin</artifactId>
+                <configuration>
+                    <apiKey>${VERSIONEYE_API_KEY}</apiKey>
+                    <projectId>56efd9becc7180000ef40804</projectId>
+                    <updatePropertiesAfterCreate>false</updatePropertiesAfterCreate>
                 </configuration>
             </plugin>
         </plugins>

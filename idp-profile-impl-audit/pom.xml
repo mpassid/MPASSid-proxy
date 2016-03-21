@@ -157,4 +157,18 @@ THE SOFTWARE.
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.versioneye</groupId>
+                <artifactId>versioneye-maven-plugin</artifactId>
+                <configuration>
+                    <apiKey>${VERSIONEYE_API_KEY}</apiKey>
+                    <projectId>56efd9e0053a52000ac0d8d5</projectId>
+                    <updatePropertiesAfterCreate>false</updatePropertiesAfterCreate>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
