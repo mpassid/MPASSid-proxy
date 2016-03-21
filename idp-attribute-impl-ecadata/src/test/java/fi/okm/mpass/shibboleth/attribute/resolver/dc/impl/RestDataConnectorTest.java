@@ -26,6 +26,7 @@ package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO;
+import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO.RolesDTO;
 import fi.okm.mpass.shibboleth.attribute.resolver.spring.dc.RestDataConnectorParserTest;
 
 /**
@@ -92,6 +95,70 @@ public class RestDataConnectorTest {
         expectedResultAttribute = "username";
         expectedToken = "testingToken";
         expectedOid = "OID1";
+    }
+    
+    /**
+     * Tests constructor.
+     */
+    @Test public void testConstructor() {
+        final HttpClientBuilder builder = new HttpClientBuilder();
+        Assert.assertEquals(new RestDataConnector(builder).getHttpClientBuilder(), builder);
+        Assert.assertNotNull(new RestDataConnector().getHttpClientBuilder());
+    }
+    
+    /**
+     * Tests populateAttribute.
+     */
+    @Test public void testPopulateAttribute() {
+        final RestDataConnector dataConnector = new RestDataConnector();
+        dataConnector.setResultAttributePrefix("");        
+        final Map<String, IdPAttribute> attributes = new HashMap<>();
+        final String name = "mock";
+        final String value = "mockValue";
+        dataConnector.populateAttribute(attributes, (String)null, (String)null);
+        Assert.assertTrue(attributes.isEmpty());
+        dataConnector.populateAttribute(attributes, "", (String)null);
+        Assert.assertTrue(attributes.isEmpty());
+        dataConnector.populateAttribute(attributes, name, (String)null);
+        Assert.assertTrue(attributes.isEmpty());
+        dataConnector.populateAttribute(attributes, name, "");
+        Assert.assertTrue(attributes.isEmpty());
+        dataConnector.populateAttribute(attributes, name, value);
+        Assert.assertEquals(attributes.size(), 1);
+        Assert.assertEquals(attributes.get(name).getValues().size(), 1);
+        Assert.assertEquals(attributes.get(name).getValues().get(0).getValue(), value);
+    }
+    
+    /**
+     * Tests populateStructuredRole.
+     */
+    @Test public void testPopulateStructuredRole() {
+        final UserDTO user = new UserDTO();
+        final RolesDTO role = user.new RolesDTO();
+        final Map<String, IdPAttribute> attributes = new HashMap<>();
+        final RestDataConnector dataConnector = new RestDataConnector();
+        dataConnector.setResultAttributePrefix("");
+        dataConnector.populateStructuredRole(attributes, role);
+        final IdPAttribute attribute = attributes.get(RestDataConnector.ATTR_ID_STRUCTURED_ROLES);
+        Assert.assertNotNull(attribute);
+        Assert.assertEquals(attribute.getValues().size(), 1);
+        Assert.assertEquals(attribute.getValues().get(0).getValue(), ";;;");
+    }
+    
+    /**
+     * Tests {@link RestDataConnector} with minimum configuration, with empty authnId value.
+     */
+    @Test
+    public void testNoAuthnId() throws Exception {
+        expectedHookAttribute = "invalid"; // differs from the configuration
+        boolean catched = false;
+        try {
+            final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-0role-0attr.json", 
+                    "restdc-min.xml");
+        } catch (ResolutionException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
     }
 
     /**
@@ -148,6 +215,7 @@ public class RestDataConnectorTest {
         Assert.assertEquals(dataConnector.getToken(), expectedToken);        
         Assert.assertEquals(dataConnector.isDisregardTLSCertificate(), disregard);
         Assert.assertEquals(dataConnector.getResultAttributePrefix(), prefix);
+        Assert.assertNotNull(dataConnector.getHttpClientBuilder());
     }
     
     /**
