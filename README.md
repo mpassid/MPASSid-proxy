@@ -1,5 +1,9 @@
 # MPASS-proxy
 
+[![License](http://img.shields.io/:license-mit-blue.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy)
+[![Coverage Status](https://coveralls.io/repos/github/Digipalvelutehdas/MPASS-proxy/badge.svg?branch=master)](https://coveralls.io/github/Digipalvelutehdas/MPASS-proxy?branch=master)
+
 MPASS-proxy consists of several modules for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home), providing
 extensions for authentication, attribute resolution and audit logging. They can be used individually, but together they provide an open source 
 implementation for the [ECA Authentication](http://docs.educloudalliance.org/en/latest/auth/index.html) standard's
@@ -20,7 +24,7 @@ For more information about the MPASS project, see http://www.mpass.fi/ (currentl
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
 - _idp-profile-impl-audit_: Some extensions for audit logging.
 
-## Prerequisities and build instructions [![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy)
+## Prerequisities and build instructions
 
 - Java 7+
 - [Apache Maven 3](https://maven.apache.org/)
