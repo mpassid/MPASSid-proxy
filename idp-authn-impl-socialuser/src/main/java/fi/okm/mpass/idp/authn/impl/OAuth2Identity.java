@@ -85,7 +85,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                     .endpointURI(getAuthorizationEndpoint()).build();
             ret = request.toURI().toString();
         } catch (URISyntaxException | SerializeException e) {
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -122,10 +122,11 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
             // Get the access token, the server may also return a refresh token
-            AccessToken accessToken = tokenSuccessResponse.getTokens().getAccessToken();
+            AccessToken accessToken = tokenSuccessResponse.getTokens()
+                    .getAccessToken();
             // try reading stuff from accesstoken
             Subject subject = new Subject();
-            log.debug("claims from provider: "+accessToken.toJSONString());
+            log.debug("claims from provider: " + accessToken.toJSONString());
             parsePrincipalsFromClaims(subject, accessToken.toJSONObject());
             if (getUserinfoEndpoint() != null
                     && !getUserinfoEndpoint().toString().isEmpty()) {
@@ -152,7 +153,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
