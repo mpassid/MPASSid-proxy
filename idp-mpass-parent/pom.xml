@@ -310,8 +310,13 @@ THE SOFTWARE.
                 </plugin>
                 <plugin>
                     <groupId>com.versioneye</groupId>
-                     <artifactId>versioneye-maven-plugin</artifactId>
-                     <version>3.9.1</version>
+                    <artifactId>versioneye-maven-plugin</artifactId>
+                    <version>3.9.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -369,6 +374,21 @@ THE SOFTWARE.
                     <projectId>56efd997053a52000ac0d7e0</projectId>
                     <updatePropertiesAfterCreate>false</updatePropertiesAfterCreate>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
