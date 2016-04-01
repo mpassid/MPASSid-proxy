@@ -34,7 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.idp.authn.SocialAuthenticationRequest;
 
-/**This class extracts request parameters from http request attributes set by shibboleth idp 3.*/
+/**
+ * This class extracts request parameters from http request attributes set by
+ * shibboleth idp 3.
+ */
 public class ShibServletSocialAuthenticationRequestImpl implements
         SocialAuthenticationRequest {
 
