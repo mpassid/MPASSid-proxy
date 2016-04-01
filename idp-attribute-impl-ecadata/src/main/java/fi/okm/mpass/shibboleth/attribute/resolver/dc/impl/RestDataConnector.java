@@ -34,7 +34,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -128,7 +127,7 @@ public class RestDataConnector extends AbstractDataConnector {
      * Constructor.
      * @param clientBuilder The {@link HttpClientBuilder} used for constructing HTTP clients.
      */
-    public RestDataConnector(HttpClientBuilder clientBuilder) {
+    public RestDataConnector(final HttpClientBuilder clientBuilder) {
         super();
         if (clientBuilder == null) {
             httpClientBuilder = new HttpClientBuilder();
@@ -145,7 +144,6 @@ public class RestDataConnector extends AbstractDataConnector {
 
         log.debug("Calling {} for resolving attributes", endpointUrl);
 
-        String attributeCallUrl = endpointUrl;
         String authnIdValue = collectSingleAttributeValue(attributeResolverWorkContext.
                 getResolvedIdPAttributeDefinitions(), hookAttribute);
         log.debug("AuthnID before URL encoding = {}", authnIdValue);
@@ -167,30 +165,37 @@ public class RestDataConnector extends AbstractDataConnector {
             log.error("Could not resolve idpId value");
             throw new ResolutionException("Could not resolve idpId value");
         }
-        attributeCallUrl = attributeCallUrl + "?" + idpIdValue + "=" + authnIdValue;
-
-        HttpEntity restEntity = null;
-
+        final String attributeCallUrl = endpointUrl + "?" + idpIdValue + "=" + authnIdValue;
+        final HttpResponse restResponse;
+        final long timestamp = System.currentTimeMillis();
         try {
             final HttpClient httpClient = getHttpClientBuilder().buildClient();
             log.debug("Calling URL {}", attributeCallUrl);
             final HttpGet getMethod = new HttpGet(attributeCallUrl);
             final HttpContext context = HttpClientContext.create();
             getMethod.addHeader("Authorization", "Token " + token);
-            final HttpResponse restResponse = httpClient.execute(getMethod, context);
-            final int status = restResponse.getStatusLine().getStatusCode();
-            restEntity = restResponse.getEntity();
-            log.debug("Response code from Data: HTTP " + status);
-            
-            if (log.isTraceEnabled()) {
-                if (restResponse.getAllHeaders() != null) {
-                    for (Header header : restResponse.getAllHeaders()) {
-                        log.trace("Header {}: {}", header.getName(), header.getValue());
-                    }
+            restResponse = httpClient.execute(getMethod, context);
+            // 2016-03-31 17:54:39,278 - ERROR [fi.okm.mpass.shibboleth.attribute.resolver.dc.impl.RestDataConnector:179] - Could not open connection to REST API, skipping attribute resolution
+            //java.util.ConcurrentModificationException: null
+            //at java.util.LinkedList$ListItr.checkForComodification(LinkedList.java:966)
+        } catch (Exception e) {
+            log.error("Could not open connection to REST API, skipping attribute resolution", e);
+            return attributes;
+        }
+
+        final int status = restResponse.getStatusLine().getStatusCode();
+        log.info("API call took {} ms, response code {}", System.currentTimeMillis() - timestamp, status);
+        
+        if (log.isTraceEnabled()) {
+            if (restResponse.getAllHeaders() != null) {
+                for (Header header : restResponse.getAllHeaders()) {
+                    log.trace("Header {}: {}", header.getName(), header.getValue());
                 }
             }
-            
-            final String restResponseStr = EntityUtils.toString(restEntity, "UTF-8");
+        }
+
+        try {
+            final String restResponseStr = EntityUtils.toString(restResponse.getEntity(), "UTF-8");
             log.trace("Response {}", restResponseStr);
             if (status == HttpStatus.SC_OK) {
                 final Gson gson = new Gson();
@@ -203,7 +208,7 @@ public class RestDataConnector extends AbstractDataConnector {
         } catch (Exception e) {
             log.error("Error in connection to Data API", e);
         } finally {
-            EntityUtils.consumeQuietly(restEntity);
+            EntityUtils.consumeQuietly(restResponse.getEntity());
         }
         return attributes;
     }
