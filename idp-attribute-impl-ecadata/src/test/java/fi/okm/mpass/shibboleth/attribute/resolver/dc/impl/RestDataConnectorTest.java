@@ -50,7 +50,7 @@ import org.apache.http.protocol.HttpContext;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO;
@@ -86,7 +86,7 @@ public class RestDataConnectorTest {
     /**
      * Initialize unit tests.
      */
-    @BeforeTest
+    @BeforeMethod
     public void init() {
         expectedId = "restdc";
         expectedEndpointUrl = "testindEndpointUrl";
@@ -161,6 +161,21 @@ public class RestDataConnectorTest {
         Assert.assertTrue(catched);
     }
 
+    /**
+     * Tests {@link RestDataConnector} with minimum configuration, with empty idpId value.
+     */
+    @Test
+    public void testNoIdpId() throws Exception {
+        expectedIdpId = "invalid"; // differs from the configuration
+        boolean catched = false;
+        try {
+            final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-0role-0attr.json", 
+                    "restdc-min.xml");
+        } catch (ResolutionException e) {
+            catched = true;
+        }
+        Assert.assertTrue(catched);
+    }
     /**
      * Tests {@link RestDataConnector} with minimum configuration, without roles for the user.
      * 

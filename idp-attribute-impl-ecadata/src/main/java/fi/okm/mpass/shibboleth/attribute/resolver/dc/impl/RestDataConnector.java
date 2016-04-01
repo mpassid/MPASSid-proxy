@@ -163,6 +163,10 @@ public class RestDataConnector extends AbstractDataConnector {
         log.debug("AuthnID after URL encoding = {}", authnIdValue);
         final String idpIdValue =
                 collectSingleAttributeValue(attributeResolverWorkContext.getResolvedIdPAttributeDefinitions(), idpId);
+        if (StringSupport.trimOrNull(idpIdValue) == null) {
+            log.error("Could not resolve idpId value");
+            throw new ResolutionException("Could not resolve idpId value");
+        }
         attributeCallUrl = attributeCallUrl + "?" + idpIdValue + "=" + authnIdValue;
 
         HttpEntity restEntity = null;
