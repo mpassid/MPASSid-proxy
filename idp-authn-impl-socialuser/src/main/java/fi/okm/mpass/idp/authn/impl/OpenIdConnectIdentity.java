@@ -84,9 +84,12 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
      * 
      * @param metadataLocation
      *            OpenId Provider Metadata location
-     * @throws URISyntaxException if metadataLocation is not URI
-     * @throws IOException if metadataLocation cannot be read
-     * @throws ParseException if metadataLocation has wrong content
+     * @throws URISyntaxException
+     *             if metadataLocation is not URI
+     * @throws IOException
+     *             if metadataLocation cannot be read
+     * @throws ParseException
+     *             if metadataLocation has wrong content
      */
     public void setProviderMetadataLocation(String metadataLocation)
             throws URISyntaxException, IOException, ParseException {
@@ -163,12 +166,11 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         this.prompt = new Prompt(oidcPrompt);
         log.trace("Leaving");
     }
-    
+
     /**
      * Getter for OpenId Prompt value.
      * 
-     * @return oidcPrompt
-     *            OpenId Prompt values
+     * @return oidcPrompt OpenId Prompt values
      */
     public Prompt getPrompt() {
         log.trace("Entering");
@@ -192,12 +194,11 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         }
         log.trace("Leaving");
     }
-    
+
     /**
      * Getter for OpenId ACR values.
      * 
-     * @return oidcAcrs
-     *            OpenId ACR values
+     * @return oidcAcrs OpenId ACR values
      */
     public List<ACR> getAcr() {
         log.trace("Entering");
@@ -219,7 +220,7 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         }
         log.trace("Leaving");
     }
-    
+
     /**
      * Getter for OpenId Display value.
      * 
