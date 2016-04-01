@@ -152,7 +152,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             params.setState(digest);
         } catch (NoSuchAlgorithmException e) {
             log.error("Unable to generate state");
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -186,7 +186,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             log.error("Unable to generate state");
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "Unable to hash, use some other method",
@@ -219,8 +219,9 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             throws SocialUserAuthenticationException {
         log.trace("Entering");
         String error = httpRequest.getParameter("error");
-        //TODO .. this needs some bean injection magic. FB for instance has error_code
-        if (error==null){
+        // TODO .. this needs some bean injection magic. FB for instance has
+        // error_code
+        if (error == null) {
             error = httpRequest.getParameter("error_code");
         }
         if (error != null && !error.isEmpty()) {
@@ -242,8 +243,9 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             }
             String errorDescription = httpRequest
                     .getParameter("error_description");
-            if (errorDescription==null){
-              //TODO .. this needs some bean injection magic. FB for instance has error_message
+            if (errorDescription == null) {
+                // TODO .. this needs some bean injection magic. FB for instance
+                // has error_message
                 errorDescription = httpRequest.getParameter("error_message");
             }
             if (errorDescription != null && !errorDescription.isEmpty()) {
@@ -282,7 +284,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
                     httpRequest.getRequestURL().toString(), null);
         } catch (HttpClientErrorException e) {
             log.trace("Leaving");
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
         }
