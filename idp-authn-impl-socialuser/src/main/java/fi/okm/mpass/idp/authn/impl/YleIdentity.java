@@ -117,7 +117,7 @@ public class YleIdentity extends OAuth2Identity implements
             // yle authorize endpoint needs extra credentials to reach
             ret = request.toURI().toString() + getYleGatewayCredentialsTrail();
         } catch (URISyntaxException | SerializeException e) {
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.trace("Leaving");
             return null;
         }
@@ -162,7 +162,8 @@ public class YleIdentity extends OAuth2Identity implements
             }
             AccessTokenResponse tokenSuccessResponse = (AccessTokenResponse) tokenResponse;
             // Get the access token, the server may also return a refresh token
-            AccessToken accessToken = tokenSuccessResponse.getTokens().getAccessToken();
+            AccessToken accessToken = tokenSuccessResponse.getTokens()
+                    .getAccessToken();
             // try reading stuff from accesstoken
             Subject subject = new Subject();
             parsePrincipalsFromClaims(subject, accessToken.toJSONObject());
@@ -191,7 +192,7 @@ public class YleIdentity extends OAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            log.error("Something bad happened "+e.getMessage());
+            log.error("Something bad happened " + e.getMessage());
             log.error(e.getMessage());
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
