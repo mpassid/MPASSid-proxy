@@ -224,5 +224,52 @@
         </property>
     </bean>
 
+    <bean id="SetOIDCInformation"
+            class="fi.okm.mpass.idp.authn.impl.SetOIDCInformation" scope="prototype"
+            p:openIdConnectInformation-ref="GoogleOpenIdConnectInformation"/>
+            
+    <bean id="ValidateOIDCAuthenticationResponse"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCAuthenticationResponse" scope="prototype"
+          p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
+     
+     <bean id="ValidateOIDCIDTokenACR"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenACR" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenAudience"
+              class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAudience" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenAuthenticationTime"
+              class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAuthenticationTime" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenAuthorizedParty"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAuthorizedParty" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenExpirationTime"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenExpirationTime" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenIssuer"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenIssuer" scope="prototype"/>     
+
+    <bean id="ValidateOIDCIDTokenSignature"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenSignature" scope="prototype"/>     
+
+    <bean id="ValidateOIDCAuthentication"
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCAuthentication" scope="prototype"/>     
+
+    <bean id="GetOIDCTokenResponse"
+          class="fi.okm.mpass.idp.authn.impl.GetOIDCTokenResponse" scope="prototype"
+          p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
+
+    <bean id="GetOIDCAuthenticationRequest"
+            class="fi.okm.mpass.idp.authn.impl.GetOIDCAuthenticationRequest" scope="prototype"
+            p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
+
+    <bean id="GoogleOpenIdConnectInformation"
+        class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
+        <property name="clientId" value=""/>
+        <property name="clientSecret" value=""/>
+        <property name="providerMetadataLocation" value="https://accounts.google.com"/>
+        <property name="redirectURI" value=""/>
+    </bean>
 
 </beans>
