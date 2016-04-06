@@ -23,13 +23,22 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.text.ParseException;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
+import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
 /**
@@ -58,6 +67,48 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+        if (suCtx == null) {
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        
+        // Check acr
+        // If the acr Claim was requested, the Client SHOULD check that the
+        // asserted Claim Value is appropriate. The meaning and processing
+        // of acr Claim Values is out of scope for this specification.
+        List<ACR> acrs=suCtx.getOpenIdConnectInformation().getAcr();
+        if (acrs != null && acrs.size() > 0) {
+            String acr;
+            try {
+                acr = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet().getStringClaim("acr");
+            } catch (ParseException e) {
+                log.error("{} Error parsing id token", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+            if (acr == null) {
+                log.error("{} acr requested but not received", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+            if (!acrs.contains(acr)) {
+                log.error("{} acr received does not match requested:" + acr, getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+        }
         log.trace("Leaving");
         return;
     }
