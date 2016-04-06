@@ -35,10 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 /**
  * An action that creates a {@link SocialUserOpenIdConnectContext}, and attaches
@@ -120,7 +124,14 @@ public class ValidateOIDCAuthenticationResponse extends
         }
         AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) response;
 
-        // TODO: compare state before setting response to context
+        State state = suCtx.getState();
+        if (state == null || !state.equals(successResponse.getState())) {
+            // TODO: FIX ERROR VALUE
+            log.info("{} state mismatch:", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.INVALID_AUTHN_CTX);
+            log.trace("Leaving");
+        }
 
         suCtx.setAuthenticationSuccessResponse(successResponse);
         log.trace("Leaving");
