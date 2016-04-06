@@ -23,14 +23,22 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
+import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 
 /**
  * An action that verifies Authentication Time of ID Token.
@@ -59,6 +67,49 @@ public class ValidateOIDCIDTokenAuthenticationTime extends
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+
+        if (!authenticationContext.isForceAuthn()) {
+            log.trace("Leaving");
+            return;
+        }
+        // If we have forced authentication, we will check for authentication
+        // age
+        // It must not be more than now-30s.
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+        if (suCtx == null) {
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        Date authTime;
+        try {
+            authTime = suCtx.getOidcTokenResponse().getOIDCTokens()
+                    .getIDToken().getJWTClaimsSet().getDateClaim("auth_time");
+        } catch (ParseException e) {
+            log.error("{} Error parsing id token", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        if (authTime == null) {
+            log.error("{} max age set but no auth_time received",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+
+        }
+        // TODO: 30000, make it as leeway init param
+        // Authentication must have been done within 30secs
+        Date currentDate = new Date();
+        if (currentDate.getTime() - authTime.getTime() > 30000) {
+            log.error("current time " + currentDate.getTime());
+            log.error("authentication time " + currentDate.getTime());
+        }
         log.trace("Leaving");
         return;
     }
