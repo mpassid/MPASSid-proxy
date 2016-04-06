@@ -41,6 +41,8 @@ import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.SerializeException;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.openid.connect.sdk.Prompt;
+import com.nimbusds.openid.connect.sdk.Prompt.Type;
 
 /**
  * An action that creates a {@link SocialUserOpenIdConnectContext}, and attaches
@@ -110,28 +112,29 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         }
         oidc.init();
         suCtx.setOpenIdConnectInformation(oidc);
-        // form redirect url, set it to context
-        // TODO: THIS IS STILL VERY DRAFT VERSION NOT SUPPORTING
-        // AUTH REQUEST PARAMETERS ETC.
+
+        // If request is passive we override default prompt value
+        Prompt prompt = authenticationContext.isPassive() ? new Prompt(
+                Type.NONE) : oidc.getPrompt();
+
         ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
-        try {
+        suCtx.setState(state);
+        if (authenticationContext.isForceAuthn()) {
+            // We set max age to 0 if forcedauth is set
             suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
-                    responseType,
-                    oidc.getScope(),
-                    oidc.getClientId(),
-                    new URI(
-                            "https://lauros.fi:8444/idp/Authn/SocialUserOpenIdConnectEnd"))
+                    responseType, oidc.getScope(), oidc.getClientId(), oidc
+                            .getRedirectURI())
                     .endpointURI(oidc.getAuthorizationEndpoint())
                     .display(oidc.getDisplay()).acrValues(oidc.getAcr())
-                    .prompt(oidc.getPrompt()).state(state).build().toURI());
-        } catch (URISyntaxException e) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} Not able to set oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
-            log.trace("Leaving");
-            return;
+                    .maxAge(0).prompt(prompt).state(state).build().toURI());
+        } else {
+            suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
+                    responseType, oidc.getScope(), oidc.getClientId(), oidc
+                            .getRedirectURI())
+                    .endpointURI(oidc.getAuthorizationEndpoint())
+                    .display(oidc.getDisplay()).acrValues(oidc.getAcr())
+                    .prompt(prompt).state(state).build().toURI());
         }
 
         log.trace("Leaving");
