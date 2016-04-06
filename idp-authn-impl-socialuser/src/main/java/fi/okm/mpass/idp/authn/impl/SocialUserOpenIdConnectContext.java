@@ -32,6 +32,7 @@ import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 
@@ -67,6 +68,9 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
 
     /** oidc token response. */
     private OIDCTokenResponse oidcTknResponse;
+
+    /** State parameter */
+    private State state;
 
     /**
      * Returns the URI to be used for authentication.
@@ -110,6 +114,25 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
         log.trace("Entering");
         this.oidcTknResponse = oidcTokenResponse;
         log.trace("Leaving");
+    }
+
+    /**
+     * Getter for State parameter
+     * 
+     * @return state parameter
+     */
+    public State getState() {
+        return state;
+    }
+
+    /**
+     * Setter for State parameter
+     * 
+     * @param state
+     *            parameter
+     */
+    public void setState(State state) {
+        this.state = state;
     }
 
     /**
