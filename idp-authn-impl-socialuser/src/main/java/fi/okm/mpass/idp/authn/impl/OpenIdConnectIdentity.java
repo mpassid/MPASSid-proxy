@@ -154,6 +154,17 @@ public class OpenIdConnectIdentity extends AbstractOAuth2Identity implements
         this.issuer = oidcIssuer;
         log.trace("Leaving");
     }
+    
+    /**
+     * Getter for OpenId Provider Issuer identifier value the client is initialized with.
+     * 
+     * @return oidcIssuer
+     *            OpenId Provider Issuer identifier
+     */
+    public String getIssuer() {
+        log.trace("Entering & Leaving");
+        return this.issuer;
+    }
 
     /**
      * Setter for OpenId Prompt value.
