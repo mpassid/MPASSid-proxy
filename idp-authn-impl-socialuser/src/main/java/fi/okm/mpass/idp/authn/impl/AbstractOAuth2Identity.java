@@ -164,7 +164,7 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @return OAuth2 redirect uri
      */
-    
+
     public URI getRedirectURI() {
         return redirectURI;
     }
@@ -174,11 +174,11 @@ public abstract class AbstractOAuth2Identity {
      * 
      * @redirect OAuth2 redirect uri
      */
-    
+
     public void setRedirectURI(URI redirect) {
         this.redirectURI = redirect;
     }
-    
+
     /**
      * Sets map of principal defaults.
      * 

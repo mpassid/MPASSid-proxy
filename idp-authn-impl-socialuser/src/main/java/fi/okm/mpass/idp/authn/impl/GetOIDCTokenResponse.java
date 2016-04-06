@@ -103,9 +103,9 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
         }
 
         AuthorizationCode code = response.getAuthorizationCode();
-        
-        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code,
-                suCtx.getOpenIdConnectInformation().getRedirectURI());
+
+        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx
+                .getOpenIdConnectInformation().getRedirectURI());
         ClientAuthentication clientAuth = new ClientSecretBasic(suCtx
                 .getOpenIdConnectInformation().getClientId(), suCtx
                 .getOpenIdConnectInformation().getClientSecret());
