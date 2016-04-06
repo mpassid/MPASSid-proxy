@@ -103,22 +103,9 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
         }
 
         AuthorizationCode code = response.getAuthorizationCode();
-        URI callback = null;
-        try {
-            // TODO: fix with proper paramter
-            callback = new URI(
-                    "https://lauros.fi:8444/idp/Authn/SocialUserOpenIdConnectEnd");
-        } catch (URISyntaxException e) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} invalid uri", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
-            log.trace("Leaving");
-            return;
-        }
-
+        
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code,
-                callback);
+                suCtx.getOpenIdConnectInformation().getRedirectURI());
         ClientAuthentication clientAuth = new ClientSecretBasic(suCtx
                 .getOpenIdConnectInformation().getClientId(), suCtx
                 .getOpenIdConnectInformation().getClientSecret());
