@@ -89,6 +89,8 @@ public abstract class AbstractOAuth2Identity {
     private URI userinfoEndpoint;
     /** Revocation Endpoint. */
     private URI revocationEndpoint;
+    /** Redirect URI. */
+    private URI redirectURI;
 
     /** Authentication request. */
     private SocialAuthenticationRequest socialAuthenticationRequest;
@@ -157,6 +159,26 @@ public abstract class AbstractOAuth2Identity {
         return scope;
     }
 
+    /**
+     * Getter for OAuth2 redirect uri for provider return to.
+     * 
+     * @return OAuth2 redirect uri
+     */
+    
+    public URI getRedirectURI() {
+        return redirectURI;
+    }
+
+    /**
+     * Setter for OAuth2 redirect uri for provider return to.
+     * 
+     * @redirect OAuth2 redirect uri
+     */
+    
+    public void setRedirectURI(URI redirect) {
+        this.redirectURI = redirect;
+    }
+    
     /**
      * Sets map of principal defaults.
      * 
