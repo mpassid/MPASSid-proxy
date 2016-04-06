@@ -67,7 +67,7 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        
+
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
                 .getSubcontext(SocialUserOpenIdConnectContext.class, true);
         if (suCtx == null) {
@@ -77,16 +77,17 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
             log.trace("Leaving");
             return;
         }
-        
+
         // Check acr
         // If the acr Claim was requested, the Client SHOULD check that the
         // asserted Claim Value is appropriate. The meaning and processing
         // of acr Claim Values is out of scope for this specification.
-        List<ACR> acrs=suCtx.getOpenIdConnectInformation().getAcr();
+        List<ACR> acrs = suCtx.getOpenIdConnectInformation().getAcr();
         if (acrs != null && acrs.size() > 0) {
             String acr;
             try {
-                acr = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet().getStringClaim("acr");
+                acr = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken()
+                        .getJWTClaimsSet().getStringClaim("acr");
             } catch (ParseException e) {
                 log.error("{} Error parsing id token", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext,
@@ -102,7 +103,8 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
                 return;
             }
             if (!acrs.contains(acr)) {
-                log.error("{} acr received does not match requested:" + acr, getLogPrefix());
+                log.error("{} acr received does not match requested:" + acr,
+                        getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext,
                         AuthnEventIds.NO_CREDENTIALS);
                 log.trace("Leaving");
