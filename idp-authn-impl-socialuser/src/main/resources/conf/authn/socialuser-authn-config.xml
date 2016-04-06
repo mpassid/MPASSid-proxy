@@ -62,6 +62,11 @@
         c:_0="contextRelative:Authn/SocialUser/LiveID">
     </bean>
     
+    <!-- new more webflow based oidc -->
+    <bean id="shibboleth.authn.SocialUserOpenIdConnect.externalAuthnPath" class="java.lang.String"
+        c:_0="contextRelative:/Authn/SocialUserOpenIdConnectStart">
+    </bean>
+    
     <!-- Populate RP UI info from metadata? -->
     <util:constant id="shibboleth.authn.SocialUser.populateUIInfo" static-field="java.lang.Boolean.FALSE" />
 
