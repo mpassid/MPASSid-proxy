@@ -23,15 +23,19 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.text.ParseException;
+
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
+import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * An action that verifies Issuer of ID Token.
@@ -60,6 +64,45 @@ public class ValidateOIDCIDTokenIssuer extends AbstractAuthenticationAction {
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+        if (suCtx == null) {
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+
+        // This issuer is not discovered during Discovery, instead
+        // the bean is initialized with the value
+        String issuer = suCtx.getOpenIdConnectInformation().getIssuer();
+
+        // The Issuer Identifier for the OpenID Provider (which is typically
+        // obtained during Discovery) MUST exactly match the value of the
+        // iss (issuer) Claim.
+        if (issuer == null) {
+            log.warn("Issuer not set, cannot be verified");
+        } else {
+            try {
+                if (!issuer.equals(suCtx.getOidcTokenResponse().getOIDCTokens()
+                        .getIDToken().getJWTClaimsSet().getIssuer())) {
+                    log.error("{} issuer mismatch", getLogPrefix());
+                    ActionSupport.buildEvent(profileRequestContext,
+                            AuthnEventIds.NO_CREDENTIALS);
+                    log.trace("Leaving");
+                    return;
+                }
+
+            } catch (ParseException e) {
+                log.error("{} unable to parse oidc token", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+        }
         log.trace("Leaving");
         return;
     }
