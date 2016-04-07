@@ -23,11 +23,15 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.text.ParseException;
+
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
+import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +63,42 @@ public class ValidateOIDCIDTokenAuthorizedParty extends
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+        if (suCtx == null) {
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+
+        // If the ID Token contains multiple audiences, the Client SHOULD
+        // verify that an azp Claim is present.
+        // If an azp (authorized party) Claim is present, the Client SHOULD
+        // verify that its client_id is the Claim Value.
+        try {
+            if (suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken()
+                    .getJWTClaimsSet().getAudience().size() > 1) {
+                String azp = suCtx.getOidcTokenResponse().getOIDCTokens()
+                        .getIDToken().getJWTClaimsSet().getStringClaim("azp");
+                if (!suCtx.getOpenIdConnectInformation().getClientId()
+                        .getValue().equals(azp)) {
+                    log.error("{} multiple audiences, client is not the azp",
+                            getLogPrefix());
+                    ActionSupport.buildEvent(profileRequestContext,
+                            AuthnEventIds.NO_CREDENTIALS);
+                    log.trace("Leaving");
+                    return;
+                }
+            }
+        } catch (ParseException e) {
+            log.error("{} Error parsing id token", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
         log.trace("Leaving");
         return;
     }
