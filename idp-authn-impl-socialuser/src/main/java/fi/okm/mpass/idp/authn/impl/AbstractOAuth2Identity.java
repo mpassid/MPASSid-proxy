@@ -170,9 +170,10 @@ public abstract class AbstractOAuth2Identity {
     }
 
     /**
-     * Setter for OAuth2 redirect uri for provider return to.
+     * Setter for OAuth2 redirect uri for provider to return to.
      * 
-     * @redirect OAuth2 redirect uri
+     * @param redirect
+     *            OAuth2 redirect uri
      */
 
     public void setRedirectURI(URI redirect) {
@@ -394,6 +395,7 @@ public abstract class AbstractOAuth2Identity {
      * @throws SocialUserAuthenticationException
      *             If tokenrequest fails to other than non-authorization reason.
      */
+    // Checkstyle: CyclomaticComplexity OFF
     protected TokenRequest getTokenRequest(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
         log.trace("Entering");
@@ -445,6 +447,8 @@ public abstract class AbstractOAuth2Identity {
                     SocialUserErrorIds.EXCEPTION);
         }
     }
+
+    // Checkstyle: CyclomaticComplexity ON
 
     /**
      * This method sets default principal values to subject if such principal

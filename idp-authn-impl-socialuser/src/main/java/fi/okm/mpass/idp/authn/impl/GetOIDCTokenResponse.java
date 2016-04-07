@@ -24,7 +24,6 @@
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.annotation.Nonnull;
@@ -78,7 +77,6 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
                 .getSubcontext(SocialUserOpenIdConnectContext.class, true);
         if (suCtx == null) {
@@ -89,7 +87,6 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-
         AuthenticationSuccessResponse response = suCtx
                 .getAuthenticationSuccessResponse();
         if (response == null) {
@@ -101,9 +98,7 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-
         AuthorizationCode code = response.getAuthorizationCode();
-
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx
                 .getOpenIdConnectInformation().getRedirectURI());
         ClientAuthentication clientAuth = new ClientSecretBasic(suCtx

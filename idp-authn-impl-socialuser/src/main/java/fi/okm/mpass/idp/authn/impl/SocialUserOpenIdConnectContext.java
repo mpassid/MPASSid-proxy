@@ -37,7 +37,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 
 /**
- * This class is used to pass oidc information produced in authentication for
+ * This class is used to store oidc information produced in authentication for
  * webflow to process later.
  */
 public class SocialUserOpenIdConnectContext extends BaseContext {
@@ -69,11 +69,11 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     /** oidc token response. */
     private OIDCTokenResponse oidcTknResponse;
 
-    /** State parameter */
+    /** State parameter. */
     private State state;
 
     /**
-     * Returns the URI to be used for authentication.
+     * Returns the oidc provider URI to be used for authentication.
      * 
      * @return URI for authentication
      */
@@ -83,14 +83,14 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
-     * Set the URI for authentication.
+     * Set the oidc provider URI for authentication.
      * 
-     * @param authenticationRequestURI
+     * @param requestURI
      *            to be used for authentication
      */
-    public void setAuthenticationRequestURI(URI authenticationRequestURI) {
+    public void setAuthenticationRequestURI(URI requestURI) {
         log.trace("Entering");
-        this.authenticationRequestURI = authenticationRequestURI;
+        this.authenticationRequestURI = requestURI;
         log.trace("Leaving");
     }
 
@@ -117,7 +117,7 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
-     * Getter for State parameter
+     * Getter for State parameter.
      * 
      * @return state parameter
      */
@@ -126,13 +126,13 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
-     * Setter for State parameter
+     * Setter for State parameter.
      * 
-     * @param state
+     * @param stateParam
      *            parameter
      */
-    public void setState(State state) {
-        this.state = state;
+    public void setState(State stateParam) {
+        this.state = stateParam;
     }
 
     /**
@@ -191,14 +191,14 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     /**
      * Method for setting the openid connect parameters.
      * 
-     * @param OpenIdConnectIdentity
+     * @param openIdConnectIdentity
      *            openidconnect parameters
      */
 
     public void setOpenIdConnectInformation(
-            @Nonnull OpenIdConnectIdentity OpenIdConnectIdentity) {
+            @Nonnull OpenIdConnectIdentity openIdConnectIdentity) {
         log.trace("Entering");
-        this.oidc = OpenIdConnectIdentity;
+        this.oidc = openIdConnectIdentity;
         log.trace("Leaving");
     }
 

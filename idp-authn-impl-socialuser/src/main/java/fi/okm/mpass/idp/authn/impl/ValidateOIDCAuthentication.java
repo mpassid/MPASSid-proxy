@@ -59,7 +59,7 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
     private final Logger log = LoggerFactory
             .getLogger(ValidateOIDCAuthentication.class);
 
-    /** the subject received from id token */
+    /** the subject received from id token. */
     private String oidcSubject;
 
     /** {@inheritDoc} */

@@ -23,9 +23,6 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
@@ -38,18 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.SerializeException;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.Prompt.Type;
 
 /**
- * An action that creates a {@link SocialUserOpenIdConnectContext}, and attaches
- * it to the {@link AuthenticationContext}.
+ * An action that sets oidc information to SocialUserOpenIdConnectContext.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
- * @event {@link AuthnEventIds#NO_CREDENTIALS}
+ * @event {@link AuthnEventIds#INVALID_AUTHN_CTX}
  */
 @SuppressWarnings("rawtypes")
 public class SetOIDCInformation extends AbstractExtractionAction {

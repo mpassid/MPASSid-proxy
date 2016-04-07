@@ -37,9 +37,6 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
-import fi.okm.mpass.idp.authn.SocialUserErrorIds;
-
 /**
  * An action that verifies Authentication Time of ID Token.
  * 

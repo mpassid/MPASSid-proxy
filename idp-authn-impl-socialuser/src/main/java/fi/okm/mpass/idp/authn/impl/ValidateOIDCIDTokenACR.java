@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import com.nimbusds.openid.connect.sdk.claims.ACR;
 
-import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
-import fi.okm.mpass.idp.authn.SocialUserErrorIds;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;

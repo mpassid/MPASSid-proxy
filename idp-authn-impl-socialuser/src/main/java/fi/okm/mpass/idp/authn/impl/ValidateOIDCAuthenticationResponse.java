@@ -41,9 +41,6 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
-import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
-import fi.okm.mpass.idp.authn.SocialUserErrorIds;
-
 /**
  * An action that creates a {@link SocialUserOpenIdConnectContext}, and attaches
  * it to the {@link AuthenticationContext}.
