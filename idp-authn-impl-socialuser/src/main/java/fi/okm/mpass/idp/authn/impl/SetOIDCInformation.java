@@ -34,10 +34,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
-import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
-import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,20 +55,11 @@ import com.nimbusds.openid.connect.sdk.claims.ACR;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 /**
- * An action that sets oidc information to SocialUserOpenIdConnectContext.
- * 
- * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
- * @event {@link AuthnEventIds#INVALID_AUTHN_CTX}
+ * An action that sets oidc information to {@link SocialUserOpenIdConnectContext} and
+ * attaches it to {@link AuthenticationContext}.
  */
 @SuppressWarnings("rawtypes")
 public class SetOIDCInformation extends AbstractExtractionAction {
-
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
 
     /** Class logger. */
     @Nonnull
@@ -242,7 +231,7 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         try {
             this.display = Display.parse(oidcDisplay);
         } catch (ParseException e) {
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Could not set display value", e);
         }
         log.trace("Leaving");
     }
@@ -259,14 +248,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
        
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
                 .getSubcontext(SocialUserOpenIdConnectContext.class, true);
-        if (suCtx == null) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} Not able to set oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
-            log.trace("Leaving");
-            return;
-        }
        
         // We initialize the context
         // If request is passive we override default prompt value
@@ -285,11 +266,13 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         suCtx.setState(state);
         if (authenticationContext.isForceAuthn()) {
             // We set max age to 0 if forcedauth is set
+            // TODO: Currently the underlying library doesn't accept value 0, so we set it to 1
+            final int maxAge = 1;
             suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
                     responseType, scope, clientID, redirectURI)
                     .endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI())
                     .display(display).acrValues(acrs)
-                    .maxAge(0).prompt(ovrPrompt).state(state).build().toURI());
+                    .maxAge(maxAge).prompt(ovrPrompt).state(state).build().toURI());
         } else {
             suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
                     responseType, scope, clientID, redirectURI)
