@@ -23,7 +23,10 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.mockito.Mockito;
 import org.springframework.webflow.execution.Event;
@@ -32,10 +35,13 @@ import org.testng.annotations.Test;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
+import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.SubjectType;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
@@ -48,6 +54,8 @@ import net.shibboleth.idp.profile.ActionTestingSupport;
  * Abstract test case sharing tests for OIDC token validation in {@link SocialUserOpenIdConnectContext}.
  */
 public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationContextTest {
+    
+    public static final String DEFAULT_ISSUER = "mockIssuer";
 
     /**
      * Returns the action to be tested.
@@ -71,8 +79,28 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
      * @return
      */
     protected OIDCTokenResponse getOidcTokenResponse(final Date expirationTime) {
+        return getOidcTokenResponse(expirationTime, null);
+    }
+    
+    /**
+     * Helper method for building {@link OIDCTokenResponse} with a given issuer.
+     * @param issuer
+     * @return
+     */
+    protected OIDCTokenResponse getOidcTokenResponse(final String issuer) {
+        return getOidcTokenResponse(null, issuer);
+    }
+    
+    /**
+     * Helper method for building {@link OIDCTokenResponse} with a given expiration time and issuer.
+     * @param expirationTime
+     * @param issuer
+     * @return
+     */
+    protected OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer) {
         final JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject("mockUser")
+                .issuer(issuer)
                 .expirationTime(expirationTime)
                 .claim("http://example.org/mock", true)
                 .build();        
@@ -81,7 +109,19 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
         final RefreshToken refreshToken = new RefreshToken();
         final OIDCTokens oidcTokens = new OIDCTokens(plainJwt, accessToken, refreshToken);
         final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
-        return oidcTokenResponse;
+        return oidcTokenResponse;        
+    }
+    
+    /**
+     * Helper method for building {@link OIDCProviderMetadata} with the given issuer.
+     * @param issuer The issuer.
+     * @return
+     * @throws Exception
+     */
+    protected OIDCProviderMetadata buildOidcMetadata(final String issuer) throws Exception {
+        final List<SubjectType> subjectTypes = new ArrayList<>();
+        subjectTypes.add(SubjectType.PUBLIC);
+        return new OIDCProviderMetadata(new Issuer(issuer), subjectTypes, new URI("https://mock.org/"));
     }
     
     /**
@@ -100,6 +140,7 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setOidcTokenResponse(oidcTokenResponse);
+        suCtx.setoIDCProviderMetadata(buildOidcMetadata(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
