@@ -41,6 +41,9 @@ import org.slf4j.LoggerFactory;
  * 
  *
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
+ * @event {@link AuthnEventIds#NO_CREDENTIALS}
+ * @pre <pre>AuthenticationContext.getSubcontext(SocialUserOpenIdConnectContext.class, false) != null</pre> AND
+ * <pre>SocialUserOpenIdConnectContext.getOidcTokenResponse() != null</pre>
  */
 @SuppressWarnings("rawtypes")
 //TODO: Add preconditions to doc (suCtx.getOidcTokenResponse() etc)
