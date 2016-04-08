@@ -67,7 +67,7 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
         log.trace("Entering");
 
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
@@ -80,7 +80,7 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
         // If the acr Claim was requested, the Client SHOULD check that the
         // asserted Claim Value is appropriate. The meaning and processing
         // of acr Claim Values is out of scope for this specification.
-        List<ACR> acrs = suCtx.getOpenIdConnectInformation().getAcr();
+        List<ACR> acrs = suCtx.getAcrs();
         if (acrs != null && acrs.size() > 0) {
             String acr;
             try {

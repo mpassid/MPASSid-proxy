@@ -23,6 +23,14 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
@@ -34,11 +42,19 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.openid.connect.sdk.Display;
+import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.Prompt.Type;
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 /**
  * An action that sets oidc information to SocialUserOpenIdConnectContext.
@@ -61,24 +77,178 @@ public class SetOIDCInformation extends AbstractExtractionAction {
     private final Logger log = LoggerFactory
             .getLogger(SetOIDCInformation.class);
 
-    // TODO: replace with better suited class
-    /** oidc methods and parameters. */
-    private OpenIdConnectIdentity oidc;
-
+    /** Redirect URI. */
+    private URI redirectURI;
+   
+    /** Client Id. */
+    @Nonnull
+    private ClientID clientID;
+    
+    /** Client Secret. */
+    @Nonnull
+    private Secret clientSecret;
+    
+    /** Scope. */
+    @Nonnull
+    private Scope scope = new Scope(OIDCScopeValue.OPENID);
+    
+    /** OIDC Prompt. */
+    private Prompt prompt;
+    
+    /** OIDC Authentication Class Reference values. */
+    private List<ACR> acrs;
+    
+    /** OIDC Display. */
+    private Display display;
+    
+    /** OIDC provider metadata. */
+    private OIDCProviderMetadata oIDCProviderMetadata;
+   
+       
     /**
-     * Method for setting the openid connect parameters.
+     * Setter for Oauth2 client id.
      * 
-     * @param openIdConnectIdentity
-     *            instance.
+     * @param oauth2ClientId
+     *            Oauth2 Client ID
+     */
+    public void setClientId(String oauth2ClientId) {
+        log.trace("Entering & Leaving");
+        this.clientID = new ClientID(oauth2ClientId);
+    }
+
+   
+    /**
+     * Setter for Oauth2 Client secret.
+     * 
+     * @param oauth2ClientSecret
+     *            Oauth2 Client Secret
+     */
+    public void setClientSecret(String oauth2ClientSecret) {
+        log.trace("Entering & Leaving");
+        this.clientSecret = new Secret(oauth2ClientSecret);
+    }
+
+   
+    /**
+     * Setter for OAuth2 redirect uri for provider to return to.
+     * 
+     * @param redirect
+     *            OAuth2 redirect uri
      */
 
-    public void setOpenIdConnectInformation(
-            @Nonnull OpenIdConnectIdentity openIdConnectIdentity) {
+    public void setRedirectURI(URI redirect) {
+        this.redirectURI = redirect;
+    }
+    
+    /**
+     * Setter for OpenId Provider Metadata location.
+     * 
+     * @param metadataLocation
+     *            OpenId Provider Metadata location
+     * @throws URISyntaxException
+     *             if metadataLocation is not URI
+     * @throws IOException
+     *             if metadataLocation cannot be read
+     * @throws ParseException
+     *             if metadataLocation has wrong content
+     */
+    public void setProviderMetadataLocation(String metadataLocation)
+            throws URISyntaxException, IOException, ParseException {
         log.trace("Entering");
-        this.oidc = openIdConnectIdentity;
+        URI issuerURI = new URI(metadataLocation);
+        URL providerConfigurationURL = issuerURI.resolve(
+                "/.well-known/openid-configuration").toURL();
+        InputStream stream = providerConfigurationURL.openStream();
+        String providerInfo = null;
+        try (java.util.Scanner s = new java.util.Scanner(stream)) {
+            providerInfo = s.useDelimiter("\\A").hasNext() ? s.next() : "";
+        }
+        oIDCProviderMetadata = OIDCProviderMetadata.parse(providerInfo);
         log.trace("Leaving");
     }
 
+    /**
+     * Setter for OpenId Scope values.
+     * 
+     * @param oidcScopes
+     *            OpenId Scope values
+     */
+    public void setScope(List<String> oidcScopes) {
+        log.trace("Entering");
+        for (String oidcScope : oidcScopes) {
+            switch (oidcScope.toUpperCase()) {
+            case "ADDRESS":
+                this.scope.add(OIDCScopeValue.ADDRESS);
+                break;
+            case "EMAIL":
+                this.scope.add(OIDCScopeValue.EMAIL);
+                break;
+            case "OFFLINE_ACCESS":
+                this.scope.add(OIDCScopeValue.OFFLINE_ACCESS);
+                break;
+            case "PHONE":
+                this.scope.add(OIDCScopeValue.PHONE);
+                break;
+            case "PROFILE":
+                this.scope.add(OIDCScopeValue.PROFILE);
+                break;
+            default:
+            }
+        }
+        log.trace("Leaving");
+    }
+
+    
+    /**
+     * Setter for OpenId Prompt value.
+     * 
+     * @param oidcPrompt
+     *            OpenId Prompt values
+     */
+    public void setPrompt(String oidcPrompt) {
+        log.trace("Entering");
+        this.prompt = new Prompt(oidcPrompt);
+        log.trace("Leaving");
+    }
+
+    
+    /**
+     * Setter for OpenId ACR values.
+     * 
+     * @param oidcAcrs
+     *            OpenId ACR values
+     */
+    public void setAcr(List<String> oidcAcrs) {
+        log.trace("Entering");
+        for (String oidcAcr : oidcAcrs) {
+            ACR acr = new ACR(oidcAcr);
+            if (this.acrs == null) {
+                this.acrs = new ArrayList<ACR>();
+            }
+            this.acrs.add(acr);
+        }
+        log.trace("Leaving");
+    }
+
+    
+    /**
+     * Setter for OpenId Display value.
+     * 
+     * @param oidcDisplay
+     *            OpenId Display values
+     */
+    public void setDisplay(String oidcDisplay) {
+        log.trace("Entering");
+        try {
+            this.display = Display.parse(oidcDisplay);
+        } catch (ParseException e) {
+            log.error("Something bad happened " + e.getMessage());
+        }
+        log.trace("Leaving");
+    }
+
+    
+    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(
@@ -86,15 +256,7 @@ public class SetOIDCInformation extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
 
-        if (oidc == null) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} oidc parameters not set", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
-            log.trace("Leaving");
-            return;
-        }
-
+       
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
                 .getSubcontext(SocialUserOpenIdConnectContext.class, true);
         if (suCtx == null) {
@@ -105,12 +267,18 @@ public class SetOIDCInformation extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-        oidc.init();
-        suCtx.setOpenIdConnectInformation(oidc);
-
+       
+        // We initialize the context
         // If request is passive we override default prompt value
-        Prompt prompt = authenticationContext.isPassive() ? new Prompt(
-                Type.NONE) : oidc.getPrompt();
+        Prompt ovrPrompt = authenticationContext.isPassive() ? new Prompt(
+                Type.NONE) : prompt;
+        suCtx.setPrompt(ovrPrompt);    
+        suCtx.setAcrs(acrs);
+        suCtx.setClientID(clientID);
+        suCtx.setClientSecret(clientSecret);
+        suCtx.setDisplay(display);
+        suCtx.setoIDCProviderMetadata(oIDCProviderMetadata);
+        suCtx.setRedirectURI(redirectURI);
 
         ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
@@ -118,18 +286,16 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         if (authenticationContext.isForceAuthn()) {
             // We set max age to 0 if forcedauth is set
             suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
-                    responseType, oidc.getScope(), oidc.getClientId(), oidc
-                            .getRedirectURI())
-                    .endpointURI(oidc.getAuthorizationEndpoint())
-                    .display(oidc.getDisplay()).acrValues(oidc.getAcr())
-                    .maxAge(0).prompt(prompt).state(state).build().toURI());
+                    responseType, scope, clientID, redirectURI)
+                    .endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI())
+                    .display(display).acrValues(acrs)
+                    .maxAge(0).prompt(ovrPrompt).state(state).build().toURI());
         } else {
             suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
-                    responseType, oidc.getScope(), oidc.getClientId(), oidc
-                            .getRedirectURI())
-                    .endpointURI(oidc.getAuthorizationEndpoint())
-                    .display(oidc.getDisplay()).acrValues(oidc.getAcr())
-                    .prompt(prompt).state(state).build().toURI());
+                    responseType, scope, clientID, redirectURI)
+                    .endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI())
+                    .display(display).acrValues(acrs)
+                    .prompt(ovrPrompt).state(state).build().toURI());
         }
 
         log.trace("Leaving");

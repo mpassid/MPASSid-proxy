@@ -24,6 +24,7 @@ package fi.okm.mpass.idp.authn.impl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +33,17 @@ import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import com.nimbusds.openid.connect.sdk.Display;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.Prompt;
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 /**
  * This class is used to store oidc information produced in authentication for
@@ -54,10 +63,31 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     private final Logger log = LoggerFactory
             .getLogger(SocialUserOpenIdConnectContext.class);
 
-    /** oidc methods and parameters. */
-    private OpenIdConnectIdentity oidc;
-
-    /** oidc authentication response URI. */
+    /** Client Id. */
+    @Nonnull
+    private ClientID clientID;
+    
+    /** Client Secret. */
+    @Nonnull
+    private Secret clientSecret;
+    
+    /** Scope. */
+    @Nonnull
+    private Scope scope;
+    
+    /** OIDC Prompt. */
+    private Prompt prompt;
+    
+    /** OIDC Authentication Class Reference values. */
+    private List<ACR> acrs;
+    
+    /** OIDC Display. */
+    private Display display;
+    
+    /** OIDC provider metadata. */
+    private OIDCProviderMetadata oIDCProviderMetadata;
+   
+    /** oidc authentication request */
     private URI authenticationRequestURI;
 
     /** oidc authentication response URI. */
@@ -71,11 +101,138 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
 
     /** State parameter. */
     private State state;
+    
+    /** Redirect URI. */
+    private URI redirectURI;
 
     /**
-     * Returns the oidc provider URI to be used for authentication.
      * 
-     * @return URI for authentication
+     * @return
+     */
+    public URI getRedirectURI() {
+        return redirectURI;
+    }
+
+    /**
+     * 
+     * @param redirectURI
+     */
+    public void setRedirectURI(URI redirectURI) {
+        this.redirectURI = redirectURI;
+    }
+
+    /**
+     * Getter for Oauth2 client id.
+     * 
+     * @return
+     */
+    public ClientID getClientID() {
+        return clientID;
+    }
+
+    /**
+     * Setter for Oauth2 client id.
+     * 
+     * @param clientID
+     *            Oauth2 Client ID
+     */
+    public void setClientID(ClientID clientID) {
+        this.clientID = clientID;
+    }
+
+    
+    /**
+     * 
+     * @param clientSecret
+     */
+    public void setClientSecret(Secret clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Scope getScope() {
+        return scope;
+    }
+
+    /**
+     * 
+     * @param scope
+     */
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Prompt getPrompt() {
+        return prompt;
+    }
+
+    /**
+     * 
+     * @param prompt
+     */
+    public void setPrompt(Prompt prompt) {
+        this.prompt = prompt;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public List<ACR> getAcrs() {
+        return acrs;
+    }
+
+    /**
+     * 
+     * @param acrs
+     */
+    public void setAcrs(List<ACR> acrs) {
+        this.acrs = acrs;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Display getDisplay() {
+        return display;
+    }
+
+    /**
+     * 
+     * @param display
+     */
+    public void setDisplay(Display display) {
+        this.display = display;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public OIDCProviderMetadata getoIDCProviderMetadata() {
+        return oIDCProviderMetadata;
+    }
+
+    /**
+     * 
+     * @param oIDCProviderMetadata
+     */
+    public void setoIDCProviderMetadata(OIDCProviderMetadata oIDCProviderMetadata) {
+        this.oIDCProviderMetadata = oIDCProviderMetadata;
+    }
+
+    /**
+     * Returns the oidc authentication request URI to be used for authentication.
+     * 
+     * @return request URI for authentication
      */
     public URI getAuthenticationRequestURI() {
         log.trace("Entering & Leaving");
@@ -83,14 +240,15 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
-     * Set the oidc provider URI for authentication.
+     * Set the oidc provider request for authentication.
      * 
-     * @param requestURI
+     * @param request
      *            to be used for authentication
      */
-    public void setAuthenticationRequestURI(URI requestURI) {
+    public void setAuthenticationRequestURI(URI request) {
         log.trace("Entering");
-        this.authenticationRequestURI = requestURI;
+        log.debug("Setting auth request redirect to "+request.toString());
+        this.authenticationRequestURI = request;
         log.trace("Leaving");
     }
 
@@ -189,28 +347,12 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
-     * Method for setting the openid connect parameters.
      * 
-     * @param openIdConnectIdentity
-     *            openidconnect parameters
+     * @return
      */
-
-    public void setOpenIdConnectInformation(
-            @Nonnull OpenIdConnectIdentity openIdConnectIdentity) {
-        log.trace("Entering");
-        this.oidc = openIdConnectIdentity;
-        log.trace("Leaving");
+    Secret getClientSecret() {
+        return clientSecret;
     }
-
-    /**
-     * Method returns oidc functionality.
-     * 
-     * @return oidc methods and paramaters
-     */
-
-    public OpenIdConnectIdentity getOpenIdConnectInformation() {
-        log.trace("Entering & Leaving");
-        return this.oidc;
-    }
+    
 
 }

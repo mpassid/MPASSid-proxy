@@ -65,7 +65,7 @@ public class ValidateOIDCIDTokenIssuer extends AbstractAuthenticationAction {
         log.trace("Entering");
 
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
@@ -74,10 +74,7 @@ public class ValidateOIDCIDTokenIssuer extends AbstractAuthenticationAction {
             return;
         }
 
-        // This issuer is not discovered during Discovery, instead
-        // the bean is initialized with the value
-        String issuer = suCtx.getOpenIdConnectInformation().getIssuer();
-
+        String issuer = suCtx.getoIDCProviderMetadata().getIssuer().getValue();
         // The Issuer Identifier for the OpenID Provider (which is typically
         // obtained during Discovery) MUST exactly match the value of the
         // iss (issuer) Claim.

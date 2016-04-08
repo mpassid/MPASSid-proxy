@@ -75,7 +75,7 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
                 getLogPrefix());
 
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,

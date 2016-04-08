@@ -24,7 +24,6 @@
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import javax.annotation.Nonnull;
 
@@ -78,7 +77,7 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             // TODO: FIX ERROR VALUE
             log.info("{} Not able to find su oidc context", getLogPrefix());
@@ -99,23 +98,12 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             return;
         }
         AuthorizationCode code = response.getAuthorizationCode();
-        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx
-                .getOpenIdConnectInformation().getRedirectURI());
-        ClientAuthentication clientAuth = new ClientSecretBasic(suCtx
-                .getOpenIdConnectInformation().getClientId(), suCtx
-                .getOpenIdConnectInformation().getClientSecret());
+        log.debug("test1"+suCtx.getRedirectURI().toString());
+        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx.getRedirectURI());
+        ClientAuthentication clientAuth = new ClientSecretBasic(suCtx.getClientID(), suCtx.getClientSecret());
         TokenRequest tokenRequest;
-        try {
-            tokenRequest = new TokenRequest(suCtx.getOpenIdConnectInformation()
-                    .getTokenEndpoint(), clientAuth, codeGrant);
-        } catch (URISyntaxException e) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} invalid uri", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
-            log.trace("Leaving");
-            return;
-        }
+        log.debug("test2"+suCtx.getoIDCProviderMetadata().getTokenEndpointURI().toString());
+        tokenRequest = new TokenRequest(suCtx.getoIDCProviderMetadata().getTokenEndpointURI(), clientAuth, codeGrant);
         OIDCTokenResponse oidcTokenResponse = null;
         try {
             oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser

@@ -65,7 +65,7 @@ public class ValidateOIDCIDTokenAudience extends AbstractAuthenticationAction {
         log.trace("Entering");
 
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
@@ -89,7 +89,7 @@ public class ValidateOIDCIDTokenAudience extends AbstractAuthenticationAction {
                     .getJWTClaimsSet()
                     .getAudience()
                     .contains(
-                            suCtx.getOpenIdConnectInformation().getClientId()
+                            suCtx.getClientID()
                                     .getValue())) {
                 log.error("{} client is not the intended audience",
                         getLogPrefix());

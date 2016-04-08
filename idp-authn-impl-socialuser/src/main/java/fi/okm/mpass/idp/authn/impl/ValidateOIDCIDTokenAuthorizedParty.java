@@ -64,7 +64,7 @@ public class ValidateOIDCIDTokenAuthorizedParty extends
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
@@ -82,7 +82,7 @@ public class ValidateOIDCIDTokenAuthorizedParty extends
                     .getJWTClaimsSet().getAudience().size() > 1) {
                 String azp = suCtx.getOidcTokenResponse().getOIDCTokens()
                         .getIDToken().getJWTClaimsSet().getStringClaim("azp");
-                if (!suCtx.getOpenIdConnectInformation().getClientId()
+                if (!suCtx.getClientID()
                         .getValue().equals(azp)) {
                     log.error("{} multiple audiences, client is not the azp",
                             getLogPrefix());
