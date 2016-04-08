@@ -39,18 +39,13 @@ import org.slf4j.LoggerFactory;
 /**
  * An action that verifies Expiration Time of ID Token.
  * 
+ *
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
  */
 @SuppressWarnings("rawtypes")
+//TODO: Add preconditions to doc (suCtx.getOidcTokenResponse() etc)
 public class ValidateOIDCIDTokenExpirationTime extends
         AbstractAuthenticationAction {
-
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
 
     /** Class logger. */
     @Nonnull
@@ -81,15 +76,15 @@ public class ValidateOIDCIDTokenExpirationTime extends
             Date expDate = suCtx.getOidcTokenResponse().getOIDCTokens()
                     .getIDToken().getJWTClaimsSet().getExpirationTime();
             if (currentDate.after(expDate)) {
-                log.error("current date " + currentDate + "is past exp date "
-                        + expDate);
+                log.error("{} Current date {} is past exp date {}", getLogPrefix(), 
+                        currentDate, expDate);
                 ActionSupport.buildEvent(profileRequestContext,
                         AuthnEventIds.NO_CREDENTIALS);
                 log.trace("Leaving");
                 return;
             }
         } catch (java.text.ParseException e) {
-            log.error("{} Error parsing id token", getLogPrefix());
+            log.error("{} Error parsing id token", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
