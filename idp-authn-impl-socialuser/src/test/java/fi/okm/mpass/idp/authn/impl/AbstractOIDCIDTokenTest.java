@@ -56,6 +56,8 @@ import net.shibboleth.idp.profile.ActionTestingSupport;
 public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationContextTest {
     
     public static final String DEFAULT_ISSUER = "mockIssuer";
+    
+    public static final String DEFAULT_CLIENT_ID = "mockClientId";
 
     /**
      * Returns the action to be tested.
@@ -103,6 +105,7 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
                 .issuer(issuer)
                 .expirationTime(expirationTime)
                 .claim("http://example.org/mock", true)
+                .audience(DEFAULT_CLIENT_ID)
                 .build();        
         final PlainJWT plainJwt = new PlainJWT(claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
