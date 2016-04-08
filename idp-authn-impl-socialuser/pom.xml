@@ -130,8 +130,16 @@ THE SOFTWARE.
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-        
-        
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-http</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-transport</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
