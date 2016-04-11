@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -88,8 +89,8 @@ public class ValidateOIDCAuthenticationResponse extends
             log.trace("Leaving");
             return;
         }
-        log.debug("Validating response "
-                + suCtx.getAuthenticationResponseURI().toString());
+        log.debug("Validating response {}",
+                suCtx.getAuthenticationResponseURI().toString());
         AuthenticationResponse response = null;
         try {
             response = AuthenticationResponseParser.parse(suCtx
@@ -108,12 +109,12 @@ public class ValidateOIDCAuthenticationResponse extends
             String error = errorResponse.getErrorObject().getCode();
             String errorDescription = errorResponse.getErrorObject()
                     .getDescription();
-            if (errorDescription != null && !errorDescription.isEmpty()) {
+            if (StringSupport.trimOrNull(errorDescription) != null) {
                 error += " : " + errorDescription;
             }
             log.trace("Leaving");
             // TODO: FIX ERROR VALUE
-            log.info("{} response indicated error:" + error, getLogPrefix());
+            log.info("{} response indicated error: {}", getLogPrefix(), error);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.INVALID_AUTHN_CTX);
             log.trace("Leaving");
