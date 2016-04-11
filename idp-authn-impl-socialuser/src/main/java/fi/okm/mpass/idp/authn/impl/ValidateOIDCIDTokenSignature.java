@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.Scanner;
 
 import javax.annotation.Nonnull;
 
@@ -110,7 +109,7 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
             providerKey = RSAKey.parse(key).toRSAPublicKey();
         } catch (IOException | java.text.ParseException | JOSEException e) {
             log.error("{} Error when parsing key to verify signature",
-                    getLogPrefix());
+                    getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
@@ -121,7 +120,7 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
             signedJWT = SignedJWT.parse(suCtx.getOidcTokenResponse()
                     .getOIDCTokens().getIDToken().serialize());
         } catch (ParseException e) {
-            log.error("{} Error when forming signed JWT", getLogPrefix());
+            log.error("{} Error when forming signed JWT", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
@@ -139,7 +138,7 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
             }
         } catch (JOSEException e) {
             log.error("{} JWT signature verification not performed",
-                    getLogPrefix());
+                    getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
