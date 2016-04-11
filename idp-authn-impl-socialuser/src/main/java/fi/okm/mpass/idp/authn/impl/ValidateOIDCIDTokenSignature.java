@@ -23,29 +23,57 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
+import java.util.Scanner;
+
 import javax.annotation.Nonnull;
 
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
+import org.apache.commons.io.IOUtils;
+import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jwt.SignedJWT;
 
 /**
  * An action that verifies Signature of ID Token.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
+ * @event {@link AuthnEventIds#NO_CREDENTIALS}
+ * @pre <pre>
+ * AuthenticationContext
+ *         .getSubcontext(SocialUserOpenIdConnectContext.class, false) != null
+ * </pre>
+ * 
+ *      AND
+ * 
+ *      <pre>
+ * SocialUserOpenIdConnectContext.getOidcTokenResponse() != null
+ * </pre>
+ * 
+ *      AND
+ * 
+ *      <pre>
+ * SocialUserOpenIdConnectContext.getoIDCProviderMetadata() != null
+ * </pre>
  */
 @SuppressWarnings("rawtypes")
 public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
-
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
 
     /** Class logger. */
     @Nonnull
@@ -58,8 +86,97 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
+        if (suCtx == null) {
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        RSAPublicKey providerKey = null;
+        try {
+            JSONObject key = getProviderRSAJWK(suCtx.getoIDCProviderMetadata()
+                    .getJWKSetURI().toURL().openStream());
+            if (key == null) {
+                log.error("{} Not able to find key to verify signature",
+                        getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+            providerKey = RSAKey.parse(key).toRSAPublicKey();
+        } catch (IOException | java.text.ParseException | JOSEException e) {
+            log.error("{} Error when parsing key to verify signature",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        SignedJWT signedJWT = null;
+        try {
+            signedJWT = SignedJWT.parse(suCtx.getOidcTokenResponse()
+                    .getOIDCTokens().getIDToken().serialize());
+        } catch (ParseException e) {
+            log.error("{} Error when forming signed JWT", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        RSASSAVerifier verifier = new RSASSAVerifier(providerKey);
+        try {
+            if (!signedJWT.verify(verifier)) {
+                log.error("{} JWT signature verification failed",
+                        getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        AuthnEventIds.NO_CREDENTIALS);
+                log.trace("Leaving");
+                return;
+            }
+        } catch (JOSEException e) {
+            log.error("{} JWT signature verification not performed",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        log.debug("ID Token signature verified");
         log.trace("Leaving");
         return;
+    }
+
+    /**
+     * Parse JWK, RSA public key for signature verification, from stream.
+     * 
+     * @param is
+     *            inputstream containing the key
+     * @return RSA publick key as JSON Object. Null if there is no key
+     * @throws ParseException
+     *             if parsing fails.
+     * @throws IOException
+     */
+    private JSONObject getProviderRSAJWK(InputStream is) throws ParseException,
+            IOException {
+        log.trace("Entering");
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(is, writer, "UTF-8");
+        JSONObject json = JSONObjectUtils.parseJSONObject(writer.toString());
+        JSONArray keyList = (JSONArray) json.get("keys");
+        for (Object key : keyList) {
+            JSONObject k = (JSONObject) key;
+            if (k.get("use").equals("sig") && k.get("kty").equals("RSA")) {
+                log.debug("verification key "+k.toString());
+                log.trace("Leaving");
+                return k;
+            }
+        }
+        log.trace("Leaving");
+        return null;
     }
 
 }
