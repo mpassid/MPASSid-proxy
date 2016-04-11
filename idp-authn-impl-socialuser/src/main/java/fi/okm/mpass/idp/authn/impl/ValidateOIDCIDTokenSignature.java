@@ -167,9 +167,13 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
         IOUtils.copy(is, writer, "UTF-8");
         JSONObject json = JSONObjectUtils.parseJSONObject(writer.toString());
         JSONArray keyList = (JSONArray) json.get("keys");
+        if (keyList == null){
+            log.trace("Leaving");
+            return null;
+        }
         for (Object key : keyList) {
             JSONObject k = (JSONObject) key;
-            if (k.get("use").equals("sig") && k.get("kty").equals("RSA")) {
+            if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
                 log.debug("verification key "+k.toString());
                 log.trace("Leaving");
                 return k;
