@@ -99,20 +99,30 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
      * @param issuer
      * @return
      */
-    protected OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer) {
-        final JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject("mockUser")
-                .issuer(issuer)
-                .expirationTime(expirationTime)
-                .claim("http://example.org/mock", true)
-                .audience(DEFAULT_CLIENT_ID)
-                .build();        
+    protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer) {
+        final JWTClaimsSet claimsSet = buildClaimsSet(expirationTime, issuer);
         final PlainJWT plainJwt = new PlainJWT(claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
         final RefreshToken refreshToken = new RefreshToken();
         final OIDCTokens oidcTokens = new OIDCTokens(plainJwt, accessToken, refreshToken);
         final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
         return oidcTokenResponse;        
+    }
+    
+    /**
+     * Helper method for building {@link JWTClaimSet} with a given expiration time and issuer.
+     * @param expirationTime
+     * @param issuer
+     * @return
+     */
+    protected static JWTClaimsSet buildClaimsSet(final Date expirationTime, final String issuer) {
+        return new JWTClaimsSet.Builder()
+                .subject("mockUser")
+                .issuer(issuer)
+                .expirationTime(expirationTime)
+                .claim("http://example.org/mock", true)
+                .audience(DEFAULT_CLIENT_ID)
+                .build();
     }
     
     /**
