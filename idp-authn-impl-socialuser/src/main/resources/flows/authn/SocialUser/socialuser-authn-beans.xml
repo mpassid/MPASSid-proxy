@@ -233,10 +233,10 @@
           p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
      
      <bean id="ValidateOIDCIDTokenACR"
-          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenACR" "/>     
+          class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenACR"/>     
 
     <bean id="ValidateOIDCIDTokenAudience"
-              class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAudience" "/>     
+              class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAudience"/>     
 
     <bean id="ValidateOIDCIDTokenAuthenticationTime"
               class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenAuthenticationTime" />     
