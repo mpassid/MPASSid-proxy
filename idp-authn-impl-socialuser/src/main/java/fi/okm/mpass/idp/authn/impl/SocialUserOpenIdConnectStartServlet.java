@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.IOException;
@@ -41,26 +42,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extracts Social identity and places it in a request attribute to be used by
- * the IdP's external authentication interface.
+ * Extracts Social identity and places it in a request attribute to be used by the IdP's external authentication
+ * interface.
  */
-@WebServlet(name = "SocialUserOpenIdConnectStartServlet", urlPatterns = { "/Authn/SocialUserOpenIdConnectStart" })
+@WebServlet(name = "SocialUserOpenIdConnectStartServlet", urlPatterns = {"/Authn/SocialUserOpenIdConnectStart"})
 public class SocialUserOpenIdConnectStartServlet extends HttpServlet {
+    
+    /** Prefix for the session attribute ids. */
+    protected static final String SESSION_ATTR_PREFIX = "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.";
 
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
+    /** Session attribute id for flow conversation key. */
+    public static final String SESSION_ATTR_FLOWKEY = SESSION_ATTR_PREFIX + "key";
+
+    /** Session attribute id for {@link SocialUserOpenIdConnectContext}. */
+    public static final String SESSION_ATTR_SUCTX = SESSION_ATTR_PREFIX + "socialUserOpenIdConnectContext";
 
     /** Serial UID. */
     private static final long serialVersionUID = -3162157736238514852L;
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SocialUserOpenIdConnectStartServlet.class);
+    private final Logger log = LoggerFactory.getLogger(SocialUserOpenIdConnectStartServlet.class);
 
     /** Constructor. */
     public SocialUserOpenIdConnectStartServlet() {
@@ -74,51 +76,38 @@ public class SocialUserOpenIdConnectStartServlet extends HttpServlet {
 
     /** {@inheritDoc} */
     @Override
-    protected void service(final HttpServletRequest httpRequest,
-            final HttpServletResponse httpResponse) throws ServletException,
-            IOException {
+    protected void service(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
+            throws ServletException, IOException {
         log.trace("Entering");
         try {
-            String key = ExternalAuthentication
-                    .startExternalAuthentication(httpRequest);
-            httpRequest
-                    .getSession()
-                    .setAttribute(
-                            "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.key",
-                            key);
+            final String key = ExternalAuthentication.startExternalAuthentication(httpRequest);
+            httpRequest.getSession().setAttribute(SESSION_ATTR_FLOWKEY, key);
 
-            @SuppressWarnings("rawtypes")
-            ProfileRequestContext profileRequestContext = (ProfileRequestContext) httpRequest
-                    .getAttribute("opensamlProfileRequestContext");
+            @SuppressWarnings("rawtypes") 
+            final ProfileRequestContext profileRequestContext =
+                    (ProfileRequestContext) httpRequest.getAttribute(ProfileRequestContext.BINDING_KEY);
             if (profileRequestContext == null) {
-                log.trace("Leaving");
-                // TODO: FIX ERROR VALUE
-                return;
+                throw new ExternalAuthenticationException("Could not access profileRequestContext from the request");
             }
-            AuthenticationContext authenticationContext = (AuthenticationContext) profileRequestContext
-                    .getSubcontext(AuthenticationContext.class);
+            final AuthenticationContext authenticationContext =
+                    (AuthenticationContext) profileRequestContext.getSubcontext(AuthenticationContext.class);
             if (authenticationContext == null) {
-                log.trace("Leaving");
-                // TODO: FIX ERROR VALUE
-                return;
+                throw new ExternalAuthenticationException("Could not find AuthenticationContext from the request");
             }
-            SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = (SocialUserOpenIdConnectContext) authenticationContext
-                    .getSubcontext("fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectContext");
-            httpRequest
-                    .getSession()
-                    .setAttribute(
-                            "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.socialUserOpenIdConnectContext",
-                            socialUserOpenIdConnectContext);
-            httpResponse.sendRedirect(socialUserOpenIdConnectContext
-                    .getAuthenticationRequestURI().toString());
-        } catch (ExternalAuthenticationException | ClassNotFoundException e) {
+            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext =
+                    (SocialUserOpenIdConnectContext) authenticationContext
+                            .getSubcontext(SocialUserOpenIdConnectContext.class);
+            if (socialUserOpenIdConnectContext == null) {
+                throw new ExternalAuthenticationException("Could not find SocialUserOpenIdConnectContext from the request");
+            }
+            httpRequest.getSession().setAttribute(SESSION_ATTR_SUCTX, socialUserOpenIdConnectContext);
+            log.debug("Redirecting user browser to {}", socialUserOpenIdConnectContext.getAuthenticationRequestURI());
+            httpResponse.sendRedirect(socialUserOpenIdConnectContext.getAuthenticationRequestURI().toString());
+        } catch (ExternalAuthenticationException e) {
+            log.error("Error processing external authentication request", e);
             log.trace("Leaving");
-            // TODO: FIX ERROR VALUE
-            log.error(e.getMessage());
-            e.printStackTrace();
+            throw new ServletException("Error processing external authentication request", e);
         }
         log.trace("Leaving");
-
     }
-
 }
