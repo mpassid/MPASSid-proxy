@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.IOException;
@@ -35,30 +36,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extracts Social identity and places it in a request attribute to be used by
- * the IdP's external authentication interface.
+ * Extracts Social identity and places it in a request attribute to be used by the IdP's external authentication
+ * interface.
  */
-@WebServlet(name = "SocialUserOpenIdConnectEndServlet", urlPatterns = { "/Authn/SocialUserOpenIdConnectEnd" })
+@WebServlet(name = "SocialUserOpenIdConnectEndServlet", urlPatterns = {"/Authn/SocialUserOpenIdConnectEnd"})
 public class SocialUserOpenIdConnectEndServlet extends HttpServlet {
-
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
 
     /** Serial UID. */
     private static final long serialVersionUID = -3162157736238514852L;
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SocialUserOpenIdConnectEndServlet.class);
+    private final Logger log = LoggerFactory.getLogger(SocialUserOpenIdConnectEndServlet.class);
 
     /** Constructor. */
     public SocialUserOpenIdConnectEndServlet() {
@@ -72,37 +67,34 @@ public class SocialUserOpenIdConnectEndServlet extends HttpServlet {
 
     /** {@inheritDoc} */
     @Override
-    protected void service(final HttpServletRequest httpRequest,
-            final HttpServletResponse httpResponse) throws ServletException,
-            IOException {
+    protected void service(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
+            throws ServletException, IOException {
         log.trace("Entering");
         try {
-            String key = (String) httpRequest
-                    .getSession()
-                    .getAttribute(
-                            "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.key");
-            SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = (SocialUserOpenIdConnectContext) httpRequest
-                    .getSession()
-                    .getAttribute(
-                            "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.socialUserOpenIdConnectContext");
-            log.debug(httpRequest.getRequestURL() + "?"
-                    + httpRequest.getQueryString());
-            try {
-                socialUserOpenIdConnectContext
-                        .setAuthenticationResponseURI(httpRequest);
-            } catch (URISyntaxException e) {
-                // TODO: FIX ERROR VALUE
-                log.trace("Leaving");
-                return;
+            final String key = StringSupport.trimOrNull((String) httpRequest.getSession()
+                    .getAttribute(SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY));
+            if (key == null) {
+                throw new ExternalAuthenticationException(
+                        "Could not find value for " + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY);
             }
-            ExternalAuthentication.finishExternalAuthentication(key,
-                    httpRequest, httpResponse);
+            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = (SocialUserOpenIdConnectContext) httpRequest
+                    .getSession().getAttribute(SocialUserOpenIdConnectStartServlet.SESSION_ATTR_SUCTX);
+            if (socialUserOpenIdConnectContext == null) {
+                throw new ExternalAuthenticationException(
+                        "Could not find value for " + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_SUCTX);                
+            }
+            log.debug("Attempting URL {}?{}", httpRequest.getRequestURL(), httpRequest.getQueryString());
+            try {
+                socialUserOpenIdConnectContext.setAuthenticationResponseURI(httpRequest);
+            } catch (URISyntaxException e) {
+                throw new ExternalAuthenticationException("Could not parse response URI", e);
+            }
+            ExternalAuthentication.finishExternalAuthentication(key, httpRequest, httpResponse);
         } catch (ExternalAuthenticationException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
+            log.error("Could not finish the external authentication", e);
+            log.trace("Leaving");
+            throw new ServletException("Error finishing the external authentication", e);
         }
         log.trace("Leaving");
-
     }
-
 }
