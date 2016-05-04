@@ -49,88 +49,62 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 
 /**
- * An action that creates a {@link SocialUserOpenIdConnectContext}, and attaches
- * it to the {@link AuthenticationContext}.
+ * An action that calls the token endpoint and populates the information to {@link SocialUserOpenIdConnectContext}.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
  * @event {@link AuthnEventIds#NO_CREDENTIALS}
+ * @event {@link AuthnEventIds#INVALID_AUTHN_CTX}
  */
 @SuppressWarnings("rawtypes")
 public class GetOIDCTokenResponse extends AbstractExtractionAction {
 
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
-
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(GetOIDCTokenResponse.class);
+    private final Logger log = LoggerFactory.getLogger(GetOIDCTokenResponse.class);
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class);
+        final SocialUserOpenIdConnectContext suCtx =
+                authenticationContext.getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} Not able to find su oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+            log.error("{} Not able to find su oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
-        AuthenticationSuccessResponse response = suCtx
-                .getAuthenticationSuccessResponse();
+        final AuthenticationSuccessResponse response = suCtx.getAuthenticationSuccessResponse();
         if (response == null) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} No oidc authentication success response",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+            log.info("{} No oidc authentication success response", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
-        AuthorizationCode code = response.getAuthorizationCode();
-        log.debug("test1"+suCtx.getRedirectURI().toString());
-        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx.getRedirectURI());
-        ClientAuthentication clientAuth = new ClientSecretBasic(suCtx.getClientID(), suCtx.getClientSecret());
-        TokenRequest tokenRequest;
-        log.debug("test2"+suCtx.getoIDCProviderMetadata().getTokenEndpointURI().toString());
-        tokenRequest = new TokenRequest(suCtx.getoIDCProviderMetadata().getTokenEndpointURI(), clientAuth, codeGrant);
-        OIDCTokenResponse oidcTokenResponse = null;
+        final AuthorizationCode code = response.getAuthorizationCode();
+        final AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx.getRedirectURI());
+        final ClientAuthentication clientAuth = new ClientSecretBasic(suCtx.getClientID(), suCtx.getClientSecret());
+        log.debug("{} Using the following token endpoint URI: {}", getLogPrefix(), suCtx.getoIDCProviderMetadata().getTokenEndpointURI());
+        final TokenRequest tokenRequest = new TokenRequest(suCtx.getoIDCProviderMetadata().getTokenEndpointURI(), clientAuth, codeGrant);
+        final OIDCTokenResponse oidcTokenResponse;
         try {
-            oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser
-                    .parse(tokenRequest.toHTTPRequest().send());
+            oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
             if (!oidcTokenResponse.indicatesSuccess()) {
-                // TODO: FIX ERROR VALUE
-                log.info("{} token response does not indicate success",
-                        getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext,
-                        AuthnEventIds.INVALID_AUTHN_CTX);
+                log.warn("{} Token response does not indicate success", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
                 log.trace("Leaving");
                 return;
             }
 
         } catch (SerializeException | IOException | ParseException e) {
-            // TODO: FIX ERROR VALUE
-            log.info("{} token response failed", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+            log.error("{} token response failed", getLogPrefix(), e);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
             log.trace("Leaving");
             return;
         }
         suCtx.setOidcTokenResponse(oidcTokenResponse);
-        log.debug("Storing oidc token response to context:"
-                + oidcTokenResponse.toJSONObject().toJSONString());
+        log.debug("Storing oidc token response to context: {}", oidcTokenResponse.toJSONObject().toJSONString());
         log.trace("Leaving");
-        return;
     }
-
 }
