@@ -65,6 +65,8 @@ import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 /** Implements OAuth2/OpenId basics for classes using Nimbus library. */
 public abstract class AbstractOAuth2Identity {
 
+    public static final String SESSION_ATTR_STATE = "fi.okm.mpass.state";
+    
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
@@ -428,7 +430,7 @@ public abstract class AbstractOAuth2Identity {
             TokenRequest request = new TokenRequest(getTokenEndpoint(),
                     clientAuth, codeGrant);
             State state = (State) httpRequest.getSession().getAttribute(
-                    "fi.okm.mpass.state");
+                    SESSION_ATTR_STATE);
             if (state == null || !state.equals(successResponse.getState())) {
                 throw new SocialUserAuthenticationException(
                         "State parameter not satisfied",
@@ -436,12 +438,12 @@ public abstract class AbstractOAuth2Identity {
             }
             return request;
         } catch (IllegalArgumentException e) {
-            log.debug("User is not authenticated yet");
+            log.debug("User is not authenticated yet", e);
             log.trace("Leaving");
             return null;
 
         } catch (URISyntaxException | ParseException e) {
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Could not construct token request", e);
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
@@ -538,16 +540,14 @@ public abstract class AbstractOAuth2Identity {
                         }
                     } catch (ParseException e) {
                         /* json parsing failed, we revert to string type */
-                        log.warn("claim type set as jsonarray but parsing failed. claim:"
-                                + value);
+                        log.warn("claim type set as jsonarray but parsing failed. claim: {}", value);
                         values = new String[1];
                         values[0] = value;
                     }
                     break;
                 default:
                     /* type definition is unkown to us, we revert to string type */
-                    log.warn("unknown type definition for claim, type is "
-                            + value);
+                    log.warn("unknown type definition for claim, type is {}", value);
                     values = new String[1];
                     values[0] = value;
                 }
@@ -555,13 +555,12 @@ public abstract class AbstractOAuth2Identity {
             }
 
             for (String newValue : values) {
-                log.debug("Adding socialuserprincipal " + newValue
-                        + " of type " + entry.getValue());
+                log.debug("Adding socialuserprincipal {} of type {}", newValue, entry.getValue());
                 subject.getPrincipals().add(
                         new SocialUserPrincipal(entry.getValue(), newValue));
                 // First value is treated as usernameprincipal
                 if (first) {
-                    log.debug("Setting userprincipal to " + newValue);
+                    log.debug("Setting userprincipal to {}", newValue);
                     subject.getPrincipals()
                             .add(new UsernamePrincipal(newValue));
                     first = false;
