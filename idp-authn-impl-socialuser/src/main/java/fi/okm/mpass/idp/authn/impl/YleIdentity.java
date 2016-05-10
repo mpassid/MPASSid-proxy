@@ -99,27 +99,10 @@ public class YleIdentity extends OAuth2Identity implements
     @Override
     public String getRedirectUrl(HttpServletRequest httpRequest) {
         log.trace("Entering");
-        if (httpRequest == null) {
-            log.trace("Leaving");
-            return null;
-        }
-        State state = new State();
-        httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);
-        String ret = null;
-        try {
-            AuthorizationRequest request = new AuthorizationRequest.Builder(
-                    new ResponseType(ResponseType.Value.CODE), getClientId())
-                    .scope(getScope())
-                    .state(state)
-                    .redirectionURI(
-                            new URI(httpRequest.getRequestURL().toString()))
-                    .endpointURI(getAuthorizationEndpoint()).build();
-            // yle authorize endpoint needs extra credentials to reach
-            ret = request.toURI().toString() + getYleGatewayCredentialsTrail();
-        } catch (URISyntaxException | SerializeException e) {
-            log.error("Something bad happened " + e.getMessage());
-            log.trace("Leaving");
-            return null;
+        String ret = super.getRedirectUrl(httpRequest);
+        if (ret != null) {
+            log.debug("Adding the gateway credentials trail to the URL");
+            ret = ret +  getYleGatewayCredentialsTrail();
         }
         log.trace("Leaving");
         return ret;
