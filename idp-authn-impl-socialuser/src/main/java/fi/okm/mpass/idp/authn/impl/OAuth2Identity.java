@@ -73,7 +73,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
             return null;
         }
         State state = new State();
-        httpRequest.getSession().setAttribute("fi.okm.mpass.state", state);
+        httpRequest.getSession().setAttribute(SESSION_ATTR_STATE, state);
         String ret = null;
         try {
             AuthorizationRequest request = new AuthorizationRequest.Builder(
@@ -85,7 +85,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                     .endpointURI(getAuthorizationEndpoint()).build();
             ret = request.toURI().toString();
         } catch (URISyntaxException | SerializeException e) {
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Could not construct the redirect URL", e);
             log.trace("Leaving");
             return null;
         }
@@ -115,7 +115,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                 if (errorDescription != null && !errorDescription.isEmpty()) {
                     error += " : " + errorDescription;
                 }
-                log.error("error:" + error);
+                log.error("Error in the token response: {}", error);
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(error,
                         SocialUserErrorIds.EXCEPTION);
@@ -126,7 +126,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
                     .getAccessToken();
             // try reading stuff from accesstoken
             Subject subject = new Subject();
-            log.debug("claims from provider: " + accessToken.toJSONString());
+            log.debug("claims from provider: {}", accessToken.toJSONString());
             parsePrincipalsFromClaims(subject, accessToken.toJSONObject());
             if (getUserinfoEndpoint() != null
                     && !getUserinfoEndpoint().toString().isEmpty()) {
@@ -153,7 +153,7 @@ public class OAuth2Identity extends AbstractOAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Could not parse subject", e);
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
