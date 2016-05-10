@@ -54,13 +54,14 @@ import net.shibboleth.idp.profile.ActionTestingSupport;
  * Abstract test case sharing tests for OIDC token validation in {@link SocialUserOpenIdConnectContext}.
  */
 public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationContextTest {
-    
+
     public static final String DEFAULT_ISSUER = "mockIssuer";
-    
+
     public static final String DEFAULT_CLIENT_ID = "mockClientId";
 
     /**
      * Returns the action to be tested.
+     * 
      * @return
      */
     protected abstract AbstractProfileAction<?, ?> getAction();
@@ -68,65 +69,86 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
     /**
      * Runs action without {@link SocialUserOpenIdConnectContext}.
      */
-    @Test public void testNoContext() throws Exception {
+    @Test
+    public void testNoContext() throws Exception {
         final AbstractProfileAction<?, ?> action = getAction();
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
-    
+
     /**
      * Helper method for building {@link OIDCTokenResponse} with a given expiration time.
+     * 
      * @param expirationTime The expiration time.
      * @return
      */
     protected OIDCTokenResponse getOidcTokenResponse(final Date expirationTime) {
         return getOidcTokenResponse(expirationTime, null);
     }
-    
+
     /**
      * Helper method for building {@link OIDCTokenResponse} with a given issuer.
+     * 
      * @param issuer
      * @return
      */
     protected OIDCTokenResponse getOidcTokenResponse(final String issuer) {
         return getOidcTokenResponse(null, issuer);
     }
-    
+
     /**
      * Helper method for building {@link OIDCTokenResponse} with a given expiration time and issuer.
+     * 
      * @param expirationTime
      * @param issuer
      * @return
      */
     protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer) {
-        final JWTClaimsSet claimsSet = buildClaimsSet(expirationTime, issuer);
+        return getOidcTokenResponse(expirationTime, issuer, null);
+    }
+
+    /**
+     * Helper method for building {@link OIDCTokenResponse} with a given expiration time and issuer.
+     * 
+     * @param expirationTime
+     * @param issuer
+     * @param audience
+     * @return
+     */
+    protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer, final List<String> audience) {
+        final JWTClaimsSet claimsSet = buildClaimsSet(expirationTime, issuer, audience);
         final PlainJWT plainJwt = new PlainJWT(claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
         final RefreshToken refreshToken = new RefreshToken();
         final OIDCTokens oidcTokens = new OIDCTokens(plainJwt, accessToken, refreshToken);
         final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
-        return oidcTokenResponse;        
+        return oidcTokenResponse;
     }
     
     /**
      * Helper method for building {@link JWTClaimSet} with a given expiration time and issuer.
+     * 
      * @param expirationTime
      * @param issuer
+     * @param audience
      * @return
      */
-    protected static JWTClaimsSet buildClaimsSet(final Date expirationTime, final String issuer) {
-        return new JWTClaimsSet.Builder()
-                .subject("mockUser")
-                .issuer(issuer)
-                .expirationTime(expirationTime)
-                .claim("http://example.org/mock", true)
-                .audience(DEFAULT_CLIENT_ID)
-                .build();
+    protected static JWTClaimsSet buildClaimsSet(final Date expirationTime, final String issuer,
+            final List<String> audience) {
+        JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder().subject("mockUser").issuer(issuer)
+                .expirationTime(expirationTime).claim("http://example.org/mock", true);
+        if (audience == null) {
+            builder = builder.audience(DEFAULT_CLIENT_ID);
+        } else {
+            builder = builder.audience(audience);
+        }
+        return builder.build();
     }
-    
+
     /**
      * Helper method for building {@link OIDCProviderMetadata} with the given issuer.
+     * 
      * @param issuer The issuer.
      * @return
      * @throws Exception
@@ -136,17 +158,18 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
         subjectTypes.add(SubjectType.PUBLIC);
         return new OIDCProviderMetadata(new Issuer(issuer), subjectTypes, new URI("https://mock.org/"));
     }
-    
+
     /**
      * Runs action with unparseable OIDC token.
      */
     @SuppressWarnings("unchecked")
-    @Test public void testUnparseable() throws Exception {
+    @Test
+    public void testUnparseable() throws Exception {
         final AccessToken accessToken = new BearerAccessToken();
         final RefreshToken refreshToken = new RefreshToken();
         final JWT jwt = Mockito.mock(JWT.class);
         Mockito.when(jwt.getJWTClaimsSet()).thenThrow(java.text.ParseException.class);
-        
+
         final OIDCTokens oidcTokens = new OIDCTokens(jwt, accessToken, refreshToken);
         final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
         final AbstractProfileAction<?, ?> action = getAction();

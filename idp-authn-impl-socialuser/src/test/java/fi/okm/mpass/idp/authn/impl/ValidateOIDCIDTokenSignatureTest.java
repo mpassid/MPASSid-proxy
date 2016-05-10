@@ -176,7 +176,7 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
 
         final RSAPrivateKey privateKey = (RSAPrivateKey) keyGenerator.genKeyPair().getPrivate();
         
-        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER);
+        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER, null);
 
         final SignedJWT signedJwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
@@ -207,7 +207,7 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         final KeyPair keyPair = keyGenerator.generateKeyPair();
         final RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         
-        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER);
+        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER, null);
 
         final SignedJWT signedJwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
