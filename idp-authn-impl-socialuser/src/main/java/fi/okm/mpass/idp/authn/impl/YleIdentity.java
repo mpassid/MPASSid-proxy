@@ -134,7 +134,7 @@ public class YleIdentity extends OAuth2Identity implements
                         error += " : " + errorDescription;
                     }
                 }
-                log.error("error:" + error);
+                log.error("Error when attempting to parse token response: {}", error);
                 log.trace("Leaving");
                 throw new SocialUserAuthenticationException(error,
                         SocialUserErrorIds.EXCEPTION);
@@ -160,7 +160,7 @@ public class YleIdentity extends OAuth2Identity implements
                     parsePrincipalsFromClaims(subject,
                             JSONObjectUtils.parseJSONObject(userinfo));
                 } catch (java.text.ParseException e) {
-                    log.error("error parsing userinfo endpoint");
+                    log.error("error parsing userinfo endpoint", e);
                     log.trace("Leaving");
                     throw new SocialUserAuthenticationException(e.getMessage(),
                             SocialUserErrorIds.EXCEPTION);
@@ -171,8 +171,7 @@ public class YleIdentity extends OAuth2Identity implements
 
         } catch (SerializeException | IOException | URISyntaxException
                 | ParseException e) {
-            log.error("Something bad happened " + e.getMessage());
-            log.error(e.getMessage());
+            log.error("Could not parse subject from the token response, ", e);
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
