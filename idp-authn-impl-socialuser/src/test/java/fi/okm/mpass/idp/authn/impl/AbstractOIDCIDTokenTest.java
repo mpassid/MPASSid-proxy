@@ -27,6 +27,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.mockito.Mockito;
 import org.springframework.webflow.execution.Event;
@@ -105,7 +106,7 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
      * @return
      */
     protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer) {
-        return getOidcTokenResponse(expirationTime, issuer, null);
+        return getOidcTokenResponse(expirationTime, issuer, null, null);
     }
 
     /**
@@ -114,10 +115,12 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
      * @param expirationTime
      * @param issuer
      * @param audience
+     * @param claims
      * @return
      */
-    protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer, final List<String> audience) {
-        final JWTClaimsSet claimsSet = buildClaimsSet(expirationTime, issuer, audience);
+    protected static OIDCTokenResponse getOidcTokenResponse(final Date expirationTime, final String issuer, final List<String> audience,
+            final Map<String, Object> claims) {
+        final JWTClaimsSet claimsSet = buildClaimsSet(expirationTime, issuer, audience, claims);
         final PlainJWT plainJwt = new PlainJWT(claimsSet);
         final AccessToken accessToken = new BearerAccessToken();
         final RefreshToken refreshToken = new RefreshToken();
@@ -132,16 +135,22 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
      * @param expirationTime
      * @param issuer
      * @param audience
+     * @param claims
      * @return
      */
     protected static JWTClaimsSet buildClaimsSet(final Date expirationTime, final String issuer,
-            final List<String> audience) {
+            final List<String> audience, final Map<String, Object> claims) {
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder().subject("mockUser").issuer(issuer)
                 .expirationTime(expirationTime).claim("http://example.org/mock", true);
         if (audience == null) {
             builder = builder.audience(DEFAULT_CLIENT_ID);
         } else {
             builder = builder.audience(audience);
+        }
+        if (claims != null) {
+            for (final String claim : claims.keySet()) {
+                builder = builder.claim(claim, claims.get(claim));
+            }
         }
         return builder.build();
     }
