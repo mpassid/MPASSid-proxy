@@ -175,7 +175,7 @@ public class SocialUserAuthServlet extends HttpServlet {
                 .startExternalAuthentication(httpRequest);
         httpRequest.getSession().setAttribute("ext_auth_start_key", key);
         // Try clearing any possible previous authentication result
-        ProfileRequestContext profileRequestContext = (ProfileRequestContext) httpRequest
+        ProfileRequestContext<?, ?> profileRequestContext = (ProfileRequestContext<?, ?>) httpRequest
                 .getAttribute("opensamlProfileRequestContext");
         if (profileRequestContext == null) {
             log.trace("Leaving");

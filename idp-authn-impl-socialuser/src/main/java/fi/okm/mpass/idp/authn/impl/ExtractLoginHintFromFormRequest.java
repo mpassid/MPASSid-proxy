@@ -48,6 +48,7 @@ import fi.okm.mpass.idp.authn.SocialLoginHintCoder;
  * and sets it to the {@link AuthenticationContext}.
  * 
  */
+@SuppressWarnings("rawtypes")
 public class ExtractLoginHintFromFormRequest extends AbstractExtractionAction {
 
     /** Class logger. */
