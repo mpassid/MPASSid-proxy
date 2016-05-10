@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.json.JsonArray;
 import javax.security.auth.Subject;
 
 import net.minidev.json.JSONArray;
