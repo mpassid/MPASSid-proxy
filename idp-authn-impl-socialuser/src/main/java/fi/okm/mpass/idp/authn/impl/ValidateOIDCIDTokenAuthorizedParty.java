@@ -40,35 +40,25 @@ import org.slf4j.LoggerFactory;
  * An action that verifies Authorized Party of ID Token.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
+ * @event {@link AuthnEventIds#NO_CREDENTIALS}
  */
 @SuppressWarnings("rawtypes")
-public class ValidateOIDCIDTokenAuthorizedParty extends
-        AbstractAuthenticationAction {
-
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
+public class ValidateOIDCIDTokenAuthorizedParty extends AbstractAuthenticationAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(ValidateOIDCIDTokenAuthorizedParty.class);
+    private final Logger log = LoggerFactory.getLogger(ValidateOIDCIDTokenAuthorizedParty.class);
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class);
+        final SocialUserOpenIdConnectContext suCtx =
+                authenticationContext.getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
@@ -78,24 +68,19 @@ public class ValidateOIDCIDTokenAuthorizedParty extends
         // If an azp (authorized party) Claim is present, the Client SHOULD
         // verify that its client_id is the Claim Value.
         try {
-            if (suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken()
-                    .getJWTClaimsSet().getAudience().size() > 1) {
-                String azp = suCtx.getOidcTokenResponse().getOIDCTokens()
-                        .getIDToken().getJWTClaimsSet().getStringClaim("azp");
-                if (!suCtx.getClientID()
-                        .getValue().equals(azp)) {
-                    log.error("{} multiple audiences, client is not the azp",
-                            getLogPrefix());
-                    ActionSupport.buildEvent(profileRequestContext,
-                            AuthnEventIds.NO_CREDENTIALS);
+            if (suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet().getAudience().size() > 1) {
+                final String azp = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet()
+                        .getStringClaim("azp");
+                if (!suCtx.getClientID().getValue().equals(azp)) {
+                    log.error("{} multiple audiences, client is not the azp", getLogPrefix());
+                    ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
                     log.trace("Leaving");
                     return;
                 }
             }
         } catch (ParseException e) {
             log.error("{} Error parsing id token", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
