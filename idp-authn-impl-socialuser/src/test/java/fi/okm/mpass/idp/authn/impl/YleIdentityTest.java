@@ -50,6 +50,8 @@ import org.testng.annotations.Test;
 
 import com.nimbusds.oauth2.sdk.id.State;
 
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+
 /**
  * Unit tests for {@link YleIdentity}.
  */
@@ -79,6 +81,12 @@ public class YleIdentityTest {
     /** The user claim key. */
     private String userClaim;
     
+    /** The error code. */
+    private String errorCode;
+    
+    /** The error description. */
+    private String errorDescription;
+    
     /**
      * Set up tests.
      */
@@ -92,6 +100,8 @@ public class YleIdentityTest {
         tokenEndpoint = urlPrefix + "/token";
         userInfoEndpoint = urlPrefix + "/userinfo";
         userClaim = "user_key";
+        errorCode = "access_denied";
+        errorDescription = "mock description";
     }
 
     /**
@@ -141,6 +151,32 @@ public class YleIdentityTest {
         Assert.assertNull(yleId.getSubject(new MockHttpServletRequest()));
     }
 
+    /**
+     * Runs getSubject with error token response.
+     * @throws Exception
+     */
+    @Test public void testSubjectErrorToken() throws Exception {
+        final YleIdentity yleId = initYleIdentity();
+        yleId.setClientSecret(clientSecret);
+        final String urlPrefix = "http://localhost:" + SetOIDCInformationTest.CONTAINER_PORT;
+        final String tokenEndpoint = urlPrefix + "/errorToken";
+        yleId.setTokenEndpoint(tokenEndpoint);
+        yleId.setUserinfoEndpoint(userInfoEndpoint);
+        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        httpRequest.setQueryString("code=mockCode&state=mockState");
+        httpRequest.getSession(true).setAttribute(AbstractOAuth2Identity.SESSION_ATTR_STATE, new State("mockState"));
+        String exception = null;
+        try {
+            executeGetSubjectWithServer(yleId, httpRequest);
+        } catch (SocialUserAuthenticationException e) {
+            exception = e.getMessage();
+        }
+        Assert.assertNotNull(exception);
+        Assert.assertTrue(exception.startsWith(errorCode));
+        Assert.assertTrue(exception.contains(errorDescription));
+    }
+
+    
     /**
      * Runs getSubject with prerequisites fulfilled.
      * @throws Exception
@@ -217,6 +253,9 @@ public class YleIdentityTest {
                     output = "{ \"access_token\":\"2YotnFZFEjr1zCsicMWpAA\", \"token_type\":\"Bearer\", \"expires_in\":3600 }";
                 } else if (request.getTarget().contains("/userinfo")) {
                     output = "{ \"" + userClaim + "\":\"mockUser\" }";
+                } else if (request.getTarget().contains("/errorToken")) {
+                    output = "{ \"error\":\"" + errorCode + "\", \"error_description\":\"" + errorDescription + "\" }";
+                    response.setCode(500);
                 }
                 IOUtils.copy(new StringReader(output), response.getOutputStream());
                 response.getOutputStream().close();
