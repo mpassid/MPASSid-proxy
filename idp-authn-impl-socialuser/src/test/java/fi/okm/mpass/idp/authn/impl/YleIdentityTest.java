@@ -157,14 +157,11 @@ public class YleIdentityTest {
      */
     @Test public void testSubjectErrorToken() throws Exception {
         final YleIdentity yleId = initYleIdentity();
-        yleId.setClientSecret(clientSecret);
         final String urlPrefix = "http://localhost:" + SetOIDCInformationTest.CONTAINER_PORT;
         final String tokenEndpoint = urlPrefix + "/errorToken";
         yleId.setTokenEndpoint(tokenEndpoint);
         yleId.setUserinfoEndpoint(userInfoEndpoint);
-        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
-        httpRequest.setQueryString("code=mockCode&state=mockState");
-        httpRequest.getSession(true).setAttribute(AbstractOAuth2Identity.SESSION_ATTR_STATE, new State("mockState"));
+        final MockHttpServletRequest httpRequest = initHttpServletRequest();
         String exception = null;
         try {
             executeGetSubjectWithServer(yleId, httpRequest);
@@ -176,22 +173,58 @@ public class YleIdentityTest {
         Assert.assertTrue(exception.contains(errorDescription));
     }
 
-    
+    /**
+     * Runs getSubject with unparseable token response.
+     * @throws Exception
+     */
+    @Test public void testSubjectUnparseableToken() throws Exception {
+        final YleIdentity yleId = initYleIdentity();
+        final MockHttpServletRequest httpRequest = initHttpServletRequest();
+        String exception = null;
+        try {
+            executeGetSubjectWithServer(yleId, httpRequest, true, false);
+        } catch (SocialUserAuthenticationException e) {
+            exception = e.getMessage();
+        }
+        Assert.assertNotNull(exception);
+    }
+
+    /**
+     * Runs getSubject with unparseable user info response.
+     * @throws Exception
+     */
+    @Test public void testSubjectUnparseableUserInfo() throws Exception {
+        final YleIdentity yleId = initYleIdentity();
+        final MockHttpServletRequest httpRequest = initHttpServletRequest();
+        String exception = null;
+        try {
+            executeGetSubjectWithServer(yleId, httpRequest, false, true);
+        } catch (SocialUserAuthenticationException e) {
+            exception = e.getMessage();
+        }
+        Assert.assertNotNull(exception);
+    }    
     /**
      * Runs getSubject with prerequisites fulfilled.
      * @throws Exception
      */
     @Test public void testSubjectSuccess() throws Exception {
         final YleIdentity yleId = initYleIdentity();
-        yleId.setClientSecret(clientSecret);
-        yleId.setTokenEndpoint(tokenEndpoint);
-        yleId.setUserinfoEndpoint(userInfoEndpoint);
-        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
-        httpRequest.setQueryString("code=mockCode&state=mockState");
-        httpRequest.getSession(true).setAttribute(AbstractOAuth2Identity.SESSION_ATTR_STATE, new State("mockState"));
+        final MockHttpServletRequest httpRequest = initHttpServletRequest();
         final Subject subject = executeGetSubjectWithServer(yleId, httpRequest);
         Assert.assertNotNull(subject);
         Assert.assertEquals(subject.getPrincipals().iterator().next().getName(), "mockUser");
+    }
+    
+    /**
+     * Initializes a servlet request.
+     * @return
+     */
+    protected MockHttpServletRequest initHttpServletRequest() {
+        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        httpRequest.setQueryString("code=mockCode&state=mockState");
+        httpRequest.getSession(true).setAttribute(AbstractOAuth2Identity.SESSION_ATTR_STATE, new State("mockState"));
+        return httpRequest;
     }
     
     /**
@@ -202,7 +235,19 @@ public class YleIdentityTest {
      * @throws Exception
      */
     protected Subject executeGetSubjectWithServer(final YleIdentity yleId, final HttpServletRequest httpRequest) throws Exception {
-        final Container container = new SimpleContainer();
+        return executeGetSubjectWithServer(yleId, httpRequest, false, false);
+    }
+    
+    /**
+     * Executes the getSubject method with simple container running.
+     * @param yleId
+     * @param httpRequest
+     * @return
+     * @throws Exception
+     */
+    protected Subject executeGetSubjectWithServer(final YleIdentity yleId, final HttpServletRequest httpRequest, 
+            final boolean unparseableToken, final boolean unparseableUserInfo) throws Exception {
+        final Container container = new SimpleContainer(unparseableToken, unparseableUserInfo);
         final SocketProcessor server = new ContainerSocketProcessor(container);
         final Connection connection = new SocketConnection(server);
         final SocketAddress address = new InetSocketAddress(SetOIDCInformationTest.CONTAINER_PORT);
@@ -215,16 +260,19 @@ public class YleIdentityTest {
             connection.close();
         }
     }
-    
+
     /**
      * Initializes {@link YleIdentity} with default settings.
      * @return
      */
-    protected YleIdentity initYleIdentity() {
+    protected YleIdentity initYleIdentity() throws Exception {
         final YleIdentity yleId = new YleIdentity();
         yleId.setAppId(appId);
         yleId.setAppKey(appKey);
         yleId.setClientId(clientId);
+        yleId.setClientSecret(clientSecret);
+        yleId.setTokenEndpoint(tokenEndpoint);
+        yleId.setUserinfoEndpoint(userInfoEndpoint);
         final Map<String, String> claims = new HashMap<>();
         claims.put(userClaim, "userId");
         yleId.setClaimsPrincipals(claims);
@@ -236,10 +284,16 @@ public class YleIdentityTest {
      */
     class SimpleContainer implements Container {
         
+        final boolean unparseableToken;
+        
+        final boolean unparseableUserInfo;
+        
         /**
          * Constructor.
          */
-        public SimpleContainer() {
+        public SimpleContainer(final boolean throwToken, final boolean throwUserInfo) {
+            unparseableToken = throwToken;
+            unparseableUserInfo = throwUserInfo;
         }
 
         @Override
@@ -250,9 +304,17 @@ public class YleIdentityTest {
                 response.setContentType("application/json");
                 String output = "";
                 if (request.getTarget().contains("/token")) {
-                    output = "{ \"access_token\":\"2YotnFZFEjr1zCsicMWpAA\", \"token_type\":\"Bearer\", \"expires_in\":3600 }";
+                    if (unparseableToken) {
+                        output = "{ unparseable }";
+                    } else {
+                        output = "{ \"access_token\":\"2YotnFZFEjr1zCsicMWpAA\", \"token_type\":\"Bearer\", \"expires_in\":3600 }";
+                    }
                 } else if (request.getTarget().contains("/userinfo")) {
-                    output = "{ \"" + userClaim + "\":\"mockUser\" }";
+                    if (unparseableUserInfo) {
+                        output = "{ unparseable }";
+                    } else {
+                        output = "{ \"" + userClaim + "\":\"mockUser\" }";
+                    }
                 } else if (request.getTarget().contains("/errorToken")) {
                     output = "{ \"error\":\"" + errorCode + "\", \"error_description\":\"" + errorDescription + "\" }";
                     response.setCode(500);
