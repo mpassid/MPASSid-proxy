@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -36,8 +35,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
 
 /**
  * Unit tests for {@link YleIdentity}.
