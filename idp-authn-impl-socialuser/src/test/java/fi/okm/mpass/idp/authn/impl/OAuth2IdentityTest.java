@@ -26,6 +26,8 @@ package fi.okm.mpass.idp.authn.impl;
 import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +50,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.State;
 
 import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
@@ -74,13 +77,16 @@ public class OAuth2IdentityTest {
     
     /** The user claim key. */
     protected String userClaim;
-    
+   
+    /** The user claim value. */
+    protected String userClaimValue;
+
     /** The error code. */
     protected String errorCode;
     
     /** The error description. */
     protected String errorDescription;
-    
+        
     /**
      * Set up tests.
      */
@@ -92,8 +98,32 @@ public class OAuth2IdentityTest {
         tokenEndpoint = urlPrefix + "/token";
         userInfoEndpoint = urlPrefix + "/userinfo";
         userClaim = "user_key";
+        userClaimValue = "mockUserId";
         errorCode = "access_denied";
         errorDescription = "mock description";
+    }
+    
+    /** 
+     * Tests generic setters and getters.
+     * 
+     * @throws Exception
+     */
+    @Test public void testGenericSetters() throws Exception {
+        final Map<String, String> customClaims = new HashMap<>();
+        customClaims.put("claim1", "value1");
+        customClaims.put("claim2", "value2");
+        final OAuth2Identity oAuthId = initOAuth2Identity();
+        oAuthId.setCustomClaimsTypes(customClaims);
+        Assert.assertEquals(oAuthId.getCustomClaimsTypes(), customClaims);
+        oAuthId.setScope(new ArrayList<String>());
+        Assert.assertEquals(oAuthId.getScope(), new Scope());
+        final ArrayList<String> scopes = new ArrayList<>();
+        scopes.add("profile");
+        oAuthId.setScope(scopes);
+        Assert.assertEquals(oAuthId.getScope(), Scope.parse("profile"));
+        final URI redirectUri = new URI("http://mock.org/redirect");
+        oAuthId.setRedirectURI(redirectUri);
+        Assert.assertEquals(oAuthId.getRedirectURI(), redirectUri);
     }
     
     /**
@@ -228,7 +258,7 @@ public class OAuth2IdentityTest {
         oAuthId.setTokenEndpoint(tokenEndpoint);
         oAuthId.setUserinfoEndpoint(userInfoEndpoint);
         final Map<String, String> claims = new HashMap<>();
-        claims.put(userClaim, "userId");
+        claims.put(userClaim, userClaimValue);
         oAuthId.setClaimsPrincipals(claims);
         oAuthId.init();
         return oAuthId;

@@ -62,7 +62,7 @@ public class YleIdentityTest extends OAuth2IdentityTest {
         errorCode = "access_denied";
         errorDescription = "mock description";
     }
-
+    
     /**
      * Runs getRedirectUrl with null {@link HttpServletRequest}.
      * @throws Exception
@@ -139,7 +139,7 @@ public class YleIdentityTest extends OAuth2IdentityTest {
         yleId.setTokenEndpoint(tokenEndpoint);
         yleId.setUserinfoEndpoint(userInfoEndpoint);
         final Map<String, String> claims = new HashMap<>();
-        claims.put(userClaim, "userId");
+        claims.put(userClaim, userClaimValue);
         yleId.setClaimsPrincipals(claims);
         yleId.init();
         return yleId;
