@@ -571,4 +571,14 @@ public abstract class AbstractOAuth2Identity {
         log.trace("Leaving");
     }
     // Checkstyle: CyclomaticComplexity ON
+    
+    /**
+     * Obtains access token, calls user info endpoint and finally populates the principals from the claims
+     * provided by the user info endpoint.
+     * @param httpRequest
+     * @return
+     * @throws SocialUserAuthenticationException
+     */
+    public abstract Subject getSubject(HttpServletRequest httpRequest)
+            throws SocialUserAuthenticationException;
 }
