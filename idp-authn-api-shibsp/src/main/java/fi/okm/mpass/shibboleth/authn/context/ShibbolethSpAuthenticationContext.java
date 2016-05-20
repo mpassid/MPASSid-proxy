@@ -61,7 +61,7 @@ public class ShibbolethSpAuthenticationContext extends BaseContext {
     public static final String SHIB_SP_AUTHN_CONTEXT_CLASS = "Shib-AuthnContext-Class";
     
     /** Shibboleth SP authentication context declaration attribute name. */
-    public static final String SHIB_SP_AUTHN_CONTEXT_DECL = "Shib-AuthnCotext-Decl";
+    public static final String SHIB_SP_AUTHN_CONTEXT_DECL = "Shib-AuthnContext-Decl";
 
     /** Map of http headers values. */
     @Nonnull @NotEmpty private Map<String, String> headers;
