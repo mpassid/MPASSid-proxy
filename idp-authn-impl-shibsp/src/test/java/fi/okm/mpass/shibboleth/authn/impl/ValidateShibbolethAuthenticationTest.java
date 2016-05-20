@@ -31,7 +31,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import fi.okm.mpass.shibboleth.authn.principal.impl.ShibAttributePrincipal;
 import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
 import net.shibboleth.idp.authn.AuthnEventIds;
@@ -81,7 +81,7 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     }
     
     /**
-     * Runs action without {@link ShibbolethAuthnContext}.
+     * Runs action without {@link ShibbolethSpAuthenticationContext}.
      */
     @Test public void testMissingContext() {
         prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
@@ -94,8 +94,8 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
      */
     @Test public void testMissingUser() {
         prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
-        final ShibbolethAuthnContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
-                .getSubcontext(ShibbolethAuthnContext.class, true);
+        final ShibbolethSpAuthenticationContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
+                .getSubcontext(ShibbolethSpAuthenticationContext.class, true);
         Assert.assertNotNull(shibContext);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
@@ -108,8 +108,8 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     public void testAttribute(final ValidateShibbolethAuthentication action) {
         final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class, false);
         ac.setAttemptedFlow(authenticationFlows.get(0));
-        final ShibbolethAuthnContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
-                .getSubcontext(ShibbolethAuthnContext.class, true);
+        final ShibbolethSpAuthenticationContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
+                .getSubcontext(ShibbolethSpAuthenticationContext.class, true);
         Assert.assertNotNull(shibContext);
         shibContext.getAttributes().put(uid, uidValue);
         final Event event = action.execute(src);
@@ -148,8 +148,8 @@ public class ValidateShibbolethAuthenticationTest extends PopulateAuthentication
     @Test public void testHeader() {
         final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class, false);
         ac.setAttemptedFlow(authenticationFlows.get(0));
-        final ShibbolethAuthnContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
-                .getSubcontext(ShibbolethAuthnContext.class, true);
+        final ShibbolethSpAuthenticationContext shibContext = prc.getSubcontext(AuthenticationContext.class, false)
+                .getSubcontext(ShibbolethSpAuthenticationContext.class, true);
         Assert.assertNotNull(shibContext);
         shibContext.getHeaders().put(uid, uidValue);
         final Event event = action.execute(src);

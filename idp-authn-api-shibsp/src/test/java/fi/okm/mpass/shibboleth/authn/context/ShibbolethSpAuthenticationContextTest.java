@@ -31,9 +31,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 /**
- * Unit tests for {@link ShibbolethAuthnContext}.
+ * Unit tests for {@link ShibbolethSpAuthenticationContext}.
  */
-public class ShibbolethAuthnContextTest {
+public class ShibbolethSpAuthenticationContextTest {
 
     /** The IdP who authenticated the user. */
     private String idp;
@@ -63,7 +63,7 @@ public class ShibbolethAuthnContextTest {
      */
     @Test
     public void testHeaders() {
-        final ShibbolethAuthnContext shibCtx = new ShibbolethAuthnContext();
+        final ShibbolethSpAuthenticationContext shibCtx = new ShibbolethSpAuthenticationContext();
         Assert.assertNotNull(shibCtx.getHeaders());
         Assert.assertTrue(shibCtx.getHeaders().isEmpty());
         Assert.assertEquals(shibCtx.getHeaders().size(), 0);
@@ -80,7 +80,7 @@ public class ShibbolethAuthnContextTest {
      */
     @Test
     public void testAttributes() {
-        final ShibbolethAuthnContext shibCtx = new ShibbolethAuthnContext();
+        final ShibbolethSpAuthenticationContext shibCtx = new ShibbolethSpAuthenticationContext();
         Assert.assertNotNull(shibCtx.getAttributes());
         Assert.assertTrue(shibCtx.getAttributes().isEmpty());
         Assert.assertEquals(shibCtx.getAttributes().size(), 0);
@@ -97,7 +97,7 @@ public class ShibbolethAuthnContextTest {
      */
     @Test
     public void testSetGet() {
-        final ShibbolethAuthnContext shibCtx = new ShibbolethAuthnContext();
+        final ShibbolethSpAuthenticationContext shibCtx = new ShibbolethSpAuthenticationContext();
         Assert.assertNull(shibCtx.getIdp());
         Assert.assertNull(shibCtx.getInstant());
         Assert.assertNull(shibCtx.getMethod());

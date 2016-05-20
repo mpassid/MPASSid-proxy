@@ -36,7 +36,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * Unit tests for {@link ExtractShibbolethAttributesFromRequest}.
@@ -97,7 +97,7 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
     }
 
     /**
-     * Tests successful construction of {@link ShibbolethAuthnContext} with prefix in headers.
+     * Tests successful construction of {@link ShibbolethSpAuthenticationContext} with prefix in headers.
      * 
      * @throws ComponentInitializationException 
      */
@@ -107,7 +107,7 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
     }
     
     /**
-     * Tests successful construction of {@link ShibbolethAuthnContext} without prefix in headers.
+     * Tests successful construction of {@link ShibbolethSpAuthenticationContext} without prefix in headers.
      * 
      * @throws ComponentInitializationException 
      */
@@ -117,7 +117,7 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
     }
     
     /**
-     * Tests successful construction of {@link ShibbolethAuthnContext}.
+     * Tests successful construction of {@link ShibbolethSpAuthenticationContext}.
      * 
      * @param prefix The prefix for the headers.
      * @throws ComponentInitializationException 
@@ -126,20 +126,20 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
         action = new ExtractShibbolethAttributesFromRequest(prefix);
         action.setHttpServletRequest(new MockHttpServletRequest());
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant);
+            .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_AUTHENTICATION_INSTANT, expectedInstant);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod);
+            .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_AUTHENTICATION_METHOD, expectedMethod);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
+            .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
         ((MockHttpServletRequest) action.getHttpServletRequest())
-            .addHeader(prefix + ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
+            .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
         ((MockHttpServletRequest) action.getHttpServletRequest()).addHeader(expectedHeader, expectedHeader);
         ((MockHttpServletRequest) action.getHttpServletRequest()).setAttribute(expectedAttribute, expectedAttribute);
         action.initialize();
         final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
         final Event event = action.execute(src);
         Assert.assertNull(event);
-        final ShibbolethAuthnContext shibCtx = authCtx.getSubcontext(ShibbolethAuthnContext.class, false);
+        final ShibbolethSpAuthenticationContext shibCtx = authCtx.getSubcontext(ShibbolethSpAuthenticationContext.class, false);
         Assert.assertNotNull(shibCtx, "No shibboleth context attached");
         Assert.assertEquals(shibCtx.getIdp(), expectedIdp);
         Assert.assertEquals(shibCtx.getInstant(), expectedInstant);

@@ -35,7 +35,7 @@ import org.opensaml.messaging.context.BaseContext;
 /**
  * This context stores attributes coming from Shibboleth SP.
  */
-public class ShibbolethAuthnContext extends BaseContext {
+public class ShibbolethSpAuthenticationContext extends BaseContext {
 
     /** Shibboleth SP session index attribute name. */
     public static final String SHIB_SP_SESSION_INDEX = "Shib-Session-Index";
@@ -79,7 +79,7 @@ public class ShibbolethAuthnContext extends BaseContext {
     /**
      * Constructor.
      */
-    public ShibbolethAuthnContext() {
+    public ShibbolethSpAuthenticationContext() {
         headers = new HashMap<String, String>();
         attributes = new HashMap<String, String>();
     }

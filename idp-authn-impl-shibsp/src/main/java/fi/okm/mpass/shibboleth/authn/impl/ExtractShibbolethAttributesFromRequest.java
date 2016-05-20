@@ -38,17 +38,17 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that extracts a Http headers and request attributes, creates and populates a 
- * {@link ShibbolethAuthnContext}, and attaches it to the {@link AuthenticationContext}.
+ * {@link ShibbolethSpAuthenticationContext}, and attaches it to the {@link AuthenticationContext}.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
  * @event {@link AuthnEventIds#NO_CREDENTIALS}
  * @pre <pre>ProfileRequestContext.getSubcontext(AuthenticationContext.class, false) != null</pre>
  * @post If getHttpServletRequest() != null, HTTP headers and request attributes with String values are
- * extracted to populate a {@link ShibbolethAuthnContext}. */
+ * extracted to populate a {@link ShibbolethSpAuthenticationContext}. */
 @SuppressWarnings("rawtypes")
 public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAction {
 
@@ -89,8 +89,8 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         if (log.isTraceEnabled()) {
             logHeadersAndAttributes(request);
         }
-        final ShibbolethAuthnContext shibbolethContext =
-                authenticationContext.getSubcontext(ShibbolethAuthnContext.class, true);
+        final ShibbolethSpAuthenticationContext shibbolethContext =
+                authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class, true);
         final Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             final String header = headerNames.nextElement();
@@ -116,23 +116,23 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
      * @param value The value of the variable to be updated.
      * @param isHeader Is the variable HTTP header (if false, it's request attribute).
      */
-    protected void updateShibbolethContext(final ShibbolethAuthnContext shibbolethContext, 
+    protected void updateShibbolethContext(final ShibbolethSpAuthenticationContext shibbolethContext, 
             final String name, final String value, final boolean isHeader) {
         if (value == null) {
             log.trace("{} The value is null, {} will be ignored", getLogPrefix(), name);
             return;
         }
         final String key = stripPrefixIfExists(name);
-        if (key.equals(ShibbolethAuthnContext.SHIB_SP_IDENTITY_PROVIDER)) {
+        if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_IDENTITY_PROVIDER)) {
             log.debug("{} Added value for Identity Provider", getLogPrefix());
             shibbolethContext.setIdp(applyTransforms(value));            
-        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_INSTANT)) {
+        } else if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_AUTHENTICATION_INSTANT)) {
             log.debug("{} Added value for Authentication Instant", getLogPrefix());
             shibbolethContext.setInstant(applyTransforms(value));
-        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHENTICATION_METHOD)) {
+        } else if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_AUTHENTICATION_METHOD)) {
             log.debug("{} Added value for Authentication Method", getLogPrefix());
             shibbolethContext.setMethod(applyTransforms(value));
-        } else if (key.equals(ShibbolethAuthnContext.SHIB_SP_AUTHN_CONTEXT_CLASS)) {
+        } else if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_CLASS)) {
             log.debug("{} Added value for Authentication Context Class", getLogPrefix());
             shibbolethContext.setContextClass(applyTransforms(value));
         } else {       

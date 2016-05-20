@@ -47,12 +47,12 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import fi.okm.mpass.shibboleth.authn.principal.impl.ShibAttributePrincipal;
 import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
 
 /**
- * An action that checks for an {@link ShibbolethAuthnContext} and produces an
+ * An action that checks for an {@link ShibbolethSpAuthenticationContext} and produces an
  * {@link net.shibboleth.idp.authn.AuthenticationResult} or records error if the configured user
  * attribute is not existing in the context.
  *  
@@ -77,7 +77,7 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
     @Nonnull private final Logger log = LoggerFactory.getLogger(ValidateShibbolethAuthentication.class);
     
     /** Context containing the result to validate. */
-    @Nullable private ShibbolethAuthnContext shibbolethContext;
+    @Nullable private ShibbolethSpAuthenticationContext shibbolethContext;
     
     /** The attribute name containing the user identifier. */
     @Nonnull @NotEmpty private String usernameAttribute;
@@ -133,7 +133,7 @@ public class ValidateShibbolethAuthentication extends AbstractValidationAction {
         }
         log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
         
-        shibbolethContext = authenticationContext.getSubcontext(ShibbolethAuthnContext.class);
+        shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} No ShibbolethAuthenticationContext available within authentication context", 
                     getLogPrefix());
