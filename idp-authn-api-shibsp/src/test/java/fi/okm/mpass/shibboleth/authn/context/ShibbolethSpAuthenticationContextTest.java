@@ -23,12 +23,17 @@
 
 package fi.okm.mpass.shibboleth.authn.context;
 
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 
 /**
  * Unit tests for {@link ShibbolethSpAuthenticationContext}.
@@ -46,6 +51,15 @@ public class ShibbolethSpAuthenticationContextTest {
 
     /** The authentication context class how user was authenticated at the IdP. */
     private String contextClass;
+    
+    /** The authentication context declaration how user was authenticated at the IdP. */
+    private String contextDecl;
+    
+    /** The initial authentication context requested from this IdP. */
+    private List<Principal> initialRequestedContext;
+    
+    /** The mapped authentication context to be requested from the authenticating IdP. */
+    private List<Principal> mappedAuthnContext;
 
     /**
      * Initializes variables.
@@ -56,6 +70,9 @@ public class ShibbolethSpAuthenticationContextTest {
         instant = "mockInstant";
         method = "mockMethod";
         contextClass = "mockContextClass";
+        contextDecl = "mockContextDecl";
+        initialRequestedContext = new ArrayList<>();
+        mappedAuthnContext = new ArrayList<>();
     }
 
     /**
@@ -102,6 +119,9 @@ public class ShibbolethSpAuthenticationContextTest {
         Assert.assertNull(shibCtx.getInstant());
         Assert.assertNull(shibCtx.getMethod());
         Assert.assertNull(shibCtx.getContextClass());
+        Assert.assertNull(shibCtx.getContextDecl());
+        Assert.assertNull(shibCtx.getInitialRequestedContext());
+        Assert.assertNull(shibCtx.getMappedAuthnContext());
         shibCtx.setIdp(idp);
         Assert.assertEquals(shibCtx.getIdp(), idp);
         shibCtx.setInstant(instant);
@@ -110,5 +130,13 @@ public class ShibbolethSpAuthenticationContextTest {
         Assert.assertEquals(shibCtx.getMethod(), method);
         shibCtx.setContextClass(contextClass);
         Assert.assertEquals(shibCtx.getContextClass(), contextClass);
+        shibCtx.setContextDecl(contextDecl);
+        Assert.assertEquals(shibCtx.getContextDecl(), contextDecl);
+        initialRequestedContext.add(new AuthnContextClassRefPrincipal("mockRequested"));
+        shibCtx.setInitialRequestedContext(initialRequestedContext);
+        Assert.assertEquals(shibCtx.getInitialRequestedContext(), initialRequestedContext);
+        mappedAuthnContext.add(new AuthnContextClassRefPrincipal("mockMapped"));
+        shibCtx.setMappedAuthnContext(mappedAuthnContext);
+        Assert.assertEquals(shibCtx.getMappedAuthnContext(), mappedAuthnContext);
     }
 }

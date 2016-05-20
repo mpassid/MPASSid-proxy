@@ -23,7 +23,9 @@
 
 package fi.okm.mpass.shibboleth.authn.context;
 
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -57,6 +59,9 @@ public class ShibbolethSpAuthenticationContext extends BaseContext {
 
     /** Shibboleth SP authentication context class attribute name. */
     public static final String SHIB_SP_AUTHN_CONTEXT_CLASS = "Shib-AuthnContext-Class";
+    
+    /** Shibboleth SP authentication context declaration attribute name. */
+    public static final String SHIB_SP_AUTHN_CONTEXT_DECL = "Shib-AuthnCotext-Decl";
 
     /** Map of http headers values. */
     @Nonnull @NotEmpty private Map<String, String> headers;
@@ -75,6 +80,15 @@ public class ShibbolethSpAuthenticationContext extends BaseContext {
 
     /** The authentication context class how user was authenticated at the IdP. */
     @Nonnull @NotEmpty private String contextClass;
+
+    /** The authentication context declaration how user was authenticated at the IdP. */
+    private String contextDecl;
+    
+    /** The initial authentication context requested from this IdP. */
+    private List<Principal> initialRequestedContext;
+    
+    /** The mapped authentication context to be requested from the authenticating IdP. */
+    private List<Principal> mappedAuthnContext;
 
     /**
      * Constructor.
@@ -199,4 +213,65 @@ public class ShibbolethSpAuthenticationContext extends BaseContext {
         contextClass = authnContextClass;
         return contextClass;
     }
+
+    /**
+     * Get the authentication context declaration how user was authenticated at the IdP.
+     * 
+     * @return contextDecl
+     */
+    @Nonnull @NotEmpty public String getContextDecl() {
+        return contextDecl;
+    }
+
+    /**
+     * Set the authentication context declaration how user was authenticated at the IdP.
+     * 
+     * @param authnContextDecl What to set.
+     * @return contextClass
+     */
+    @Nonnull @NotEmpty public String setContextDecl(@Nonnull @NotEmpty final String authnContextDecl) {
+        contextDecl = authnContextDecl;
+        return contextDecl;
+    }
+
+    /**
+     * Get the initial authentication context requested from this IdP.
+     * 
+     * @return initialRequestedContext
+     */
+    public List<Principal> getInitialRequestedContext() {
+        return initialRequestedContext;
+    }
+    
+    /**
+     * Get the initial authentication context requested from this IdP.
+     * 
+     * @param initialContext What to set.
+     * @return initialRequestedContext
+     */
+    public List<Principal> setInitialRequestedContext(final List<Principal> initialContext) {
+        initialRequestedContext = initialContext;
+        return initialRequestedContext;
+    }
+
+    /**
+     * Get the mapped authentication context to be requested from the authenticating IdP.
+     * 
+     * @return mappedAuthnContext
+     */
+    public List<Principal> getMappedAuthnContext() {
+        return mappedAuthnContext;
+    }
+    
+    /**
+     * Get the mapped authentication context to be requested from the authenticating IdP.
+     * 
+     * @param mappedContext What to set.
+     * @return mappedAuthnContext
+     */
+    public List<Principal> setMappedAuthnContext(final List<Principal> mappedContext) {
+        mappedAuthnContext = mappedContext;
+        return mappedAuthnContext;
+    }
+
 }
