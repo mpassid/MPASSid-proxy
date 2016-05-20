@@ -124,6 +124,11 @@ THE SOFTWARE.
                 <version>${shib.idp.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-saml-api</artifactId>
+                <version>${shib.idp.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${opensaml.groupId}</groupId>
                 <artifactId>opensaml-core</artifactId>
                 <version>${opensaml.version}</version>
