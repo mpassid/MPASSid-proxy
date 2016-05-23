@@ -55,6 +55,9 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
     /** The contextClass of the context. */
     private String expectedContextClass;
 
+    /** The contextDecl of the context. */
+    private String expectedContextDecl;
+    
     /** The method of the context. */
     private String expectedMethod;
     
@@ -78,6 +81,7 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
         expectedIdp = "mockIdp";
         expectedInstant = "mockInstant";
         expectedContextClass = "mockContextClass";
+        expectedContextDecl = "mockContextDecl";
         expectedMethod = "mockMethod";
         expectedAttribute = "mockAttribute";
         expectedHeader = "mockHeader";
@@ -132,6 +136,8 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
         ((MockHttpServletRequest) action.getHttpServletRequest())
             .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_CLASS, expectedContextClass);
         ((MockHttpServletRequest) action.getHttpServletRequest())
+            .addHeader(prefix  + ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_DECL, expectedContextDecl);
+        ((MockHttpServletRequest) action.getHttpServletRequest())
             .addHeader(prefix + ShibbolethSpAuthenticationContext.SHIB_SP_IDENTITY_PROVIDER, expectedIdp);
         ((MockHttpServletRequest) action.getHttpServletRequest()).addHeader(expectedHeader, expectedHeader);
         ((MockHttpServletRequest) action.getHttpServletRequest()).setAttribute(expectedAttribute, expectedAttribute);
@@ -144,10 +150,11 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
         Assert.assertEquals(shibCtx.getIdp(), expectedIdp);
         Assert.assertEquals(shibCtx.getInstant(), expectedInstant);
         Assert.assertEquals(shibCtx.getMethod(), expectedMethod);
-        Assert.assertEquals(shibCtx.getContextClass(), expectedContextClass);        
+        Assert.assertEquals(shibCtx.getContextClass(), expectedContextClass);
+        Assert.assertEquals(shibCtx.getContextDecl(), expectedContextDecl);
         Assert.assertEquals(shibCtx.getAttributes().size(), 1);
         Assert.assertEquals(shibCtx.getAttributes().get(expectedAttribute), expectedAttribute);
-        Assert.assertEquals(shibCtx.getHeaders().size(), 1);
+        Assert.assertEquals(shibCtx.getHeaders().size(), 6);
         Assert.assertEquals(shibCtx.getHeaders().get(expectedHeader), expectedHeader);
     }
 }

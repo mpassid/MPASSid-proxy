@@ -135,14 +135,17 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         } else if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_CLASS)) {
             log.debug("{} Added value for Authentication Context Class", getLogPrefix());
             shibbolethContext.setContextClass(applyTransforms(value));
-        } else {       
-            if (isHeader) {
-                log.debug("{} Added value for header {}", getLogPrefix(), key);
-                shibbolethContext.getHeaders().put(key, applyTransforms(value));
-            } else {
-                log.debug("{} Added value for attribute {}", getLogPrefix(), key);
-                shibbolethContext.getAttributes().put(key, applyTransforms(value));
-            }
+        } else if (key.equals(ShibbolethSpAuthenticationContext.SHIB_SP_AUTHN_CONTEXT_DECL)) {
+            log.debug("{} Added value for Authentication Context Decl", getLogPrefix());
+            shibbolethContext.setContextDecl(applyTransforms(value));
+        }
+       
+        if (isHeader) {
+            log.debug("{} Added value for header {}", getLogPrefix(), key);
+            shibbolethContext.getHeaders().put(key, applyTransforms(value));
+        } else {
+            log.debug("{} Added value for attribute {}", getLogPrefix(), key);
+            shibbolethContext.getAttributes().put(key, applyTransforms(value));
         }
     }
     
