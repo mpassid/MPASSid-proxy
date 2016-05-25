@@ -144,6 +144,16 @@ THE SOFTWARE.
                 <version>${opensaml.version}</version>
             </dependency>
             <dependency>
+                <groupId>${opensaml.groupId}</groupId>
+                <artifactId>opensaml-saml-api</artifactId>
+                <version>${opensaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${opensaml.groupId}</groupId>
+                <artifactId>opensaml-saml-impl</artifactId>
+                <version>${opensaml.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
@@ -212,6 +222,13 @@ THE SOFTWARE.
             </dependency>
             <dependency>
                 <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-saml-api</artifactId>
+                <version>${shib.idp.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.shibboleth.idp</groupId>
                 <artifactId>idp-saml-impl</artifactId>
                 <version>${shib.idp.version}</version>
                 <type>test-jar</type>
@@ -239,7 +256,14 @@ THE SOFTWARE.
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
-
+            <dependency>
+                <groupId>${opensaml.groupId}</groupId>
+                <artifactId>opensaml-saml-api</artifactId>
+                <version>${opensaml.version}</version>
+                <scope>test</scope>
+                <type>test-jar</type>
+            </dependency>
+            
             <dependency>
                 <groupId>${opensaml.groupId}</groupId>
                 <artifactId>opensaml-security-impl</artifactId>

@@ -107,6 +107,14 @@ THE SOFTWARE.
             <groupId>${opensaml.groupId}</groupId>
             <artifactId>opensaml-soap-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-saml-impl</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>net.shibboleth.ext</groupId>
@@ -150,6 +158,13 @@ THE SOFTWARE.
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>net.shibboleth.idp</groupId>
+            <artifactId>idp-saml-api</artifactId>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+
 
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
@@ -175,6 +190,13 @@ THE SOFTWARE.
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
             <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
 
     </dependencies>
