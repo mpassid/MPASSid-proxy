@@ -200,7 +200,7 @@ public class RestDataConnectorTest {
     public void testDefaultOneRole() throws ComponentInitializationException, ResolutionException, Exception {
         final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-1role-1attr.json", 
                 "restdc-min.xml");
-        Assert.assertEquals(resolvedAttributes.size(), 8);
+        Assert.assertEquals(resolvedAttributes.size(), 9);
         Assert.assertEquals(resolvedAttributes.get(expectedResultAttribute).getValues().get(0).getValue(), expectedOid);
     }
 
@@ -214,7 +214,7 @@ public class RestDataConnectorTest {
     public void testDefaultTwoRoles() throws ComponentInitializationException, ResolutionException, Exception {
         final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-2role-2attr.json", 
                 "restdc-min.xml");
-        Assert.assertEquals(resolvedAttributes.size(), 8);
+        Assert.assertEquals(resolvedAttributes.size(), 10);
         Assert.assertEquals(resolvedAttributes.get(expectedResultAttribute).getValues().get(0).getValue(), expectedOid);
     }
 

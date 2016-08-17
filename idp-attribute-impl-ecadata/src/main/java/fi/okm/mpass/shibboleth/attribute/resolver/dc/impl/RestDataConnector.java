@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO;
+import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO.AttributesDTO;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
@@ -94,6 +96,9 @@ public class RestDataConnector extends AbstractDataConnector {
     
     /** The attribute id for the structured roles. */
     public static final String ATTR_ID_STRUCTURED_ROLES = "structuredRoles";
+    
+    /** The attribute id prefix for UserDTO/attribute keys. */
+    public static final String ATTR_PREFIX = "attr_";
 
     /** Class logging. */
     private final Logger log = LoggerFactory.getLogger(RestDataConnector.class);
@@ -232,6 +237,12 @@ public class RestDataConnector extends AbstractDataConnector {
                 populateStructuredRole(attributes, ecaUser.getRoles()[i]);
             }
         }
+        if (ecaUser.getAttributes() != null) {
+            for (int i = 0; i < ecaUser.getAttributes().length; i++) {
+                final AttributesDTO attribute = ecaUser.getAttributes()[i];
+                populateAttribute(attributes, ATTR_PREFIX + attribute.getName(), attribute.getValue());
+            }
+        }
     }
 
     /**
@@ -265,8 +276,12 @@ public class RestDataConnector extends AbstractDataConnector {
             return;
         }
         if (attributes.get(resultAttributePrefix + attributeId) != null) {
+            log.trace("Adding a new value to existing attribute {}", resultAttributePrefix + attributeId);
             final IdPAttribute idpAttribute = attributes.get(resultAttributePrefix + attributeId);
-            idpAttribute.getValues().add(new StringAttributeValue(attributeValue));
+            log.trace("Existing values {}", idpAttribute.getValues());
+            final List<IdPAttributeValue<String>> values = copyExistingValues(idpAttribute.getValues());
+            values.add(new StringAttributeValue(attributeValue));
+            idpAttribute.setValues(values);
             log.debug("Added value {} to attribute {}", attributeValue, resultAttributePrefix + attributeId);
         } else {
             final IdPAttribute idpAttribute = new IdPAttribute(resultAttributePrefix + attributeId);
@@ -276,6 +291,21 @@ public class RestDataConnector extends AbstractDataConnector {
             attributes.put(resultAttributePrefix + attributeId, idpAttribute);
             log.debug("Populated {} with value {}", resultAttributePrefix + attributeId, attributeValue);
         }
+    }
+    
+    /**
+     * Copies the String values from the source list to a new writable list.
+     * @param sourceValues The existing values, expected to be Strings.
+     * @return A writable list containing existing values.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<IdPAttributeValue<String>> copyExistingValues(final List<IdPAttributeValue<?>> sourceValues) {
+        final List<IdPAttributeValue<String>> values = new ArrayList<>();
+        final Iterator<IdPAttributeValue<?>> iterator = sourceValues.iterator();
+        while (iterator.hasNext()) {
+            values.add((IdPAttributeValue<String>)iterator.next());
+        }
+        return values;
     }
 
     /**
