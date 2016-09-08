@@ -4,7 +4,7 @@ Vagrant box: Shibboleth Service Provider 2.x connected to MPASS-testing environm
 
 ## Prereqs
 * Virtualbox (or other vagrant compliant virtualization "engine")
-* Vagrant (tested with 1.8.1)
+* Vagrant (tested with 1.8.5)
 * Ansible (tested with 1.9.4 and 2.0.0.1)
 
 ## This Vagrant box includes following packages / applications:
