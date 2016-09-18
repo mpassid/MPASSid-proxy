@@ -8,6 +8,10 @@
       "name" : "API product owner",
       "url" : "http://mpass.id",
       "email" : "jarkko.moilanen@minedu.fi"
+    },
+    "license" : {
+      "name" : "MIT",
+      "url" : "https://github.com/Digipalvelutehdas/MPASS-proxy/blob/master/API/license.md"
     }
   },
   "host" : "api.mpass.fi",
