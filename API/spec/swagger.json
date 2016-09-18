@@ -5,7 +5,7 @@
     "description" : "Metadata API for Education sector SSO MPASS.id.",
     "version" : "MVP",
     "contact" : {
-      "name" : "API product owner",
+      "name" : "Jarkko Moilanen, API product owner",
       "url" : "http://mpass.id",
       "email" : "jarkko.moilanen@minedu.fi"
     },
