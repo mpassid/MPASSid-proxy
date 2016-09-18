@@ -45,7 +45,7 @@
     },
     "/municipalities" : {
       "get" : {
-        "summary" : "Returns lists of connected municipalities",
+        "summary" : "Returns list of connected municipalities",
         "description" : "Get list of proxy connected municipalities. \n",
         "parameters" : [ {
           "name" : "lang",
