@@ -1,0 +1,216 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "title" : "MPASSid SSO proxy metadata API",
+    "description" : "Metadata API for Education sector SSO MPASS.id. Provide metadata information about proxy operations and information such as statistics, connected services and municipalities. Currently API is read only.",
+    "version" : "MVP",
+    "contact" : {
+      "name" : "Jarkko Moilanen, API product owner",
+      "url" : "http://mpass.id/apis",
+      "email" : "jarkko.moilanen@minedu.fi"
+    },
+    "license" : {
+      "name" : "MIT",
+      "url" : "https://github.com/Digipalvelutehdas/MPASS-proxy/blob/master/API/license.md"
+    }
+  },
+  "host" : "api.mpass.fi",
+  "schemes" : [ "http", "https" ],
+  "basePath" : "/v1",
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/statistics/successrate" : {
+      "get" : {
+        "summary" : "Returns service´s realtime login success rate as percentage",
+        "description" : "More detailed description\n",
+        "tags" : [ "Statistics" ],
+        "responses" : {
+          "200" : {
+            "description" : "Success rate as percentage",
+            "schema" : {
+              "type" : "object",
+              "items" : {
+                "$ref" : "#/definitions/successrate"
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/municipalities" : {
+      "get" : {
+        "summary" : "Returns list of connected municipalities",
+        "description" : "Get list of proxy connected municipalities. \n",
+        "parameters" : [ {
+          "name" : "lang",
+          "in" : "query",
+          "description" : "Content language. Default is English. Each language is a two-letter (ISO 639-1) lowercase abbreviation",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "offset",
+          "in" : "query",
+          "description" : "use offset to set starting point in pagination",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "set number of services to return in list.",
+          "type" : "number"
+        } ],
+        "tags" : [ "Municipalities" ],
+        "responses" : {
+          "200" : {
+            "description" : "List of municipalities",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/municipality"
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/services" : {
+      "get" : {
+        "summary" : "Returns lists of connected services",
+        "description" : "Get list of proxy connected services. \n",
+        "parameters" : [ {
+          "name" : "lang",
+          "in" : "query",
+          "description" : "Content language. Default is English. Each language is a two-letter (ISO 639-1) lowercase abbreviation",
+          "required" : false,
+          "type" : "string",
+          "pattern" : "^[a-z]{2}"
+        }, {
+          "name" : "offset",
+          "in" : "query",
+          "description" : "use offset to set starting point in pagination",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "set number of services to return in list.",
+          "type" : "number"
+        } ],
+        "tags" : [ "Services" ],
+        "responses" : {
+          "200" : {
+            "description" : "List of services",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/service"
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "successrate" : {
+      "type" : "object",
+      "properties" : {
+        "rate" : {
+          "type" : "number",
+          "description" : "Success rate value as percentage",
+          "pattern" : "^(100\\.00|[1-9]?\\d\\,\\d{2})$"
+        },
+        "count" : {
+          "type" : "number",
+          "format" : "int32",
+          "description" : "Number of logins from where success rate is calculated"
+        },
+        "timestamp" : {
+          "type" : "string",
+          "format" : "number",
+          "description" : "as defined by ISO 8601. All times UTC. Example '2016-09-18T03:54:48Z'"
+        },
+        "proxyname" : {
+          "type" : "string",
+          "description" : "Name of the proxy eg. MPASS.fi - SSO for Finland"
+        }
+      }
+    },
+    "municipality" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "description" : "Municipality code from Opintopolku Organization registry"
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Municipality name"
+        },
+        "status" : {
+          "type" : "string",
+          "enum" : [ "design", "test", "production", "retired" ],
+          "description" : "Integration status."
+        }
+      }
+    },
+    "service" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "description" : "identifying code in proxy"
+        },
+        "provider_id" : {
+          "type" : "string",
+          "description" : "service provider's id code"
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Service name"
+        },
+        "service_description" : {
+          "type" : "string",
+          "description" : "Description of the service. Note, param defined language by code."
+        },
+        "contact_email" : {
+          "type" : "string",
+          "description" : "contact email for the service"
+        }
+      }
+    },
+    "Error" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "fields" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
