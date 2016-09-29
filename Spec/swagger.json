@@ -357,7 +357,7 @@
         "status" : {
           "type" : "string",
           "enum" : [ "design", "test", "production", "retired" ],
-          "description" : "Authentication method status."
+          "description" : "Authentication method status. Check status before taking into use."
         },
         "name" : {
           "type" : "string"
