@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "title" : "MPASS.id SSO proxy metadata API",
-    "description" : "This is work in progress version. Metadata API for Education sector SSO MPASS.id. Provide metadata information about proxy operations and information such as statistics, connected services and municipalities.\nAPI is CORS enabled. JSON swagger file https://github.com/Digipalvelutehdas/MPASSid-proxy/tree/master/API/spec\n\n------------------------------",
+    "description" : "This is work in progress version of Metadata API for Education sector SSO MPASS.id. Provide metadata information about proxy operations and information such as statistics, connected services and municipalities.\nAPI is CORS enabled. JSON swagger file https://github.com/Digipalvelutehdas/MPASSid-proxy/tree/master/API/spec\n\n------------------------------",
     "version" : "MVP",
     "contact" : {
       "name" : "Jarkko Moilanen, API product owner",
@@ -352,12 +352,12 @@
       "properties" : {
         "id" : {
           "type" : "string",
-          "description" : "Authentication method metadata"
+          "description" : "Authentication method metadata."
         },
         "status" : {
           "type" : "string",
           "enum" : [ "design", "test", "production", "retired" ],
-          "description" : "Authentication method status."
+          "description" : "Authentication method status. Check status before taking into use."
         },
         "name" : {
           "type" : "string"
@@ -403,7 +403,7 @@
         },
         "country_code" : {
           "type" : "string",
-          "description" : "country code...ISO ...."
+          "description" : "country code...ISO something ...."
         },
         "service_description" : {
           "type" : "string",
