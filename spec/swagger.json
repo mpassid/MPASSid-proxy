@@ -22,7 +22,7 @@
     "/meta" : {
       "get" : {
         "summary" : "Returns meta information about proxy",
-        "description" : "More detailed description...\n",
+        "description" : "Returns metadata set of information about this particular MPASS.id proxy. \n",
         "produces" : [ "application/json" ],
         "tags" : [ "Meta" ],
         "responses" : {
