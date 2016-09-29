@@ -403,7 +403,7 @@
         },
         "country_code" : {
           "type" : "string",
-          "description" : "country code...ISO ...."
+          "description" : "country code...ISO something ...."
         },
         "service_description" : {
           "type" : "string",
