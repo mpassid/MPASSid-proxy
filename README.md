@@ -2,7 +2,7 @@
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASSid-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASSid-proxy)
-[![Coverage Status](https://coveralls.io/repos/github/Digipalvelutehdas/MPASS-proxy/badge.svg?branch=master)](https://coveralls.io/github/Digipalvelutehdas/MPASS-proxy?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Digipalvelutehdas/MPASSid-proxy/badge.svg?branch=master)](https://coveralls.io/github/Digipalvelutehdas/MPASSid-proxy?branch=master)
 
 MPASS-proxy consists of several modules for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home), providing
 extensions for authentication, attribute resolution and audit logging. They can be used individually, but together they provide an open source 
@@ -18,7 +18,7 @@ For more information about the MPASS project, see http://www.mpass.id/.
 - _idp-attribute-impl-ecadata_: ECA Auth Data -connection implementation.
 - _idp-authn-api-shibsp_: Interface module for integrating SAML-based auth sources.
 - _idp-authn-api-socialuser_: Interface module for integrating OAuth2/OIDC-based auth sources.
-- _idp_authn_impl_jwt_: Implementation module for integrating (Opinsys) JWT auth sources.
+- _idp-authn-impl-jwt_: Implementation module for integrating (Opinsys/Peda.net) JWT auth sources.
 - _idp-authn-impl-shibsp_: Implementation module for integrating SAML-based auth sources.
 - _idp-authn-impl-socialuser_: Implementation module for integrating OAuth2/OIDC-based auth sources.
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
