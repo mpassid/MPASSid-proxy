@@ -2,7 +2,7 @@
 #MPASS.id Proxy Metadata API 
 
 ##Purpose
-Provide metadata information about proxy operations and information such as statistics, connected services and municipalities. Currently API is read only. 
+Provide metadata information about proxy operations and information such as statistics, connected services and municipalities. 
 
 ##Data models
 Data models will be accessible also from https://iow.csc.fi but also via API specification (see below)
