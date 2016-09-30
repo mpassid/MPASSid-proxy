@@ -1,7 +1,7 @@
 # MPASS-proxy
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASS-proxy)
+[![Build Status](https://travis-ci.org/Digipalvelutehdas/MPASSid-proxy.svg?branch=master)](https://travis-ci.org/Digipalvelutehdas/MPASSid-proxy)
 [![Coverage Status](https://coveralls.io/repos/github/Digipalvelutehdas/MPASS-proxy/badge.svg?branch=master)](https://coveralls.io/github/Digipalvelutehdas/MPASS-proxy?branch=master)
 
 MPASS-proxy consists of several modules for [Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home), providing
