@@ -43,6 +43,7 @@ THE SOFTWARE.
         <module>../idp-authn-impl-jwt</module>
         <module>../idp-authn-impl-shibsp</module>
         <module>../idp-authn-impl-socialuser</module>
+        <module>../idp-mpass-rest-api</module>
         <module>../idp-profile-impl-audit</module>
     </modules>
 
