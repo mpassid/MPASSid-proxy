@@ -39,10 +39,12 @@ THE SOFTWARE.
         <module>../idp-attribute-impl-ecadata</module>
         <module>../idp-authn-api-shibsp</module>
         <module>../idp-authn-api-socialuser</module>
+        <module>../idp-authn-api-wilma</module>
         <module>../idp-authn-impl-discovery</module>
         <module>../idp-authn-impl-jwt</module>
         <module>../idp-authn-impl-shibsp</module>
         <module>../idp-authn-impl-socialuser</module>
+        <module>../idp-authn-impl-wilma</module>
         <module>../idp-mpass-rest-api</module>
         <module>../idp-mpass-rest-impl</module>
         <module>../idp-profile-impl-audit</module>
@@ -97,6 +99,11 @@ THE SOFTWARE.
             <dependency>
                 <groupId>fi.okm.mpass</groupId>
                 <artifactId>idp-mpass-rest-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>fi.okm.mpass</groupId>
+                <artifactId>idp-authn-api-wilma</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

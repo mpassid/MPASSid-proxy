@@ -18,9 +18,11 @@ For more information about the MPASS project, see http://www.mpass.id/.
 - _idp-attribute-impl-ecadata_: ECA Auth Data -connection implementation.
 - _idp-authn-api-shibsp_: Interface module for integrating SAML-based auth sources.
 - _idp-authn-api-socialuser_: Interface module for integrating OAuth2/OIDC-based auth sources.
+- _idp-authn-api-wilma_: Interface module for integrating Wilma auth sources.
 - _idp-authn-impl-jwt_: Implementation module for integrating (Opinsys/Peda.net) JWT auth sources.
 - _idp-authn-impl-shibsp_: Implementation module for integrating SAML-based auth sources.
 - _idp-authn-impl-socialuser_: Implementation module for integrating OAuth2/OIDC-based auth sources.
+- _idp-authn-impl-wilma_: Implementation module for integrating Wilma auth sources.
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
 - _idp-mpass-rest-api_: Interface module for metadata API.
 - _idp-mpass-rest-impl_: Implementation module for metadata API.
