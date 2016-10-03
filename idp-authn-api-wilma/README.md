@@ -2,9 +2,9 @@
 
 ## Overview
 
-This module contains interface classes for idp-authn-impl-wilma. These two modules can be used for adding
-a Wilma instance as an authentication method for [Shibboleth Identity Provider v3]
-(https://wiki.shibboleth.net/confluence/display/IDP30/Home).
+This module contains interface classes for [idp-authn-impl-wilma](https://github.com/Digipalvelutehdas/MPASSid-proxy/tree/master/idp-authn-impl-wilma).
+These two modules can be used for adding a [Wilma](https://help.starsoft.fi/?q=node/106) instance as an authentication method for
+[Shibboleth Identity Provider v3](https://wiki.shibboleth.net/confluence/display/IDP30/Home).
 
 ## Prerequisities and compilation
 
