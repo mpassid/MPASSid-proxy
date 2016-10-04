@@ -70,7 +70,7 @@ public class ValidateWilmaResponse extends AbstractValidationAction {
     /**
      * Constructor.
      * @param sharedSecret The secret used for the validation.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
     public ValidateWilmaResponse(final String sharedSecret) throws UnsupportedEncodingException {
         this(sharedSecret, WilmaAuthenticationContext.MAC_ALGORITHM);
@@ -80,7 +80,7 @@ public class ValidateWilmaResponse extends AbstractValidationAction {
      * Constructor.
      * @param sharedSecret The secret used for the validation.
      * @param macAlgorithm The MAC algorithm used for the validation.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
     public ValidateWilmaResponse(final String sharedSecret, final String macAlgorithm)
             throws UnsupportedEncodingException {
@@ -189,7 +189,7 @@ public class ValidateWilmaResponse extends AbstractValidationAction {
      * Returns the given parameter from the query.
      * @param servletRequest The request containing the query.
      * @param paramName The parameter whose value is to be returned.
-     * @return
+     * @return The value for the parameter, or null if it does not exist.
      */
     protected String getQueryParam(final HttpServletRequest servletRequest, final String paramName) {
         final String query = servletRequest.getQueryString();

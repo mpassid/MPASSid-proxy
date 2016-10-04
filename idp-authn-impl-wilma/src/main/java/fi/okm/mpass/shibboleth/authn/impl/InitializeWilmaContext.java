@@ -56,7 +56,7 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
 public class InitializeWilmaContext extends AbstractAuthenticationAction {
 
     /** Class logger. */
-    @Nonnull private final static Logger log = LoggerFactory.getLogger(InitializeWilmaContext.class);
+    @Nonnull private final Logger log = LoggerFactory.getLogger(InitializeWilmaContext.class);
 
     /** The secret key used for calculating the checksum. */
     @Nonnull private final SecretKeySpec signatureKey;
@@ -71,7 +71,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
      * Constructor, using a default MAC algorithm {@link WilmaAuthenticationContext.MAC_ALGORITHM}.
      * @param sharedSecret The secret key used for calculating the checksum.
      * @param wilmaEndpoint The endpoint where the authentication request is sent.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
     public InitializeWilmaContext(final String sharedSecret, final String wilmaEndpoint)
             throws UnsupportedEncodingException {
@@ -83,7 +83,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
      * @param sharedSecret The secret key used for calculating the checksum.
      * @param wilmaEndpoint The endpoint where the authentication request is sent.
      * @param macAlgorithm The algorithm used for calculating the checksum.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
     public InitializeWilmaContext(final String sharedSecret, final String wilmaEndpoint, final String macAlgorithm)
             throws UnsupportedEncodingException {
@@ -121,25 +121,31 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
      * Constructs an URL where the user is redirected for authentication.
      * @param flowExecutionUrl The current flow execution URL, to be included in the redirect URL.
      * @param authenticationContext The context, also containing {@link WilmaAuthenticationContext}.
-     * @return
+     * @return The redirect URL containing the checksum.
      */
-    public String getRedirect(final String flowExecutionUrl, final AuthenticationContext authenticationContext) {
+    public String getRedirect(final String flowExecutionUrl, 
+            final AuthenticationContext authenticationContext) {
         final HttpServletRequest httpRequest = getHttpServletRequest();
-        final WilmaAuthenticationContext wilmaContext = authenticationContext.getSubcontext(WilmaAuthenticationContext.class);
-        final StringBuffer redirectToBuffer = new StringBuffer(httpRequest.getScheme() + "://" + httpRequest.getServerName());
+        final WilmaAuthenticationContext wilmaContext = 
+                authenticationContext.getSubcontext(WilmaAuthenticationContext.class);
+        final StringBuffer redirectToBuffer = new StringBuffer(httpRequest.getScheme() + "://" 
+                + httpRequest.getServerName());
         if (httpRequest.getServerPort() != 443) {
             redirectToBuffer.append(":" + httpRequest.getServerPort());
         }
         redirectToBuffer.append(flowExecutionUrl).append(getAsParameter("&", "_eventId_proceed", "1"));
-        redirectToBuffer.append(getAsParameter("&", WilmaAuthenticationContext.PARAM_NAME_NONCE, wilmaContext.getNonce()));
+        redirectToBuffer.append(getAsParameter("&", WilmaAuthenticationContext.PARAM_NAME_NONCE, 
+                wilmaContext.getNonce()));
         final URLCodec urlCodec = new URLCodec();
         try {
             final StringBuffer unsignedUrlBuffer = new StringBuffer(endpoint);
-            unsignedUrlBuffer.append(getAsParameter("?", WilmaAuthenticationContext.PARAM_NAME_REDIRECT_TO, urlCodec.encode(redirectToBuffer.toString())));
+            unsignedUrlBuffer.append(getAsParameter("?", WilmaAuthenticationContext.PARAM_NAME_REDIRECT_TO, 
+                    urlCodec.encode(redirectToBuffer.toString())));
             if (authenticationContext.isForceAuthn()) {
                 unsignedUrlBuffer.append(getAsParameter("&", WilmaAuthenticationContext.PARAM_NAME_FORCE_AUTH, "true"));
             }
-            final String redirectUrl = unsignedUrlBuffer.toString() + getAsParameter("&", WilmaAuthenticationContext.PARAM_NAME_CHECKSUM,
+            final String redirectUrl = unsignedUrlBuffer.toString() + getAsParameter("&", 
+                    WilmaAuthenticationContext.PARAM_NAME_CHECKSUM,
                     calculateChecksum(Mac.getInstance(algorithm), unsignedUrlBuffer.toString(), signatureKey));
             return redirectUrl;
         } catch (EncoderException | NoSuchAlgorithmException e) {
@@ -150,10 +156,10 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
 
     /**
      * Constructs the parameter name and value with the given divider.
-     * @param divider
-     * @param name
-     * @param value
-     * @return
+     * @param divider The divider to the other parameters in the URL.
+     * @param name The name of the parameter.
+     * @param value The value of the parameter.
+     * @return The parameter and value in query fraction.
      */
     protected String getAsParameter(final String divider, final String name, final String value) {
         return divider + name + "=" + value;
@@ -164,7 +170,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
      * @param mac The Mac instance.
      * @param string The seed.
      * @param key The secret key used for calculating the checksum.
-     * @return
+     * @return The checksum value.
      */
     public static String calculateChecksum(final Mac mac, final String string, final SecretKey key) {
         try {
@@ -172,8 +178,9 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
             final byte[] bytes = mac.doFinal(string.getBytes("UTF-8"));
             return new String(Hex.encodeHex(bytes));
         } catch (InvalidKeyException | UnsupportedEncodingException e) {
-            log.error("Could not sign the input data {} with the key", string);
+            LoggerFactory.getLogger(InitializeWilmaContext.class).
+                error("Could not sign the input data {} with the key", string);
         }
         return null;
     }
-}
+}   
