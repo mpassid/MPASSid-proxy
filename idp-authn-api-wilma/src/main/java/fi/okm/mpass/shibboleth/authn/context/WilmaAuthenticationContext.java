@@ -30,29 +30,35 @@ import org.opensaml.messaging.context.BaseContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 
 /**
- * This context stores attributes required for creating an authentication request to a Wilma
- * instance and for validating the response from there.
+ * This context stores attributes required for creating an authentication
+ * request to a Wilma instance and for validating the response from there.
  */
 public class WilmaAuthenticationContext extends BaseContext {
-    
+
+    /** The default MAC algorithm. */
     public static final String MAC_ALGORITHM = "HmacSHA256";
-    
+
+    /** The parameter name for redirectto. */
     public static final String PARAM_NAME_REDIRECT_TO = "redirectto";
-    
+
+    /** The parameter name for nonce. */
     public static final String PARAM_NAME_NONCE = "nonce";
-    
+
+    /** The parameter name for forceauth. */
     public static final String PARAM_NAME_FORCE_AUTH = "forceauth";
-    
+
+    /** The parameter name for checksum. */
     public static final String PARAM_NAME_CHECKSUM = "h";
-    
+
+    /** The parameter name for userid. */
     public static final String PARAM_NAME_USER_ID = "userid";
 
     /** The nonce included to the redirect URL. */
     @Nonnull @NotEmpty private String nonce;
 
-    /** The URL where the user is redirected for authentication */
+    /** The URL where the user is redirected for authentication. */
     @Nonnull @NotEmpty private String redirectUrl;
-    
+
     /**
      * Get the nonce included to the redirect URL.
      * 
@@ -72,7 +78,7 @@ public class WilmaAuthenticationContext extends BaseContext {
         nonce = nonceParameter;
         return nonce;
     }
-    
+
     /**
      * Get the URL where the user is redirected for authentication.
      * 
@@ -81,7 +87,7 @@ public class WilmaAuthenticationContext extends BaseContext {
     @Nonnull @NotEmpty public String getRedirectUrl() {
         return redirectUrl;
     }
-    
+
     /**
      * Set the URL where the user is redirected for authentication.
      * 
