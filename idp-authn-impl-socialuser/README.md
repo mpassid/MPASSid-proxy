@@ -23,6 +23,7 @@ Spring social modules all try to populate email, firstName, lastName, userId, di
 #### Google
 - Template for bean definition in socialuser-authn-beans.xml: GoogleIdentity
 - This module does not support forced authentication.
+- As Google support OpenID Connect, you can use the generic OpenID Connect flow instead. See OpenID Connect section below.
 
 #### LinkedIn
 - Template for bean definition in socialuser-authn-beans.xml: LinkedInIdentity
@@ -44,7 +45,7 @@ All Nimbus based modules have population of principals configured in the respect
 - Windows Live ID example configuration in socialuser-authn-beans.xml.
 
 #### OpenID Connect
-- Template for bean definition in socialuser-authn-beans.xml: ExampleOpenIdConnectIdentity
+- Example flow exists in _src/main/resources/flows/authn/socialuseropenidconnect-authn-flow.xml_.
 - This module maybe be configured to support forced auhentication, passive authentication and login hint.
 - Forced authentication request is implemented as max_age=0 oidc parameter. Not all providers respect that.
 - Passive authentication request is implemented prompt=none oidc parameter. Check that the provider respects that.
