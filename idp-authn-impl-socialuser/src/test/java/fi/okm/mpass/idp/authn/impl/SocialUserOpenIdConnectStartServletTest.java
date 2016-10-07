@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mockito.Mockito;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -67,6 +68,18 @@ public class SocialUserOpenIdConnectStartServletTest {
         MockServletConfig mockConfig = new MockServletConfig();
         servlet.init(mockConfig);
         conversationKey = "mockKey";
+    }
+    
+    /**
+     * Run servlet without HttpSession set.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testNoHttpSession() throws Exception {
+        HttpServletRequest httpRequest = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(httpRequest.getSession()).thenReturn(null);
+        Assert.assertTrue(runService(servlet, httpRequest, new MockHttpServletResponse()));
     }
 
     /**
