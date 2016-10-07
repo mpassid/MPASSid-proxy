@@ -25,6 +25,8 @@ package fi.okm.mpass.idp.authn.impl;
 
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.mockito.Mockito;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -72,6 +74,19 @@ public class SocialUserOpenIdConnectEndServletTest {
     @Test
     public void testNoConversationKey() throws Exception {
         MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        Assert.assertTrue(SocialUserOpenIdConnectStartServletTest.runService(servlet, httpRequest,
+                new MockHttpServletResponse()));
+    }
+    
+    /**
+     * Run servlet without HttpSession set.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testNoHttpSession() throws Exception {
+        HttpServletRequest httpRequest = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(httpRequest.getSession()).thenReturn(null);
         Assert.assertTrue(SocialUserOpenIdConnectStartServletTest.runService(servlet, httpRequest,
                 new MockHttpServletResponse()));
     }

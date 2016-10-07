@@ -33,6 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
@@ -71,6 +72,10 @@ public class SocialUserOpenIdConnectEndServlet extends HttpServlet {
             throws ServletException, IOException {
         log.trace("Entering");
         try {
+            final HttpSession session = httpRequest.getSession();
+            if (session == null) {
+                throw new ExternalAuthenticationException("No session exist, this URL shouldn't be called directly!");
+            }
             final String key = StringSupport.trimOrNull((String) httpRequest.getSession()
                     .getAttribute(SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY));
             if (key == null) {
