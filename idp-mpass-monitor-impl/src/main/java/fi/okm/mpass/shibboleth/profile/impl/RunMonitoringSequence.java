@@ -97,25 +97,23 @@ public class RunMonitoringSequence extends AbstractProfileAction {
         final HttpContext context = HttpClientContext.create();
         final CookieStore cookieStore = new BasicCookieStore();
         context.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-        int i = 0;
         final MonitoringSequenceResult seqResult = new MonitoringSequenceResult();
         seqResult.setStartTime(System.currentTimeMillis());
         SequenceStep initial = new SequenceStep();
         initial.setUrl(initialUrl);
-        for (final SequenceStepResolver resolver : resolvers) {
+        boolean errorFound = false;
+        for (int i = 0; i < resolvers.size() && !errorFound; i++) {
+            final SequenceStepResolver resolver = resolvers.get(i);
             final MonitoringSequenceStepResult stepResult = new MonitoringSequenceStepResult();
             stepResult.setStartTime(System.currentTimeMillis());
             stepResult.setId(resolver.getId());
-            i++;
             log.debug("Performing step {} : {}", i, initial.toString());
             try {
                 initial = resolver.resolve(context, initial);
             } catch (ResponseValidatorException e) {
                 log.warn("Response validation failed", e);
                 stepResult.setErrorMessage(e.getMessage());
-                stepResult.setEndTime(System.currentTimeMillis());
-                seqResult.addStepResult(stepResult);
-                break;
+                errorFound = true;
             }
             stepResult.setEndTime(System.currentTimeMillis());
             seqResult.addStepResult(stepResult);
