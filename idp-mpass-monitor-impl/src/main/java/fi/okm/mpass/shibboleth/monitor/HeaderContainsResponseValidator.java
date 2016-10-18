@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * A {@link ResponseValidator} that checks whether the response header contains expected value.
@@ -62,9 +63,9 @@ public class HeaderContainsResponseValidator implements ResponseValidator {
     @Override
     public void validate(final HttpResponse httpResponse, final String contents) throws ResponseValidatorException {
         for (final Header header : httpResponse.getHeaders(headerName)) {
-            final String value = header.getValue();
+            final String value = StringSupport.trimOrNull(header.getValue());
             log.trace("Header {} has value {}", headerName, value);
-            if (value.contains(expected)) {
+            if (value != null && value.contains(expected)) {
                 log.debug("Header {} value {} contains the expected {}", headerName, value, expected);
                 return;
             }

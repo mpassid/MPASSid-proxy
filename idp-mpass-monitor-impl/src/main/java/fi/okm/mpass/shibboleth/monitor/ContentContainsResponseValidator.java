@@ -54,7 +54,7 @@ public class ContentContainsResponseValidator implements ResponseValidator {
     /** {@inheritDoc} */
     @Override
     public void validate(final HttpResponse httpResponse, final String contents) throws ResponseValidatorException {
-        if (!contents.contains(expected)) {
+        if (contents == null || !contents.contains(expected)) {
             log.debug("{} not included in the response", expected);
             log.trace("The full content was {}", contents);
             throw new ResponseValidatorException("Expected string '" + expected + "' missing!", contents);
