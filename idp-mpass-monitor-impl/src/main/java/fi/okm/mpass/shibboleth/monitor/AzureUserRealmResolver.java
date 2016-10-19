@@ -86,6 +86,9 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
         final String restResponseStr = resolveStep(context, startingStep, false);
         final SequenceStep result = new SequenceStep();
         final String stsRequest = getValue(restResponseStr, "name=\"ctx\" value");
+        if (stsRequest == null) {
+            throw new ResponseValidatorException("Could not find ctx value from the response");
+        }
         final String query = "?" + PARAM_KEY_USER + "=" + username + "&" + PARAM_KEY_API_VERSION + "=" + apiVersion + 
                 PARAM_KEY_STSREQUEST + "=" + stsRequest;
         result.setUrl(userRealmUrl + query);
