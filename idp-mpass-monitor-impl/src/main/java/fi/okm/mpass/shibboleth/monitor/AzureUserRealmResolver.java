@@ -37,7 +37,7 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
     public static final String DEFAULT_API_VERSION = "2.1";
     
     /** The user realm base URL. */
-    public static final String USER_REALM_URL = "https://login.microsoftonline.com/common/userrealm/";
+    public static final String DEFAULT_USER_REALM_URL = "https://login.microsoftonline.com/common/userrealm/";
     
     /** The parameter key for user. */
     public static final String PARAM_KEY_USER = "user";
@@ -53,6 +53,9 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
     
     /** The API version. */
     private final String apiVersion;
+    
+    /** The user realm URL. */
+    private final String userRealmUrl;
 
     /**
      * Constructor.
@@ -60,7 +63,7 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
      * @param userid The username for which the authenticator is resolved.
      */
     public AzureUserRealmResolver(final HttpClientBuilder clientBuilder, final String userid) {
-        this(clientBuilder, userid, DEFAULT_API_VERSION);
+        this(clientBuilder, userid, DEFAULT_API_VERSION, DEFAULT_USER_REALM_URL);
     }
 
     /**
@@ -69,10 +72,12 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
      * @param userid The username for which the authenticator is resolved.
      * @param api The API version.
      */
-    public AzureUserRealmResolver(final HttpClientBuilder clientBuilder, final String userid, final String api) {
+    public AzureUserRealmResolver(final HttpClientBuilder clientBuilder, final String userid, final String api, 
+            final String realmUrl) {
         super(clientBuilder);
         username = Constraint.isNotEmpty(userid, "userid cannot be empty!");
         apiVersion = Constraint.isNotEmpty(api, "api version cannot be empty!");
+        userRealmUrl = Constraint.isNotEmpty(realmUrl, "realmUrl cannot be empty!");
     }
     
     /** {@inheritDoc} */
@@ -83,7 +88,7 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
         final String stsRequest = getValue(restResponseStr, "name=\"ctx\" value");
         final String query = "?" + PARAM_KEY_USER + "=" + username + "&" + PARAM_KEY_API_VERSION + "=" + apiVersion + 
                 PARAM_KEY_STSREQUEST + "=" + stsRequest;
-        result.setUrl(USER_REALM_URL + query);
+        result.setUrl(userRealmUrl + query);
         return result;
     }
 }
