@@ -228,10 +228,13 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      */
     protected String getParamValue(final String string, final String paramKey) {
         int index = string.indexOf("\"" + paramKey + "\"");
+        if (index < 0) {
+            return null;
+        }
         int elementEnd = string.indexOf(">", index);
         final String valueKey = "value=\"";
         int valueStart = string.indexOf(valueKey, index);
-        if (valueStart < elementEnd) {
+        if (valueStart > 0 && valueStart < elementEnd) {
             int offset = valueStart + new String(valueKey).length();
             return string.substring(offset, string.indexOf("\"", offset));
         }
