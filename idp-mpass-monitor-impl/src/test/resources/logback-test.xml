@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <logger name="fi.okm.mpass" level="DEBUG"/>
+    <logger name="fi.okm.mpass" level="ALL"/>
     <logger name="net.shibboleth" level="INFO"/>
     <logger name="org.springframework" level="INFO"/>
 
