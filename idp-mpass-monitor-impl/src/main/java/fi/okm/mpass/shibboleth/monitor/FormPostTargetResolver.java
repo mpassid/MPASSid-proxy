@@ -92,16 +92,15 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
         final SequenceStep resultStep = new SequenceStep();
         final List<NameValuePair> resultParameters = new ArrayList<>();
         final String action = getValue(result, "action");
-        if (action == null) {
-            throw new ResponseValidatorException("Could not resolve the form action!");
-        }
         for (final String item : outputParameters) {
             final String value = getParamValue(result, item);
             if (value != null) {
                 resultParameters.add(new BasicNameValuePair(item, StringEscapeUtils.unescapeHtml(value)));                
             }
         }
-        resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));
+        if (action != null) {
+            resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));            
+        }
         if (resultParameters.size() > 0) {
             resultStep.setParameters(resultParameters);
         }
