@@ -119,7 +119,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
             throw new ResponseValidatorException(getId() + ": The starting step does not contain URL");
         }
         final HttpUriRequest request;
-        if (step.getParameters() == null) {
+        if (step.getParameters() == null || step.getParameters().size() == 0) {
             request = new HttpGet(step.getUrl());
         } else {
             request = new HttpPost(step.getUrl());
