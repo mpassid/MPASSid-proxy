@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * A sequence step resolver that expects the result to contain an HTML FORM with defined action URL.
@@ -85,18 +86,22 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
             }
         }
         final String result = resolveStep(context, startingStep, true);
+        if (StringSupport.trimOrNull(result) == null) {
+            throw new ResponseValidatorException("The response is empty!");
+        }
         final SequenceStep resultStep = new SequenceStep();
         final List<NameValuePair> resultParameters = new ArrayList<>();
         final String action = getValue(result, "action");
+        if (action == null) {
+            throw new ResponseValidatorException("Could not resolve the form action!");
+        }
         for (final String item : outputParameters) {
             final String value = getParamValue(result, item);
             if (value != null) {
                 resultParameters.add(new BasicNameValuePair(item, StringEscapeUtils.unescapeHtml(value)));                
             }
         }
-        if (action != null) {
-            resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));
-        }
+        resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));
         if (resultParameters.size() > 0) {
             resultStep.setParameters(resultParameters);
         }
