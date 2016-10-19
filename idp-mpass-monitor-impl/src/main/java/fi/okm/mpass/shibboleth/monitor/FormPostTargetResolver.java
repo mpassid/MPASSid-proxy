@@ -47,23 +47,32 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
 
     /** The automatically parsed FORM parameters. */
     private final List<NameValuePair> parameters;
+    
+    /** The automatically parsed result FORM parameters. */
+    private final List<String> outputParameters;
 
     /**
      * Constructor.
      * @param clientBuilder The HTTP client builder.
+     * @param formItems The FORM parameters that should be parsed from the response.
      */
-    public FormPostTargetResolver(final HttpClientBuilder clientBuilder) {
-        this(clientBuilder, null);
+    public FormPostTargetResolver(final HttpClientBuilder clientBuilder, final String... formItems) {
+        this(clientBuilder, null, formItems);
     }
     
     /**
      * Constructor.
      * @param clientBuilder The HTTP client builder.
      * @param initialParams The parameters not existing in the {@link SequenceStep}, but needed for the step.
+     * @param formItems The FORM parameters that should be parsed from the response.
      */
-    public FormPostTargetResolver(final HttpClientBuilder clientBuilder, final List<NameValuePair> initialParams) {
+    public FormPostTargetResolver(final HttpClientBuilder clientBuilder, final List<NameValuePair> initialParams, final String... formItems) {
         super(clientBuilder);
         parameters = initialParams;
+        outputParameters = new ArrayList<>();
+        for (final String formItem : formItems) {
+            outputParameters.add(formItem);
+        }
     }
     
     /** {@inheritDoc} */
@@ -79,25 +88,11 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
         final SequenceStep resultStep = new SequenceStep();
         final List<NameValuePair> resultParameters = new ArrayList<>();
         final String action = getValue(result, "action");
-        if (getValue(result, "name=\"wa\" value") != null) {
-            resultParameters.add(new BasicNameValuePair("wa", 
-                    StringEscapeUtils.unescapeHtml(getValue(result, "name=\"wa\" value"))));
-        }
-        if (getValue(result, "name=\"wresult\" value") != null) {
-            resultParameters.add(new BasicNameValuePair("wresult", 
-                    StringEscapeUtils.unescapeHtml(getValue(result, "name=\"wresult\" value"))));
-        }
-        if (getValue(result, "name=\"wctx\" value") != null) {
-            resultParameters.add(new BasicNameValuePair("wctx",
-                    StringEscapeUtils.unescapeHtml(getValue(result, "name=\"wctx\" value"))));
-        }
-        if (getValue(result, "name=\"SAMLResponse\" value") != null) {
-            resultParameters.add(new BasicNameValuePair("SAMLResponse", 
-                    StringEscapeUtils.unescapeHtml(getValue(result, "name=\"SAMLResponse\" value"))));
-        }
-        if (getValue(result, "name=\"RelayState\" value") != null) {
-            resultParameters.add(new BasicNameValuePair("RelayState", 
-                    StringEscapeUtils.unescapeHtml(getValue(result, "name=\"RelayState\" value"))));
+        for (final String item : outputParameters) {
+            final String value = getParamValue(result, item);
+            if (value != null) {
+                resultParameters.add(new BasicNameValuePair(item, StringEscapeUtils.unescapeHtml(value)));                
+            }
         }
         if (action != null) {
             resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));
