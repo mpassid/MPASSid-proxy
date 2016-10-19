@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * A sequence step resolver that also resolves a parameter value for the resulting step URL as well as values for the
@@ -76,6 +77,9 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
     public SequenceStep resolve(final HttpContext context, final SequenceStep startingStep) 
             throws ResponseValidatorException {
         final String responseStr = resolveStep(context, startingStep, true);
+        if (StringSupport.trimOrNull(responseStr) == null) {
+            throw new ResponseValidatorException("Empty response content from the server");
+        }
         final SequenceStep result = new SequenceStep();
         final String url = getValue(responseStr, key).replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/");
         if (!url.contains("://")) {
