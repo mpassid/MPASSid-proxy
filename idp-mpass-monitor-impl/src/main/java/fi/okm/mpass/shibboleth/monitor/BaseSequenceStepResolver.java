@@ -114,6 +114,10 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      * @throws ResponseValidatorException If initialization failed for some reason.
      */
     protected HttpUriRequest initializeHttpRequest(final SequenceStep step) throws ResponseValidatorException {
+        if (step.getUrl() == null) {
+            log.error("The starting step does not contain URL");
+            throw new ResponseValidatorException(getId() + ": The starting step does not contain URL");
+        }
         final HttpUriRequest request;
         if (step.getParameters() == null) {
             request = new HttpGet(step.getUrl());
