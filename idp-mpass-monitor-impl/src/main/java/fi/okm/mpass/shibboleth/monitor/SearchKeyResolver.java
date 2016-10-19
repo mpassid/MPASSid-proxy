@@ -81,13 +81,19 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
             throw new ResponseValidatorException("Empty response content from the server");
         }
         final SequenceStep result = new SequenceStep();
-        final String url = getValue(responseStr, key).replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/");
-        if (!url.contains("://")) {
+        final String url = getValue(responseStr, key);
+        if (StringSupport.trimOrNull(url) == null) {
+            throw new ResponseValidatorException("Could not find an URL with the key " + key);
+        }
+        final String normalizedUrl = url.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/");
+
+        if (!normalizedUrl.contains("://")) {
+            //TODO: should support non-standard http/https ports
             final HttpHost target = (HttpHost) context.getAttribute(
                     HttpCoreContext.HTTP_TARGET_HOST);
-            result.setUrl(target.getSchemeName() + "://" + target.getHostName() + url);
+            result.setUrl(target.getSchemeName() + "://" + target.getHostName() + normalizedUrl);
         } else {
-            result.setUrl(url);
+            result.setUrl(normalizedUrl);
         }
         log.debug("Starting to process parameter keys {}", paramKeys.size());
         for (final String paramKey : paramKeys) {
