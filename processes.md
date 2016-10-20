@@ -2,7 +2,7 @@
 
 This document describes automation processes used in MPASSid solution
 
-## Register new Wilma instance
+## Add new municipality (Wilma instance)
 When municipality wants to take MPASSid into use and they have Wilma student management system, 
 the following process happens: 
 - Local Wilma is configured following the instructions of service provider Starsoft Ltd
