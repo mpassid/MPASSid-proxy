@@ -12,3 +12,9 @@ After submit, info is stored to TypeForm.
 - From there Zapier gets new entries and post the data to Digipalvelutehdas Slack 
 channel #wilma-integrations. At the same time new instance information is posted to mpassid operator as email too. 
 - mpassid operator manually adds the provided new wilma instance in the trusted sources, creates login button forthe municipality (using the icon provided), tests the connection with robot account if possible, then inform the readiness of integration to municipality given email address. 
+
+## Add new municipality (AD instance)
+TBD
+
+## Add new municipality (Azure AD instance)
+TBD 
