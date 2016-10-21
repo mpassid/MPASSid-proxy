@@ -3,6 +3,7 @@
 This document describes automation processes used in MPASSid solution
 
 # Municipalities
+Integration at the municipality is in 99% of the cases about adding attribute source to MPASSid. Attribute source is from where MPASSid gets needed information about students and teachers. Normally attribute source is one of the following: Wilma, Helmi, AD or Azure AD.  
 
 ## Add new municipality (Wilma instance)
 When municipality wants to take MPASSid into use and they have Wilma student management system, 
