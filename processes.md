@@ -16,12 +16,15 @@ Integration at the municipality is in 99% of the cases about adding attribute so
 ## Add new municipality (Wilma instance)
 When municipality wants to take MPASSid into use and they have Wilma student management system, 
 the following process happens: 
-- Local Wilma is configured following the instructions of service provider Starsoft Ltd
-- Municipality fills in form at https://kyyberi.typeform.com/to/H60CAI and provide following data: logo url, 
+1. Local Wilma is configured following the instructions of service provider Starsoft Ltd
+2. Municipality fills in form at https://kyyberi.typeform.com/to/H60CAI and provide following data: logo url, 
 wilma instance url, contact email, municipality name. After submit, info is stored to TypeForm. 
-- From there Zapier gets new entries and post the data to Digipalvelutehdas Slack 
+3. From TypeForm Zapier gets new entries and post the data to Digipalvelutehdas Slack 
 channel #wilma-integrations (private channel). At the same time new instance information is posted to mpassid operator as email too. 
-- MPASSid operator manually adds the provided new wilma instance in the trusted sources, creates login button for the municipality (using the icon provided), tests the connection with robot account if possible, then informs the readiness of integration to municipality given email address. 
+4. MPASSid operator manually adds the provided new wilma instance in the trusted sources, 
+5. MPASSid operator creates login button for the municipality (using the icon provided), 
+6. MPASSid operator tests the connection with robot account if possible
+7. MPASSid operator then informs the readiness of integration to municipality given email address. 
 
 ## Add new municipality (AD instance)
 TBD
