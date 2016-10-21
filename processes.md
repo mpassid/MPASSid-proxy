@@ -39,6 +39,10 @@ TBD
 ## Add new municipality (Azure AD instance)
 TBD 
 
+## Add new municipality (Helmi instance)
+When municipality wants to take MPASSid into use and they have Helmi student management system, 
+the following process happens: 
+
 # Services
 
 ## Add new service
