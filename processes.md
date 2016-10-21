@@ -1,6 +1,8 @@
-#Processes 
+# Processes 
 
 This document describes automation processes used in MPASSid solution
+
+# Municipalities
 
 ## Add new municipality (Wilma instance)
 When municipality wants to take MPASSid into use and they have Wilma student management system, 
@@ -17,3 +19,8 @@ TBD
 
 ## Add new municipality (Azure AD instance)
 TBD 
+
+# Services
+
+## Add new service
+TBD
