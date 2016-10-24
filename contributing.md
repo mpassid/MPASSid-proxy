@@ -45,16 +45,14 @@ Use the following guidelines when contributing to this project.
 # Get involved
 
 There are many ways to get involved:
-* Contribute to our [Planning Documents](https://apinf.hackpad.com)
-* Report bugs on our [issue tracker](https://github.com/apinf/api-umbrella-dashboard/issues/new)
-* Add documentation via our [documentation repository](https://github.com/apinf/docs)
+* Report bugs on our [issue tracker](https://github.com/Digipalvelutehdas/MPASSid-proxy/issues/new)
+* Add documentation via our [documentation repository](https://github.com/Digipalvelutehdas/MPASSid-proxy/docs)
 * Improve the code with pull requests
-  * Choose a [task from our backlog](https://github.com/apinf/api-umbrella-dashboard/issues)
+  * Choose a [task from our backlog](https://github.com/Digipalvelutehdas/MPASSid-proxy/issues)
 
 ## Join the discussion
 
-* Join the [Apinf Community portal](https://community.apinf.io) - ask and answer questions, share ideas, etc.
-* Hang out in the [Apinf IRC chatroom](https://webchat.freenode.net/?channels=apinf) ([#Apinf](irc://irc.freenode.net/apinf) on Freenode)
+* Hang out in the [MPASSid Slack channel](https://digipalvelutehdas.slack.com/messages/mpass/). Join Slack from [here](https://digitehdasinvite.herokuapp.com/)
 
 # Submitting issues
 There are a couple of common issue types in our tracker:
@@ -243,9 +241,7 @@ eat(food);
 disgard(trash);
 ```
 ### Code standard(s) and Lint
-Configure your IDE to use eslint with the Airbnb styleguide.
 
-Reference: Meteor Guide - Check  Your Code with ESLint [Integrating with your editor](https://guide.meteor.com/code-style.html#eslint-editor)
 
 ### Indentation
 Indent all HTML(Blaze) and JavaScript code with two spaces for each level of nesting.
