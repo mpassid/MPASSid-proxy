@@ -285,7 +285,7 @@ This project is organized around a 'module' / 'component' architecture.
 
 By 'module', we mean anything that has it's own database collection and one or more routes. Components are more closely related to the idea of [WebComponents](http://webcomponents.org/), which are intended to be reusable, hierarchical user interface elements. Modules are located in the project root, with components in the client sub-directory.
 
-In general, our module structure follows this pattern:
+In general, our module structure follows this pattern (UPDATE to fit this project):
 
 * **/module_name**
   * **client/**
@@ -317,103 +317,19 @@ folder_name/file_name.css
 folder_name/file_name.html
 folder_name/file_name.js
 ```
-## Collection/Schema structure
-After some trial and error, we have settled on the following pattern for defining collections and schemas:
-
-```js
-// inside 'component/collection/index.js'
-
-// Define collection name variable with corresponding MongoDB collection name in camelCase
-const CollectionName = new Mongo.Collection("collectionName");
-
-// Export the collection
-export { CollectionName };
-```
-
-Next, we need to attach a schema to the collection, for validation, etc.
-
-```js
-// inside 'component/collection/schema.js'
-
-// Import the collection using relative path
-import { CollectionName } from './';
-
-// Define the collection schema, by attaching a 'schema' property
-CollectionName.schema = new SimpleSchema({
-  // Schema field definitions
-});
-
-// Allow collection internationalization
-CollectionName.schema.i18n("schemas.collection_name");
-
-// Attach schema to collection for validation, etc.
-CollectionName.attachSchema(CollectionName.schema);
-```
-
-References:
-- Meteor Guide: Code Style - [Collections](https://guide.meteor.com/code-style.html#collections)
-- Meteor Guide: [Collections and Schemas](https://guide.meteor.com/collections.html#schemas)
 
 ## Internationalization (i18n)
 To the extent possible, all user-facing text should be internationalized. To add internationalization support for texts, we use the following conventions.
 
-### i18n key structure
-Internationalization keys in our project use the following elements, separated by underscores
-- `templateName` - the name of the template as it appears in either:
-  - the `<template name="templateName">`
-  - the `{{# AutoForm id="formName" }}`
-- `pageElement` or `event` - indicate the page element or JS related event
-- `additionalText` - additional text to distinguish this string from others (optional)
-
-
-### Template text (HTML/Blaze)
-Text in HTML/Blaze templates can be internationalized by adding an i18n tag:
-
-```html
-{{_ "templateName_pageElement_additionalText" }}
-```
-
-A specific example, found on a page element heading:
-
-```html
-<!-- note the element nesting, for readability -->
-<h1 class="page-header">
-  {{_ "pageTemplate_header_text" }}
-</h1>
-```
-
-### JavaScript text
-When internationalization strings are used in JavaScript, use the following pattern:
-
-1. fetch the ii18n string and store it in a descriptive variable
-2. use the i18n variable in related code
-
-For example, when showing an `sAlert` to the user:
-
-```js
-// Get a translation string
-const message = TAPi18n._("templateName_event_translationString");
-
-// Use the translation string
-sAlert.warning(message);
-
-```
 
 # Packages
-The project is built using the [Meteor.js framework](https://meteor.com). The following Meteor packages provide important functionality.
-
-## Forms
-[AutoForm](https://github.com/aldeed/meteor-autoform) is used to provide easy input forms, based on schema definitions (see below).
-
-## Routing
-* [Iron Router](https://github.com/iron-meteor/iron-router) is used for project routing.
-* [Simple JSON Routes](https://github.com/stubailo/meteor-rest/) is used where only JSON data is needed from a route.
+The project is built using the 
 
 ## Schema
-[Simple Schema](https://github.com/aldeed/meteor-simple-schema) is used to create schemas for our database collections.
+Data models and schemas are maintained in [IOW](https://iow.csc.fi)
 
 ## Templating
-[Blaze](https://meteor.github.io/blaze/) is the templating language used in our project packages.
+
 
 ## CSS
-[Bootstrap](http://getbootstrap.com/) is the primary CSS framework for the templates.
+
