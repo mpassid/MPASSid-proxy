@@ -23,6 +23,8 @@ For more information about the MPASS project, see http://www.mpass.id/.
 - _idp-authn-impl-shibsp_: Implementation module for integrating SAML-based auth sources.
 - _idp-authn-impl-socialuser_: Implementation module for integrating OAuth2/OIDC-based auth sources.
 - _idp-authn-impl-wilma_: Implementation module for integrating Wilma auth sources.
+- _idp-mpass-monitor-api_: Interface module for integrated SSO sequence monitoring.
+- _idp-mpass-monitor-impl_: Implementation module for integrated SSO sequence monitoring.
 - _idp-mpass-parent_: Parent module containing for instance version management for the libraries.
 - _idp-mpass-rest-api_: Interface module for metadata API.
 - _idp-mpass-rest-impl_: Implementation module for metadata API.

@@ -45,6 +45,8 @@ THE SOFTWARE.
         <module>../idp-authn-impl-shibsp</module>
         <module>../idp-authn-impl-socialuser</module>
         <module>../idp-authn-impl-wilma</module>
+        <module>../idp-mpass-monitor-api</module>
+        <module>../idp-mpass-monitor-impl</module>
         <module>../idp-mpass-rest-api</module>
         <module>../idp-mpass-rest-impl</module>
         <module>../idp-profile-impl-audit</module>
