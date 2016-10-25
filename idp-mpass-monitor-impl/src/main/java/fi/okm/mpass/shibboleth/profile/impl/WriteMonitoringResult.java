@@ -53,6 +53,12 @@ import net.shibboleth.utilities.java.support.net.HttpServletSupport;
  */
 @SuppressWarnings("rawtypes")
 public class WriteMonitoringResult extends AbstractProfileAction {
+    
+    /** Error message returned when no context is available. */
+    public static final String ERROR_MSG_NO_CONTEXT = "ERROR: No context available";
+
+    /** Error message returned when no results are available. */
+    public static final String ERROR_MSG_NO_RESULTS = "ERROR: No results available";
 
     /** Class logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(WriteMonitoringResult.class);
@@ -74,10 +80,13 @@ public class WriteMonitoringResult extends AbstractProfileAction {
         HttpServletSupport.setUTF8Encoding(httpResponse);
         final ProfileRequestContext prc = 
                 (ProfileRequestContext) getProfileContextLookupStrategy().apply(springRequestContext);
-        final MonitoringResultContext monitorinCtx = prc.getSubcontext(MonitoringResultContext.class, false);
-        final List<MonitoringSequenceResult> results = monitorinCtx.getResults();
+        final MonitoringResultContext monitoringCtx = prc.getSubcontext(MonitoringResultContext.class, false);
+        if (monitoringCtx == null) {
+            return writeAndReturn(httpResponse, ERROR_MSG_NO_CONTEXT);            
+        }
+        final List<MonitoringSequenceResult> results = monitoringCtx.getResults();
         if (results == null || results.size() == 0) {
-            return writeAndReturn(httpResponse, "ERROR: No results available");
+            return writeAndReturn(httpResponse, ERROR_MSG_NO_RESULTS);
         }
         long start = results.get(results.size() - 1).getStartTime();
         for (final MonitoringSequenceStepResult result : results.get(results.size() - 1).getStepResults()) {
