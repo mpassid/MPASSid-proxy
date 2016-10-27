@@ -64,5 +64,7 @@ public class RestDataConnectorParser extends AbstractDataConnectorParser {
         } else {
             builder.addPropertyValue("disregardTLSCertificate", "false");
         }
+        String nameApiBaseUrl = element.getAttributeNS(null, "nameApiBaseUrl");
+        builder.addPropertyValue("nameApiBaseUrl", nameApiBaseUrl);
     }
 }

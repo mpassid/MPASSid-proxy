@@ -23,6 +23,7 @@
 
 package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -34,9 +35,11 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -47,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import fi.okm.mpass.shibboleth.attribute.resolver.data.OpintopolkuOppilaitosDTO;
 import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO;
 import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO.AttributesDTO;
 import net.shibboleth.idp.attribute.IdPAttribute;
@@ -93,12 +97,21 @@ public class RestDataConnector extends AbstractDataConnector {
     
     /** The attribute id for the schools. */
     public static final String ATTR_ID_SCHOOLS = "schools";
-    
+
+    /** The attribute id for the school ids. */
+    public static final String ATTR_ID_SCHOOL_IDS = "schoolIds";
+
     /** The attribute id for the structured roles. */
     public static final String ATTR_ID_STRUCTURED_ROLES = "structuredRoles";
-    
+
+    /** The attribute id for the structured roles with IDs. */
+    public static final String ATTR_ID_STRUCTURED_ROLES_WID = "structuredRolesWid";
+
     /** The attribute id prefix for UserDTO/attribute keys. */
     public static final String ATTR_PREFIX = "attr_";
+    
+    public static final String DEFAULT_BASE_URL_SCHOOL_INFO = 
+            "https://virkailija.opintopolku.fi/koodisto-service/rest/codeelement/oppilaitosnumero_";
 
     /** Class logging. */
     private final Logger log = LoggerFactory.getLogger(RestDataConnector.class);
@@ -117,6 +130,9 @@ public class RestDataConnector extends AbstractDataConnector {
 
     /** The token used for authenticating to the REST server. */
     private String token;
+    
+    /** The base URL for resolving the school name via API. */
+    private String nameApiBaseUrl;
 
     /** The {@link HttpClientBuilder} used for constructing HTTP clients. */
     private HttpClientBuilder httpClientBuilder;
@@ -230,11 +246,19 @@ public class RestDataConnector extends AbstractDataConnector {
         populateAttribute(attributes, ATTR_ID_SURNAME, ecaUser.getLastName());
         if (ecaUser.getRoles() != null) {
             for (int i = 0; i < ecaUser.getRoles().length; i++) {
-                populateAttribute(attributes, ATTR_ID_SCHOOLS, ecaUser.getRoles()[i].getSchool());
+                final String rawSchool = ecaUser.getRoles()[i].getSchool();
+                final String mappedSchool = getSchoolName(getHttpClientBuilder(), rawSchool, nameApiBaseUrl);
+                if (mappedSchool == null) {
+                    populateAttribute(attributes, ATTR_ID_SCHOOLS, rawSchool);                    
+                    populateStructuredRole(attributes, rawSchool, null, ecaUser.getRoles()[i]);
+                } else {
+                    populateAttribute(attributes, ATTR_ID_SCHOOLS, mappedSchool);
+                    populateAttribute(attributes, ATTR_ID_SCHOOL_IDS, rawSchool);
+                    populateStructuredRole(attributes, mappedSchool, rawSchool, ecaUser.getRoles()[i]);
+                }
                 populateAttribute(attributes, ATTR_ID_GROUPS, ecaUser.getRoles()[i].getGroup());
                 populateAttribute(attributes, ATTR_ID_ROLES, ecaUser.getRoles()[i].getRole());
                 populateAttribute(attributes, ATTR_ID_MUNICIPALITIES, ecaUser.getRoles()[i].getMunicipality());
-                populateStructuredRole(attributes, ecaUser.getRoles()[i]);
             }
         }
         if (ecaUser.getAttributes() != null) {
@@ -250,15 +274,22 @@ public class RestDataConnector extends AbstractDataConnector {
      * populated to the given map, or appended to its values if the attribute already exists.
      * 
      * @param attributes The result map of attributes.
-     * @param role The role object whose values are added.
+     * @param schoolName The human-readable name of the school.
+     * @param schoolId The id for the school.
+     * @param role The role object whose values are added (except school).
      */
-    protected void populateStructuredRole(final Map<String, IdPAttribute> attributes, final UserDTO.RolesDTO role) {
-        final String school = role.getSchool() != null ? role.getSchool() : "";
+    protected void populateStructuredRole(final Map<String, IdPAttribute> attributes, final String schoolName, 
+            final String schoolId, final UserDTO.RolesDTO role) {
+        final String school = schoolName != null ? schoolName : "";
         final String group = role.getGroup() != null ? role.getGroup() : "";
         final String aRole = role.getRole() != null ? role.getRole() : "";
         final String municipality = role.getMunicipality() != null ? role.getMunicipality() : "";
         final String structuredRole = municipality + ";" + school + ";" + group + ";" + aRole;
         populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES, structuredRole);
+        if (schoolId != null) {
+            final String structuredRoleWid = municipality + ";" + schoolId + ";" + group + ";" + aRole;
+            populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES_WID, structuredRoleWid);
+        }
     }
     
     /**
@@ -407,6 +438,26 @@ public class RestDataConnector extends AbstractDataConnector {
     public boolean isDisregardTLSCertificate() {
         return httpClientBuilder.isConnectionDisregardTLSCertificate();
     }
+    
+    /**
+     * Sets the base URL for resolving the school name via API.
+     * @param baseUrl The base URL for resolving the school name via API.
+     */
+    public void setNameApiBaseUrl(final String baseUrl) {
+        if (StringSupport.trimOrNull(baseUrl) == null) {
+            nameApiBaseUrl = DEFAULT_BASE_URL_SCHOOL_INFO;
+        } else {
+            nameApiBaseUrl = baseUrl;
+        }
+    }
+    
+    /**
+     * Gets the base URL for resolving the school name via API.
+     * @return The base URL for resolving the school name via API.
+     */
+    public String getNameApiBaseUrl() {
+        return nameApiBaseUrl;
+    }
 
     /**
      * Helper method for collecting single attribute value from the map of attribute definitions.
@@ -440,5 +491,50 @@ public class RestDataConnector extends AbstractDataConnector {
      */
     protected HttpClientBuilder getHttpClientBuilder() {
         return httpClientBuilder;
+    }
+    
+    /**
+     * Fetch school name from external API.
+     * @param clientBuilder The HTTP client builder.
+     * @param id The school id whose information is fetched.
+     * @param baseUrl The base URL for the external API. It is appended with the ID of the school.
+     * @return The name of the school.
+     */
+    public static synchronized String getSchoolName(final HttpClientBuilder clientBuilder, 
+            final String id, final String baseUrl) {
+        final Logger log = LoggerFactory.getLogger(RestDataConnector.class);
+        if (StringSupport.trimOrNull(id) == null || !StringUtils.isNumeric(id) || id.length() > 6) {
+            return null;
+        }
+        final HttpResponse response;
+        try {
+            final HttpGet get = new HttpGet(baseUrl + id);
+            response = clientBuilder.buildClient().execute(get);
+        } catch (Exception e) {
+            log.error("Could not get school information with id {}", id, e);
+            return null;
+        }
+        if (response == null) {
+            log.error("Could not get school information with id {}", id);
+            return null;
+        }
+        final String output;
+        try {
+            output = EntityUtils.toString(response.getEntity());
+        } catch (ParseException | IOException e) {
+            log.error("Could not parse school information response with id {}", id, e);
+            return null;
+        } finally {
+            EntityUtils.consumeQuietly(response.getEntity());
+        }
+        log.trace("Fetched the following response body: {}", output);
+        Gson gson = new Gson();
+        OpintopolkuOppilaitosDTO[] oResponse = gson.fromJson(output, OpintopolkuOppilaitosDTO[].class);
+        if (oResponse.length == 1 && oResponse[0].getMetadata() != null && oResponse[0].getMetadata().length == 1) {
+            log.debug("Successfully fetched name for id {}", id);
+            return oResponse[0].getMetadata()[0].getName();
+        }
+        log.warn("Could not find name for id {}", id);
+        return null;
     }
 }

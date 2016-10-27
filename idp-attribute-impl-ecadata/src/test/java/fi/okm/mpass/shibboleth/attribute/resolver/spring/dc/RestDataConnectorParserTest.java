@@ -56,6 +56,9 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
     /** The expected token value. */
     private String expectedToken;
     
+    /** The expected name api base URL value. */
+    private String expectedNameApiBaseUrl;
+    
     /**
      * Initialize unit tests.
      */
@@ -66,6 +69,7 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
         expectedIdpId = "testingIdpId";
         expectedResultAttribute = "testingPrefix";
         expectedToken = "testingToken";
+        expectedNameApiBaseUrl = "http://localhost:8997/mock_";
     }
     
     /**
@@ -84,6 +88,7 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
         Assert.assertEquals(dataConnector.getResultAttributePrefix(), "");
         Assert.assertFalse(dataConnector.isDisregardTLSCertificate());
         Assert.assertEquals(dataConnector.getToken(), expectedToken);
+        Assert.assertEquals(dataConnector.getNameApiBaseUrl(), expectedNameApiBaseUrl);
     }
 
     /**
@@ -101,6 +106,7 @@ public class RestDataConnectorParserTest extends BaseAttributeDefinitionParserTe
         Assert.assertEquals(dataConnector.getResultAttributePrefix(), expectedResultAttribute);
         Assert.assertTrue(dataConnector.isDisregardTLSCertificate());
         Assert.assertEquals(dataConnector.getToken(), expectedToken);
+        Assert.assertEquals(dataConnector.getNameApiBaseUrl(), expectedNameApiBaseUrl);
     }
 
     /**

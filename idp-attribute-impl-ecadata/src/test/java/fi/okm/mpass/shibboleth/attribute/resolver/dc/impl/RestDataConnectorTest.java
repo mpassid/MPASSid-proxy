@@ -24,7 +24,11 @@
 package fi.okm.mpass.shibboleth.attribute.resolver.dc.impl;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +45,7 @@ import net.shibboleth.idp.saml.impl.TestSources;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
@@ -49,6 +54,15 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.protocol.HttpContext;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerSocketProcessor;
+import org.simpleframework.transport.SocketProcessor;
+import org.simpleframework.transport.connect.Connection;
+import org.simpleframework.transport.connect.SocketConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -62,6 +76,9 @@ import fi.okm.mpass.shibboleth.attribute.resolver.spring.dc.RestDataConnectorPar
  */
 public class RestDataConnectorTest {
 
+    /** Class logging. */
+    private final Logger log = LoggerFactory.getLogger(RestDataConnectorTest.class);
+    
     /** The expected data connector id. */
     private String expectedId;
 
@@ -138,7 +155,7 @@ public class RestDataConnectorTest {
         final Map<String, IdPAttribute> attributes = new HashMap<>();
         final RestDataConnector dataConnector = new RestDataConnector();
         dataConnector.setResultAttributePrefix("");
-        dataConnector.populateStructuredRole(attributes, role);
+        dataConnector.populateStructuredRole(attributes, null, null, role);
         final IdPAttribute attribute = attributes.get(RestDataConnector.ATTR_ID_STRUCTURED_ROLES);
         Assert.assertNotNull(attribute);
         Assert.assertEquals(attribute.getValues().size(), 1);
@@ -318,4 +335,113 @@ public class RestDataConnectorTest {
         idpAttribute.setValues(values);
         return idpAttribute;
     }
+    
+    @Test
+    public void testNullSchoolName() {
+        Assert.assertNull(RestDataConnector.getSchoolName(null, null, null));
+    }
+
+    @Test
+    public void testEmptySchoolName() {
+        Assert.assertNull(RestDataConnector.getSchoolName(null, "", null));
+    }
+
+    @Test
+    public void testNonNumericSchoolName() {
+        Assert.assertNull(RestDataConnector.getSchoolName(null, "mock", null));
+    }
+
+    @Test
+    public void testLongSchoolName() {
+        Assert.assertNull(RestDataConnector.getSchoolName(null, "1234567", null));
+    }
+
+    @Test
+    public void testSchoolNameException() throws Exception {
+        HttpClientBuilder clientBuilder = Mockito.mock(HttpClientBuilder.class);
+        HttpClient mockClient = Mockito.mock(HttpClient.class);
+        Mockito.when(mockClient.execute((HttpUriRequest)Mockito.any())).thenThrow(new IOException("mock"));
+        Mockito.when(clientBuilder.buildClient()).thenReturn(mockClient);
+        final String name = RestDataConnector.getSchoolName(clientBuilder, "123456", "http://localhost/");
+        Assert.assertNull(name);
+    }
+
+    @Test
+    public void testSchoolNameEmptyArray() throws Exception {
+        final String name = executeWithServer("[]");
+        Assert.assertNull(name);
+    }
+    
+    @Test
+    public void testSchoolNameNoMetadata() throws Exception {
+        final String name = executeWithServer("[{\"koodiUri\":\"oppilaitosnumero_123456\"," +
+                "\"versio\":1,\"koodiArvo\":\"123456\"}]");
+        Assert.assertNull(name);
+    }
+    
+    @Test
+    public void testSchoolNameEmptyMetadata() throws Exception {
+        final String name = executeWithServer("[{\"koodiUri\":\"oppilaitosnumero_123456\",\"metadata\":" + 
+                "[],\"versio\":1,\"koodiArvo\":\"123456\"}]");
+        Assert.assertNull(name);
+    }
+    
+    @Test
+    public void testSchoolNameSuccess() throws Exception {
+        final String name = executeWithServer("[{\"koodiUri\":\"oppilaitosnumero_123456\",\"metadata\":" + 
+                "[{\"nimi\":\"Mock School Name\",\"lyhytNimi\":\"Mock Short\",\"kieli\":\"FI\"}]," +
+                "\"versio\":1,\"koodiArvo\":\"123456\"}]");
+        Assert.assertNotNull(name);
+        Assert.assertEquals(name, "Mock School Name");
+    }
+
+    protected String executeWithServer(final String responseContent) throws Exception {
+        final Container container = new SimpleContainer(responseContent);
+        final SocketProcessor server = new ContainerSocketProcessor(container);
+        final Connection connection = new SocketConnection(server);
+        final int port = 8997;
+        final SocketAddress address = new InetSocketAddress(port);
+        connection.connect(address);
+        try {
+            return RestDataConnector.getSchoolName(new HttpClientBuilder(), "123456", 
+                    "http://localhost:" + port + "/mock");
+        } catch (Exception e) {
+            log.debug("Catched exception", e);
+            return null;
+        } finally {
+            connection.close();
+        }
+    }
+
+    /**
+     * Simple container implementation.
+     */
+    class SimpleContainer implements Container {
+
+        final String responseContent;
+        
+        /**
+         * Constructor.
+         */
+        public SimpleContainer(final String response) {
+            responseContent = response;
+        }
+
+        @Override
+        /** {@inheritDoc} */
+        public void handle(Request request, Response response) {
+            log.trace("Server got request for {}", request.getTarget());
+            try {
+                response.setContentType("application/json");
+                if (responseContent != null) {
+                    IOUtils.copy(new StringReader(responseContent), response.getOutputStream());
+                }
+                response.setCode(200);
+                response.getOutputStream().close();
+            } catch (Exception e) {
+                log.error("Container-side exception ", e);
+            }
+        }
+    }
+
 }
