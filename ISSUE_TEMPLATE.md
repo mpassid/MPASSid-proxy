@@ -13,7 +13,7 @@ As a registered user I need a widget on the page so that I have something to cli
 ## Definition of Done
 The task is complete when the following criteria are satisfied:
 
-- [] Widget appears on page
-- [] User can click on widget
+- [ ] Widget appears on page
+- [ ] User can click on widget
 
 Note: Some of the above details will be added during the feature discovery and planning process.
