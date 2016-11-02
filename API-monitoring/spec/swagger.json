@@ -1,0 +1,165 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "MVP",
+    "title" : "MPASSid Monitoring API",
+    "description" : "API provides monitoring data from MPASSid",
+    "contact" : {
+      "name" : "Jarkko Moilanen, API product owner",
+      "url" : "http://mpass.id/api",
+      "email" : "jarkko.moilanen@minedu.fi"
+    },
+    "license" : {
+      "name" : "MIT",
+      "url" : "https://github.com/Digipalvelutehdas/MPASS-proxy/blob/master/API/license.md"
+    }
+  },
+  "host" : "api.mpass.fi",
+  "schemes" : [ "https" ],
+  "basePath" : "/monitoring",
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/attributesources" : {
+      "get" : {
+        "summary" : "Returns list of integrated municipalities",
+        "description" : "Returns list of attribute source systems integrated to MPASS.id proxy. \n",
+        "produces" : [ "application/json" ],
+        "tags" : [ "source list" ],
+        "responses" : {
+          "200" : {
+            "description" : "List of attribute source systems integrated to current MPASSid proxy",
+            "schema" : {
+              "$ref" : "#/definitions/source"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        },
+        "security" : [ {
+          "api_key" : [ ]
+        } ]
+      }
+    },
+    "/attributesources/{id}" : {
+      "get" : {
+        "summary" : "Returns data set of performance objects for specific attribute source",
+        "description" : "Get list of performance objects related to one specific data srource MPASS.id proxy. \n",
+        "produces" : [ "application/json" ],
+        "tags" : [ "source" ],
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "type" : "string",
+          "description" : "attribute source identifier which you can get with above method",
+          "required" : true
+        }, {
+          "in" : "query",
+          "name" : "duration",
+          "type" : "string",
+          "description" : "Set period starting from this day. Options are \"5d\", \"10d\", \"15d\", \"30d\". Option 5d gives 5 days history of performance objects (if available).  \n",
+          "required" : false
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Meta information package",
+            "schema" : {
+              "$ref" : "#/definitions/performance"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        },
+        "security" : [ {
+          "api_key" : [ ]
+        } ]
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "api_key" : {
+      "type" : "apiKey",
+      "name" : "api_key",
+      "in" : "header"
+    }
+  },
+  "definitions" : {
+    "source" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "description" : "identifying code for source"
+        },
+        "status" : {
+          "type" : "string",
+          "enum" : [ "design", "test", "production", "retired" ],
+          "description" : "integration status."
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Proxy name"
+        },
+        "organisation" : {
+          "type" : "string",
+          "description" : "Name of the organisation maintaining attribute source"
+        },
+        "contact_email" : {
+          "type" : "string",
+          "description" : "contact email for the service"
+        }
+      }
+    },
+    "performance" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "description" : "identifier of the attribute system"
+        },
+        "start_time" : {
+          "type" : "integer",
+          "description" : "timestamp, when process started"
+        },
+        "end_time" : {
+          "type" : "integer",
+          "description" : "timestamp, when process ended"
+        },
+        "process_time" : {
+          "type" : "integer",
+          "description" : "how long the whole process took in milliseconds"
+        },
+        "sub_auth_to_ext_system" : {
+          "type" : "string",
+          "description" : "How long it takes for MPASSid proxy to authenticate to attribute system to gain access. Time is in milliseonds."
+        },
+        "sub_get_attributes" : {
+          "type" : "string",
+          "description" : "How long getting attributes from system took in milliseconds."
+        }
+      }
+    },
+    "Error" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "fields" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
