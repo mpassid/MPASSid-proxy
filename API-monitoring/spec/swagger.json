@@ -100,12 +100,20 @@
         },
         "status" : {
           "type" : "string",
-          "enum" : [ "design", "test", "production", "retired" ],
-          "description" : "integration status."
+          "enum" : [ "planned", "test", "production", "retired" ],
+          "description" : "MPASSid integration status."
         },
-        "name" : {
+        "system" : {
           "type" : "string",
-          "description" : "Proxy name"
+          "enum" : [ "Wilma", "Helmi", "Azure AD", "AD", "other" ]
+        },
+        "municipality" : {
+          "type" : "string",
+          "description" : "Municipality name"
+        },
+        "municipality_code" : {
+          "type" : "string",
+          "description" : "Municipality code. Normally same as Statistics Finland municipality code. Retrieved from the municipality system."
         },
         "organisation" : {
           "type" : "string",
