@@ -147,6 +147,14 @@
     "step" : {
       "type" : "object",
       "properties" : {
+        "status" : {
+          "type" : "boolean",
+          "description" : "success or failure?"
+        },
+        "fail_reason" : {
+          "type" : "string",
+          "description" : "if status is failure, this field provides human readable reason. Often content is response given by target system."
+        },
         "start_time" : {
           "type" : "integer",
           "description" : "timestamp, when process started"
