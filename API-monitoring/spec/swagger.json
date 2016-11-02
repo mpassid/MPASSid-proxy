@@ -132,6 +132,17 @@
           "type" : "string",
           "description" : "identifier of the attribute system"
         },
+        "steps" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/step"
+          }
+        }
+      }
+    },
+    "step" : {
+      "type" : "object",
+      "properties" : {
         "start_time" : {
           "type" : "integer",
           "description" : "timestamp, when process started"
