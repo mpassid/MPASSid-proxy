@@ -16,7 +16,7 @@
   },
   "host" : "api.mpass.fi",
   "schemes" : [ "https" ],
-  "basePath" : "/mvp",
+  "basePath" : "/proxy",
   "produces" : [ "application/json" ],
   "paths" : {
     "/meta" : {
