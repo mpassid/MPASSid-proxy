@@ -94,6 +94,10 @@
     "source" : {
       "type" : "object",
       "properties" : {
+        "datalicense" : {
+          "type" : "string",
+          "description" : "Data license, should be CC-BY or equivalent to enable reuse of data"
+        },
         "id" : {
           "type" : "string",
           "description" : "identifying code for source"
