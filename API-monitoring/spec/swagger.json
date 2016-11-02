@@ -3,7 +3,7 @@
   "info" : {
     "version" : "MVP",
     "title" : "MPASSid Monitoring API",
-    "description" : "API provides monitoring data from MPASSid",
+    "description" : "API provides monitoring data from MPASSid. API is CORS enabled.",
     "contact" : {
       "name" : "Jarkko Moilanen, API product owner",
       "url" : "http://mpass.id/api",
