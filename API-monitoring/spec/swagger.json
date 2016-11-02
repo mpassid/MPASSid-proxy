@@ -132,6 +132,10 @@
           "type" : "string",
           "description" : "identifier of the attribute system"
         },
+        "datalicense" : {
+          "type" : "string",
+          "description" : "Data license, should be CC-BY or equivalent to enable reuse of data"
+        },
         "steps" : {
           "type" : "array",
           "items" : {
