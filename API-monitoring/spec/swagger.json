@@ -6,7 +6,7 @@
     "description" : "API provides monitoring data from MPASSid. API is CORS enabled. Get needed API_KEY from API management, https://apika.digipalvelutehdas.fi",
     "contact" : {
       "name" : "Jarkko Moilanen, API product owner",
-      "url" : "http://mpass.id/api",
+      "url" : "http://mpass.fi/api",
       "email" : "jarkko.moilanen@minedu.fi"
     },
     "license" : {
