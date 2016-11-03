@@ -65,7 +65,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Meta information package",
+            "description" : "Performance information package",
             "schema" : {
               "$ref" : "#/definitions/performance"
             }
