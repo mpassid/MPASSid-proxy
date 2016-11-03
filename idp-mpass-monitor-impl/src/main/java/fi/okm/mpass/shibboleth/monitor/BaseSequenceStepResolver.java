@@ -66,6 +66,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
     /** The identifier for this resolver. */
     private String id;
     
+    /** The switch whether or not to follow HTTP redirects automatically. */
     private boolean followRedirects = true;
 
     /**
@@ -275,21 +276,39 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
         return null;
     }
     
+    /**
+     * Wrapper class containing response body and headers.
+     */
     class SequenceResponse {
         
+        /** The response body. */
         private final String response;
         
+        /** The headers in the response. */
         private final Header[] headers;
         
+        /**
+         * Constructor.
+         * @param responseStr The response body.
+         * @param allHeaders The headers in the response.
+         */
         public SequenceResponse(final String responseStr, final Header[] allHeaders) {
             response = responseStr;
             headers = allHeaders;
         }
         
+        /**
+         * Get the response body.
+         * @return The response body.
+         */
         public String getResponse() {
             return response;
         }
         
+        /**
+         * Get the headers in the response.
+         * @return The headers in the response.
+         */
         public Header[] getHeaders() {
             return headers;
         }
