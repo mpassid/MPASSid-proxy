@@ -112,6 +112,7 @@ public class RunMonitoringSequence extends AbstractProfileAction {
                 initial = resolver.resolve(context, initial);
             } catch (ResponseValidatorException e) {
                 log.warn("Response validation failed", e);
+                log.trace("The full response was {}", e.getResponseStr());
                 stepResult.setErrorMessage(e.getMessage());
                 errorFound = true;
             }
