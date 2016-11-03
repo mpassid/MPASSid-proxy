@@ -85,7 +85,14 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
                 startingStep.getParameters().add(parameter);
             }
         }
-        final String result = resolveStep(context, startingStep, true);
+        final SequenceResponse response = resolveStep(context, startingStep, isFollowRedirects());
+        final String redirectUrl = getHeaderValue(response.getHeaders(), "Location");
+        if (!isFollowRedirects() && redirectUrl != null) {
+            final SequenceStep resultStep = new SequenceStep();
+            resultStep.setUrl(redirectUrl);
+            return resultStep;
+        }
+        final String result = response.getResponse();
         if (StringSupport.trimOrNull(result) == null) {
             throw new ResponseValidatorException("The response is empty!");
         }

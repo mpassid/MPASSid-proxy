@@ -43,10 +43,10 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
     public static final String PARAM_KEY_USER = "user";
     
     /** The parameter key for STS request. */
-    public static final String PARAM_KEY_STSREQUEST = "stsrequest";
+    public static final String PARAM_KEY_STSREQUEST = "stsRequest";
     
     /** The parameter key for API version. */
-    public static final String PARAM_KEY_API_VERSION = "api_version";
+    public static final String PARAM_KEY_API_VERSION = "api-version";
     
     /** The username for which the authenticator is resolved. */
     private final String username;
@@ -83,14 +83,14 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
     /** {@inheritDoc} */
     public SequenceStep resolve(final HttpContext context, final SequenceStep startingStep) 
             throws ResponseValidatorException {
-        final String restResponseStr = resolveStep(context, startingStep, false);
+        final String restResponseStr = resolveStep(context, startingStep, false).getResponse();
         final SequenceStep result = new SequenceStep();
         final String stsRequest = getValue(restResponseStr, "name=\"ctx\" value");
         if (stsRequest == null) {
             throw new ResponseValidatorException("Could not find ctx value from the response");
         }
         final String query = "?" + PARAM_KEY_USER + "=" + username + "&" + PARAM_KEY_API_VERSION + "=" + apiVersion + 
-                PARAM_KEY_STSREQUEST + "=" + stsRequest;
+                "&" + PARAM_KEY_STSREQUEST + "=" + stsRequest;
         result.setUrl(userRealmUrl + query);
         return result;
     }

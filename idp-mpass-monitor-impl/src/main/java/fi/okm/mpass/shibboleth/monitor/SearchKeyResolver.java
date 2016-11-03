@@ -76,7 +76,7 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
     /** {@inheritDoc} */
     public SequenceStep resolve(final HttpContext context, final SequenceStep startingStep) 
             throws ResponseValidatorException {
-        final String responseStr = resolveStep(context, startingStep, true);
+        final String responseStr = resolveStep(context, startingStep, isFollowRedirects()).getResponse();
         if (StringSupport.trimOrNull(responseStr) == null) {
             throw new ResponseValidatorException("Empty response content from the server");
         }

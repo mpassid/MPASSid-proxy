@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
  * The base {@link SequenceStepResolver} implementation.
@@ -64,6 +65,8 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
     
     /** The identifier for this resolver. */
     private String id;
+    
+    private boolean followRedirects = true;
 
     /**
      * Constructor.
@@ -88,7 +91,23 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
     public void setValidators(List<ResponseValidator> newValidators) {
         validators = newValidators;
     }
-  
+    
+    /**
+     * Set whether or not to automatically follow HTTP redirects.
+     * @param value What to set.
+     */
+    public void setFollowRedirects(boolean value) {
+        followRedirects = value;
+    }
+    
+    /**
+     * Get whether or not to automatically follow HTTP redirects.
+     * @return Whether or not to automatically follow HTTP redirects.
+     */
+    public boolean isFollowRedirects() {
+        return followRedirects;
+    }
+    
     /**
      * Initializes a HTTP client.
      * 
@@ -142,7 +161,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      * @return The resulting step.
      * @throws ResponseValidatorException If validation failed for some reason.
      */
-    public String resolveStep(final HttpContext context, final SequenceStep step, final boolean followRedirects) 
+    public SequenceResponse resolveStep(final HttpContext context, final SequenceStep step, final boolean followRedirects) 
             throws ResponseValidatorException {
         final HttpClient httpClient = initializeHttpClient();
         final HttpUriRequest request = initializeHttpRequest(step);
@@ -174,7 +193,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                         validator.validate(response, result);
                     }
                     log.trace("Full contents of the response {}", result);
-                    return result;
+                    return new SequenceResponse(result, response.getAllHeaders());
                 }
             } finally {
                 EntityUtils.consume(response.getEntity());                
@@ -239,5 +258,40 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
             return string.substring(offset, string.indexOf("\"", offset));
         }
         return null;
+    }
+    
+    /**
+     * Returns a desired header from the array of headers.
+     * @param headers The array of headers.
+     * @param headerName The name of the desired header.
+     * @return The value of the desired header, or null if not exists in the array.
+     */
+    protected String getHeaderValue(final Header[] headers, final String headerName) {
+        for (final Header header : headers) {
+            if (headerName.equals(header.getName())) {
+                return StringSupport.trimOrNull(header.getValue());
+            }
+        }
+        return null;
+    }
+    
+    class SequenceResponse {
+        
+        private final String response;
+        
+        private final Header[] headers;
+        
+        public SequenceResponse(final String responseStr, final Header[] allHeaders) {
+            response = responseStr;
+            headers = allHeaders;
+        }
+        
+        public String getResponse() {
+            return response;
+        }
+        
+        public Header[] getHeaders() {
+            return headers;
+        }
     }
 }
