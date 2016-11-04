@@ -25,7 +25,7 @@ package fi.okm.mpass.shibboleth.monitor;
 
 import org.apache.http.protocol.HttpContext;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 /**
@@ -83,7 +83,7 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
     /** {@inheritDoc} */
     public SequenceStep resolve(final HttpContext context, final SequenceStep startingStep) 
             throws ResponseValidatorException {
-        final String restResponseStr = resolveStep(context, startingStep, false).getResponse();
+        final String restResponseStr = resolveStep(context, startingStep, isFollowRedirects()).getResponse();
         final SequenceStep result = new SequenceStep();
         final String stsRequest = getValue(restResponseStr, "name=\"ctx\" value");
         if (stsRequest == null) {

@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 
 /**
  * Unit test base for {@link SequenceStepResolver}s.

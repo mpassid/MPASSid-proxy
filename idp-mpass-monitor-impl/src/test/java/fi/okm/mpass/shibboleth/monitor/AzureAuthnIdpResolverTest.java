@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 
 /**
  * Unit tests for {@link AzureAuthnIdpResolver}.

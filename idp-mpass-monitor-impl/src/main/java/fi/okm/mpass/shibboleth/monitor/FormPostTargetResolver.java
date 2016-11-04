@@ -35,7 +35,7 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**

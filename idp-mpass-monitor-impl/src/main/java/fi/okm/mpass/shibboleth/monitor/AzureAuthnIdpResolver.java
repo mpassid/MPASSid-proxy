@@ -25,7 +25,7 @@ package fi.okm.mpass.shibboleth.monitor;
 
 import org.apache.http.protocol.HttpContext;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 
 /**
  * A {@link SequenceStepResolver} for resolving the Authentication URL endpoint from Azure.
@@ -46,7 +46,7 @@ public class AzureAuthnIdpResolver extends BaseSequenceStepResolver {
     /** {@inheritDoc} */
     public SequenceStep resolve(final HttpContext context, final SequenceStep startingStep) 
             throws ResponseValidatorException {
-        final String responseStr = resolveStep(context, startingStep, false).getResponse();
+        final String responseStr = resolveStep(context, startingStep, isFollowRedirects()).getResponse();
         final String authUrlKey = "\"" + AUTH_URL_KEY + "\":\"";
         final int keyStartIndex = responseStr.indexOf(authUrlKey);
         if (keyStartIndex < 0) {

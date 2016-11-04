@@ -34,17 +34,17 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
+import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
@@ -115,9 +115,10 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      * @return The HTTP client.
      * @throws ResponseValidatorException If initialization fails for some reason.
      */
-    protected HttpClient initializeHttpClient() throws ResponseValidatorException {
+    protected synchronized HttpClient initializeHttpClient() throws ResponseValidatorException {
         final HttpClient httpClient;
         try {
+            httpClientBuilder.setHttpFollowRedirects(followRedirects);
             httpClient = httpClientBuilder.buildClient();
         } catch (Exception e) {
             log.error("Could not initialize a http client", e);
@@ -139,12 +140,15 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
             throw new ResponseValidatorException(getId() + ": The starting step does not contain URL");
         }
         final HttpUriRequest request;
+        final RequestConfig config = RequestConfig.custom().setCircularRedirectsAllowed(isFollowRedirects()).build();
         if (step.getParameters() == null || step.getParameters().size() == 0) {
-            request = new HttpGet(step.getUrl());
+//            request = new HttpGet(step.getUrl());
+            request = RequestBuilder.get().setUri(step.getUrl()).setConfig(config).build();
         } else {
-            request = new HttpPost(step.getUrl());
+            //request = new HttpPost(step.getUrl());
             try {
-                ((HttpPost)request).setEntity(new UrlEncodedFormEntity(step.getParameters()));
+                request = RequestBuilder.post().setUri(step.getUrl()).setEntity(new UrlEncodedFormEntity(step.getParameters())).setConfig(config).build();
+                //((HttpPost)request).setEntity(new UrlEncodedFormEntity(step.getParameters()));
             } catch (UnsupportedEncodingException e) {
                 log.error("Could not encode the given parameters to POST", e);
                 throw new ResponseValidatorException(getId() + ": Could not encode the request parameters!");
@@ -178,6 +182,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
             try {
                 if (followRedirects && response.getHeaders("Location") != null 
                         && response.getHeaders("Location").length > 0) {
+                    log.trace("Following redirect automatically");
                     final SequenceStep redirectStep = new SequenceStep();
                     final String url = response.getHeaders("Location")[0].getValue();
                     if (!url.contains("://")) {
@@ -268,11 +273,14 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      * @return The value of the desired header, or null if not exists in the array.
      */
     protected String getHeaderValue(final Header[] headers, final String headerName) {
+        log.trace("Trying to find header {} from {} headers", headerName, headers.length);
         for (final Header header : headers) {
             if (headerName.equals(header.getName())) {
+                log.trace("Found value {} for {}", header.getValue(), headerName);
                 return StringSupport.trimOrNull(header.getValue());
             }
         }
+        log.trace("Could not find a value for {}", headerName);
         return null;
     }
     
