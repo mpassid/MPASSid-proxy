@@ -71,6 +71,7 @@ public class AzureUserRealmResolver extends BaseSequenceStepResolver {
      * @param clientBuilder The builder for HTTP client.
      * @param userid The username for which the authenticator is resolved.
      * @param api The API version.
+     * @param realmUrl The user realm base URL.
      */
     public AzureUserRealmResolver(final HttpClientBuilder clientBuilder, final String userid, final String api, 
             final String realmUrl) {
