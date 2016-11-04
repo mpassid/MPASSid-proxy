@@ -78,10 +78,16 @@ public class RunMonitoringSequenceTest {
         prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
     }
     
-    protected List<SequenceStepResolver> initResolvers(final int amount, final int error) throws Exception {
+    protected List<SequenceStepResolver> initResolvers(final int amount, final int error, boolean sameId) 
+            throws Exception {
         final List<SequenceStepResolver> resolvers = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
             SequenceStepResolver resolver = Mockito.mock(SequenceStepResolver.class);
+            if (sameId) {
+                Mockito.when(resolver.getId()).thenReturn("mock");
+            } else {
+                Mockito.when(resolver.getId()).thenReturn("mock" + i);                
+            }
             if (i == error) {
                 Mockito.when(resolver.resolve((HttpContext)Mockito.any(), (SequenceStep)Mockito.any()))
                     .thenThrow(new ResponseValidatorException(errorMessage));
@@ -98,7 +104,7 @@ public class RunMonitoringSequenceTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testError() throws Exception {
-        action.setResolvers(initResolvers(6, 3));
+        action.setResolvers(initResolvers(6, 3, false));
         action.initialize();
         action.execute(prc);
         final MonitoringResultContext monitoringCtx = prc.getSubcontext(MonitoringResultContext.class);
@@ -111,7 +117,7 @@ public class RunMonitoringSequenceTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testSuccess() throws Exception {
-        action.setResolvers(initResolvers(6, 7));
+        action.setResolvers(initResolvers(6, 7, false));
         action.initialize();
         action.execute(prc);
         final MonitoringResultContext monitoringCtx = prc.getSubcontext(MonitoringResultContext.class);
@@ -121,4 +127,16 @@ public class RunMonitoringSequenceTest {
         Assert.assertNull(monitoringCtx.getResults().get(0).getStepResults().get(5).getErrorMessage());
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSuccessSameId() throws Exception {
+        action.setResolvers(initResolvers(6, 7, true));
+        action.initialize();
+        action.execute(prc);
+        final MonitoringResultContext monitoringCtx = prc.getSubcontext(MonitoringResultContext.class);
+        Assert.assertNotNull(monitoringCtx);
+        Assert.assertEquals(monitoringCtx.getResults().size(), 1);
+        Assert.assertEquals(monitoringCtx.getResults().get(0).getStepResults().size(), 1);
+        Assert.assertNull(monitoringCtx.getResults().get(0).getStepResults().get(0).getErrorMessage());
+    }
 }

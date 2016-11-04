@@ -104,9 +104,18 @@ public class RunMonitoringSequence extends AbstractProfileAction {
         boolean errorFound = false;
         for (int i = 0; i < resolvers.size() && !errorFound; i++) {
             final SequenceStepResolver resolver = resolvers.get(i);
-            final MonitoringSequenceStepResult stepResult = new MonitoringSequenceStepResult();
-            stepResult.setStartTime(System.currentTimeMillis());
-            stepResult.setId(resolver.getId());
+            final MonitoringSequenceStepResult stepResult;
+            final int resultsSize = seqResult.getStepResults().size();
+            final boolean editExisting;
+            if (i > 0 && resolver.getId().equals(seqResult.getStepResults().get(resultsSize - 1).getId())) {
+                stepResult = seqResult.getStepResults().get(resultsSize - 1);
+                editExisting = true;
+            } else {
+                stepResult = new MonitoringSequenceStepResult();
+                stepResult.setStartTime(System.currentTimeMillis());
+                stepResult.setId(resolver.getId());
+                editExisting = false;
+            }
             log.debug("Performing step {} : {}", i, initial.toString());
             try {
                 initial = resolver.resolve(context, initial);
@@ -117,7 +126,11 @@ public class RunMonitoringSequence extends AbstractProfileAction {
                 errorFound = true;
             }
             stepResult.setEndTime(System.currentTimeMillis());
-            seqResult.addStepResult(stepResult);
+            if (editExisting) {
+                seqResult.getStepResults().set(resultsSize - 1, stepResult);
+            } else {
+                seqResult.addStepResult(stepResult);
+            }
         }
         seqResult.setEndTime(System.currentTimeMillis());
         monitoringCtx.addResult(seqResult);
