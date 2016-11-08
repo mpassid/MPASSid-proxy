@@ -271,7 +271,8 @@ public class OAuth2IdentityTest {
      * @return
      * @throws Exception
      */
-    protected Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId, final HttpServletRequest httpRequest) 
+    protected Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId, 
+            final HttpServletRequest httpRequest) 
             throws Exception {
         return executeGetSubjectWithServer(oAuthId, httpRequest, false, false);
     }
@@ -285,8 +286,9 @@ public class OAuth2IdentityTest {
      * @return
      * @throws Exception
      */
-    protected synchronized Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId, final HttpServletRequest httpRequest, 
-            final boolean unparseableToken, final boolean unparseableUserInfo) throws Exception {
+    protected synchronized Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId,
+            final HttpServletRequest httpRequest, final boolean unparseableToken, final boolean unparseableUserInfo)
+                    throws Exception {
         final Container container = new SimpleContainer(unparseableToken, unparseableUserInfo);
         final SocketProcessor server = new ContainerSocketProcessor(container);
         final Connection connection = new SocketConnection(server);
@@ -329,7 +331,8 @@ public class OAuth2IdentityTest {
                     if (unparseableToken) {
                         output = "{ unparseable }";
                     } else {
-                        output = "{ \"access_token\":\"2YotnFZFEjr1zCsicMWpAA\", \"token_type\":\"Bearer\", \"expires_in\":3600 }";
+                        output = "{ \"access_token\":\"2YotnFZFEjr1zCsicMWpAA\", \"token_type\":\"Bearer\", "
+                                + "\"expires_in\":3600 }";
                     }
                 } else if (request.getTarget().contains("/userinfo")) {
                     if (unparseableUserInfo) {
@@ -338,7 +341,8 @@ public class OAuth2IdentityTest {
                         output = "{ \"" + userClaim + "\":\"mockUser\" }";
                     }
                 } else if (request.getTarget().contains("/errorToken")) {
-                    output = "{ \"error\":\"" + errorCode + "\", \"error_description\":\"" + errorDescription + "\" }";
+                    output = 
+                        "{ \"error\":\"" + errorCode + "\", \"error_description\":\"" + errorDescription + "\" }";
                     response.setCode(500);
                 }
                 IOUtils.copy(new StringReader(output), response.getOutputStream());
