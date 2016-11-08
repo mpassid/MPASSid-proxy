@@ -285,7 +285,7 @@ public class OAuth2IdentityTest {
      * @return
      * @throws Exception
      */
-    protected Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId, final HttpServletRequest httpRequest, 
+    protected synchronized Subject executeGetSubjectWithServer(final AbstractOAuth2Identity oAuthId, final HttpServletRequest httpRequest, 
             final boolean unparseableToken, final boolean unparseableUserInfo) throws Exception {
         final Container container = new SimpleContainer(unparseableToken, unparseableUserInfo);
         final SocketProcessor server = new ContainerSocketProcessor(container);
