@@ -32,18 +32,18 @@ public class OpintopolkuOppilaitosDTO {
 
     /** The code URI value. */
     @SerializedName("koodiUri")
-    String codeUri;
+    private String codeUri;
     
     /** The metadata for a school. */
-    OpintopolkuOppilaitosMetadataDTO[] metadata;
+    private OpintopolkuOppilaitosMetadataDTO[] metadata;
     
     /** The version value. */
     @SerializedName("versio")
-    String version;
+    private String version;
     
     /** The code value. */
     @SerializedName("koodiArvo")
-    String codeValue;
+    private String codeValue;
     
     /**
      * Set the code URI value.

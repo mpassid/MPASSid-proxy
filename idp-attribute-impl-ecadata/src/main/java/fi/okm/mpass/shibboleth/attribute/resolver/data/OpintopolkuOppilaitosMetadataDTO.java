@@ -32,15 +32,15 @@ public class OpintopolkuOppilaitosMetadataDTO {
 
     /** The name of the school. */
     @SerializedName("nimi")
-    String name;
+    private String name;
     
     /** The short name of the school. */
     @SerializedName("lyhytNimi")
-    String shortName;
+    private String shortName;
     
     /** The language of the school. */
     @SerializedName("kieli")
-    String language;
+    private String language;
     
     /**
      * Set the name of the school.
