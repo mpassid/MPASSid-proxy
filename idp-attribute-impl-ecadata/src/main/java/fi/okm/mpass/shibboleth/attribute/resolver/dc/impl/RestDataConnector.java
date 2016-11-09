@@ -41,7 +41,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -192,13 +193,10 @@ public class RestDataConnector extends AbstractDataConnector {
         try {
             final HttpClient httpClient = getHttpClientBuilder().buildClient();
             log.debug("Calling URL {}", attributeCallUrl);
-            final HttpGet getMethod = new HttpGet(attributeCallUrl);
-            final HttpContext context = HttpClientContext.create();
-            getMethod.addHeader("Authorization", "Token " + token);
+            final HttpContext context = HttpClientContext.create();          
+            final HttpUriRequest getMethod = RequestBuilder.get().setUri(attributeCallUrl)
+                    .setHeader("Authorization", "Token " + token).build();
             restResponse = httpClient.execute(getMethod, context);
-            // 2016-03-31 17:54:39,278 - ERROR [fi.okm.mpass.shibboleth.attribute.resolver.dc.impl.RestDataConnector:179] - Could not open connection to REST API, skipping attribute resolution
-            //java.util.ConcurrentModificationException: null
-            //at java.util.LinkedList$ListItr.checkForComodification(LinkedList.java:966)
         } catch (Exception e) {
             log.error("Could not open connection to REST API, skipping attribute resolution", e);
             return attributes;
@@ -508,7 +506,7 @@ public class RestDataConnector extends AbstractDataConnector {
         }
         final HttpResponse response;
         try {
-            final HttpGet get = new HttpGet(baseUrl + id);
+            final HttpUriRequest get = RequestBuilder.get().setUri(baseUrl + id).build();
             response = clientBuilder.buildClient().execute(get);
         } catch (Exception e) {
             log.error("Could not get school information with id {}", id, e);
