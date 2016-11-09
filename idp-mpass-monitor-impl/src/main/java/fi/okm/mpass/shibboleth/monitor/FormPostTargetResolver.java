@@ -67,7 +67,8 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
      * @param initialParams The parameters not existing in the {@link SequenceStep}, but needed for the step.
      * @param formItems The FORM parameters that should be parsed from the response.
      */
-    public FormPostTargetResolver(final HttpClientBuilder clientBuilder, final List<NameValuePair> initialParams, final String... formItems) {
+    public FormPostTargetResolver(final HttpClientBuilder clientBuilder, final List<NameValuePair> initialParams, 
+            final String... formItems) {
         super(clientBuilder);
         parameters = initialParams;
         outputParameters = new ArrayList<>();
@@ -102,7 +103,7 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
         for (final String item : outputParameters) {
             final String value = getParamValue(result, item);
             if (value != null) {
-                resultParameters.add(new BasicNameValuePair(item, StringEscapeUtils.unescapeHtml(value)));                
+                resultParameters.add(new BasicNameValuePair(item, StringEscapeUtils.unescapeHtml(value)));
             }
         }
         if (action != null) {
