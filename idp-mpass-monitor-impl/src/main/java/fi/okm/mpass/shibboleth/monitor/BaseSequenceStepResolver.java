@@ -142,13 +142,11 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
         final HttpUriRequest request;
         final RequestConfig config = RequestConfig.custom().setCircularRedirectsAllowed(isFollowRedirects()).build();
         if (step.getParameters() == null || step.getParameters().size() == 0) {
-//            request = new HttpGet(step.getUrl());
             request = RequestBuilder.get().setUri(step.getUrl()).setConfig(config).build();
         } else {
-            //request = new HttpPost(step.getUrl());
             try {
-                request = RequestBuilder.post().setUri(step.getUrl()).setEntity(new UrlEncodedFormEntity(step.getParameters())).setConfig(config).build();
-                //((HttpPost)request).setEntity(new UrlEncodedFormEntity(step.getParameters()));
+                request = RequestBuilder.post().setUri(step.getUrl()).setEntity(
+                        new UrlEncodedFormEntity(step.getParameters())).setConfig(config).build();
             } catch (UnsupportedEncodingException e) {
                 log.error("Could not encode the given parameters to POST", e);
                 throw new ResponseValidatorException(getId() + ": Could not encode the request parameters!");
@@ -162,11 +160,12 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      * 
      * @param context The context containing for instance cookies.
      * @param step The SSO sequence step starting the resolution.
-     * @param followRedirects Whether to automatically follow redirects.
+     * @param followRedirect Whether to automatically follow redirects.
      * @return The resulting step.
      * @throws ResponseValidatorException If validation failed for some reason.
      */
-    public SequenceResponse resolveStep(final HttpContext context, final SequenceStep step, final boolean followRedirects) 
+    public SequenceResponse resolveStep(final HttpContext context, final SequenceStep step,
+            final boolean followRedirect) 
             throws ResponseValidatorException {
         final HttpClient httpClient = initializeHttpClient();
         final HttpUriRequest request = initializeHttpRequest(step);
@@ -180,7 +179,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                 }            
             }
             try {
-                if (followRedirects && response.getHeaders("Location") != null 
+                if (followRedirect && response.getHeaders("Location") != null 
                         && response.getHeaders("Location").length > 0) {
                     log.trace("Following redirect automatically");
                     final SequenceStep redirectStep = new SequenceStep();
@@ -192,7 +191,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                     } else {
                         redirectStep.setUrl(url);
                     }
-                    return resolveStep(context, redirectStep, followRedirects);
+                    return resolveStep(context, redirectStep, followRedirect);
                 } else {
                     final String result = EntityUtils.toString(response.getEntity(), "UTF-8");
                     for (final ResponseValidator validator : validators) {
