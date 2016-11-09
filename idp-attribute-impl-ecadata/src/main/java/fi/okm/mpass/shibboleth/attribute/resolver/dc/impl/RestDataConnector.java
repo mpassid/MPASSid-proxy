@@ -111,6 +111,7 @@ public class RestDataConnector extends AbstractDataConnector {
     /** The attribute id prefix for UserDTO/attribute keys. */
     public static final String ATTR_PREFIX = "attr_";
     
+    /** The default base URL for fetching school info. */
     public static final String DEFAULT_BASE_URL_SCHOOL_INFO = 
             "https://virkailija.opintopolku.fi/koodisto-service/rest/codeelement/oppilaitosnumero_";
 
