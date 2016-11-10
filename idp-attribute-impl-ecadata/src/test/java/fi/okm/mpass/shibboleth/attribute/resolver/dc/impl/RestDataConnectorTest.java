@@ -165,34 +165,21 @@ public class RestDataConnectorTest {
     /**
      * Tests {@link RestDataConnector} with minimum configuration, with empty authnId value.
      */
-    @Test
+    @Test(expectedExceptions = ResolutionException.class)
     public void testNoAuthnId() throws Exception {
         expectedHookAttribute = "invalid"; // differs from the configuration
-        boolean catched = false;
-        try {
-            final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-0role-0attr.json", 
-                    "restdc-min.xml");
-        } catch (ResolutionException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+        resolveAttributes("user-0role-0attr.json", "restdc-min.xml");
     }
 
     /**
      * Tests {@link RestDataConnector} with minimum configuration, with empty idpId value.
      */
-    @Test
+    @Test(expectedExceptions = ResolutionException.class)
     public void testNoIdpId() throws Exception {
         expectedIdpId = "invalid"; // differs from the configuration
-        boolean catched = false;
-        try {
-            final Map<String, IdPAttribute> resolvedAttributes = resolveAttributes("user-0role-0attr.json", 
-                    "restdc-min.xml");
-        } catch (ResolutionException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+        resolveAttributes("user-0role-0attr.json", "restdc-min.xml");
     }
+    
     /**
      * Tests {@link RestDataConnector} with minimum configuration, without roles for the user.
      * 
