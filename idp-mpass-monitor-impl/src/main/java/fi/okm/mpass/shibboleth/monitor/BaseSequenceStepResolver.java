@@ -194,7 +194,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                     return resolveStep(context, redirectStep, followRedirect);
                 } else {
                     final String result = EntityUtils.toString(response.getEntity(), "UTF-8");
-                    for (final ResponseValidator validator : validators) {
+                    for (final ResponseValidator validator : getValidators()) {
                         validator.validate(response, result);
                     }
                     log.trace("Full contents of the response {}", result);

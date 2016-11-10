@@ -77,6 +77,7 @@ public class AbstractSequenceStepResolverTest {
         HttpClientBuilder clientBuilder = Mockito.mock(HttpClientBuilder.class);
         Mockito.when(clientBuilder.buildClient()).thenThrow(new Exception("mock"));
         resolver = new SearchKeyResolver("mock", clientBuilder);
+        ((SearchKeyResolver)resolver).setId("mockId");
         boolean thrown = false;
         try {
             resolver.resolve(HttpClientContext.create(), new SequenceStep());
