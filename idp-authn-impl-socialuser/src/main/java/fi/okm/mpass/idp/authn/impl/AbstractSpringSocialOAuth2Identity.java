@@ -151,8 +151,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             String digest = new String(Hex.encode(md.digest()));
             params.setState(digest);
         } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state");
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Unable to generate state", e);
             log.trace("Leaving");
             return null;
         }
@@ -161,7 +160,6 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
                 GrantType.AUTHORIZATION_CODE, params);
         log.trace("Leaving");
         return authorizeUrl;
-
     }
 
     /**
@@ -185,8 +183,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         try {
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state");
-            log.error("Something bad happened " + e.getMessage());
+            log.error("Unable to generate state", e);
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "Unable to hash, use some other method",
@@ -283,8 +280,8 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             accessGrant = oauthOperations.exchangeForAccess(authorizationCode,
                     httpRequest.getRequestURL().toString(), null);
         } catch (HttpClientErrorException e) {
+            log.error("Could not get access grant", e);
             log.trace("Leaving");
-            log.error("Something bad happened " + e.getMessage());
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
         }
