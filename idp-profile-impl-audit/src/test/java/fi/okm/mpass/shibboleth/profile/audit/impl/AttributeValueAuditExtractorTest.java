@@ -88,27 +88,17 @@ public class AttributeValueAuditExtractorTest {
     /**
      * Verifies that the construction fails with null function.
      */
-    @Test public void initNullFunction() {
-        boolean catched = false;
-        try {
-            auditExtractor = new AttributeValueAuditExtractor(null, attributeId);
-        } catch (ConstraintViolationException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+    @Test(expectedExceptions = ConstraintViolationException.class)
+    public void initNullFunction() {
+        auditExtractor = new AttributeValueAuditExtractor(null, attributeId);
     }
     
     /**
      * Verifies that the construction fails with null attributeId.
      */
-    @Test public void initNullAttributeId() {
-        boolean catched = false;
-        try {
-            auditExtractor = new AttributeValueAuditExtractor(null);
-        } catch (ConstraintViolationException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+    @Test(expectedExceptions = ConstraintViolationException.class)    
+    public void initNullAttributeId() {
+        auditExtractor = new AttributeValueAuditExtractor(null);
     }
     
     /**

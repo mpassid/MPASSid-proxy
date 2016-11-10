@@ -78,14 +78,9 @@ public class AuthnFlowIdAuditExtractorTest {
     /**
      * Verifies that the construction fails with null function.
      */
-    @Test public void initNullFunction() {
-        boolean catched = false;
-        try {
-            authnFlowIdExtractor = new AuthnFlowIdAuditExtractor(null);
-        } catch (ConstraintViolationException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+    @Test(expectedExceptions = ConstraintViolationException.class)
+    public void initNullFunction() {
+        authnFlowIdExtractor = new AuthnFlowIdAuditExtractor(null);
     }
     
     /**
