@@ -234,8 +234,8 @@ public class SetOIDCInformationTest extends PopulateAuthenticationContextTest {
      * @param publish
      * @throws Exception
      */
-    protected void loadMetadata(final SetOIDCInformation action, boolean publish) throws IOException, ParseException, 
-        URISyntaxException {
+    protected synchronized void loadMetadata(final SetOIDCInformation action, boolean publish) throws IOException, 
+        ParseException, URISyntaxException {
         final Container container = new SimpleContainer(publish);
         final SocketProcessor server = new ContainerSocketProcessor(container);
         final Connection connection = new SocketConnection(server);
