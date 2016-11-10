@@ -47,7 +47,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
+    private final static Logger log = LoggerFactory
             .getLogger(AbstractSpringSocialOAuth2Identity.class);
 
     /** Oauth2 Application id. */
@@ -144,17 +144,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         if (scope != null) {
             params.setScope(scope);
         }
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.reset();
-            md.update(httpRequest.getSession().getId().getBytes());
-            String digest = new String(Hex.encode(md.digest()));
-            params.setState(digest);
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state", e);
-            log.trace("Leaving");
-            return null;
-        }
+        params.setState(calculateHash(httpRequest.getSession().getId()));
         params.setRedirectUri(httpRequest.getRequestURL().toString());
         String authorizeUrl = oauthOperations.buildAuthorizeUrl(
                 GrantType.AUTHORIZATION_CODE, params);
@@ -179,27 +169,31 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             throw new SocialUserAuthenticationException(
                     "State parameter missing", SocialUserErrorIds.EXCEPTION);
         }
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state", e);
-            log.trace("Leaving");
-            throw new SocialUserAuthenticationException(
-                    "Unable to hash, use some other method",
-                    SocialUserErrorIds.EXCEPTION);
-        }
-        md.reset();
-        md.update(httpRequest.getSession().getId().getBytes());
-        String cmpState = new String(Hex.encode(md.digest()));
-        if (!state.equalsIgnoreCase(cmpState)) {
+        if (!state.equalsIgnoreCase(calculateHash(httpRequest.getSession().getId()))) {
             log.error("state parameter mismatch");
             log.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "State parameter mismatch", SocialUserErrorIds.EXCEPTION);
         }
     }
-
+    
+    /**
+     * Calculates a SHA-256 hash for the given input.
+     * @param input The input to be hashed.
+     * @return The hash of the input.
+     */
+    protected static String calculateHash(final String input) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Unable to generate state", e);
+            return null;
+        }
+        md.reset();
+        md.update(input.getBytes());
+        return new String(Hex.encode(md.digest()));
+    }
     /**
      * Throws an error if user authentication has failed Returns Authorization
      * Code if such exists Returns null if authentication has not been performed
