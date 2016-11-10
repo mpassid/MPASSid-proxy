@@ -24,9 +24,11 @@
 package fi.okm.mpass.idp.authn.impl;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.openid.connect.sdk.Display;
 import com.nimbusds.openid.connect.sdk.Prompt;
 
@@ -91,16 +94,10 @@ public class SetOIDCInformationTest extends PopulateAuthenticationContextTest {
      * Tests with unavailable server metadata.
      * @throws Exception
      */
-    @Test public void testNoMetadata() throws Exception {
+    @Test(expectedExceptions = { IOException.class, ParseException.class, URISyntaxException.class })
+    public void testNoMetadata() throws Exception {
         action = new SetOIDCInformation();
-        boolean catched = false;
-        try {
-            loadMetadata(action, false);
-        } catch (Exception e) {
-            log.trace("Could not load OIDC metadata", e);
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+        loadMetadata(action, false);
     }
     
     /**
@@ -237,7 +234,8 @@ public class SetOIDCInformationTest extends PopulateAuthenticationContextTest {
      * @param publish
      * @throws Exception
      */
-    protected void loadMetadata(final SetOIDCInformation action, boolean publish) throws Exception {
+    protected void loadMetadata(final SetOIDCInformation action, boolean publish) throws IOException, ParseException, 
+        URISyntaxException {
         final Container container = new SimpleContainer(publish);
         final SocketProcessor server = new ContainerSocketProcessor(container);
         final Connection connection = new SocketConnection(server);
@@ -245,7 +243,7 @@ public class SetOIDCInformationTest extends PopulateAuthenticationContextTest {
         connection.connect(address);
         try {
             action.setProviderMetadataLocation("http://localhost:" + CONTAINER_PORT + "/");
-        } catch (Exception e) {
+        } catch (IOException | ParseException | URISyntaxException e) {
             throw e;
         } finally {
             connection.close();
