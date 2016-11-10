@@ -93,15 +93,11 @@ public class ValidateJwtTokenAuthenticationTest extends PopulateAuthenticationCo
     /**
      * Attempts to initialize action with invalid shared secret.
      */
-    @Test public void testInvalidSecret() throws Exception {
-        boolean catched = false;
-        try {
-            action = new ValidateJwtTokenAuthentication("not_working");
-        } catch (ConstraintViolationException e) {
-            catched = true;
-        }
-        Assert.assertTrue(catched);
+    @Test(expectedExceptions = ConstraintViolationException.class)
+    public void testInvalidSecret() throws Exception {
+        action = new ValidateJwtTokenAuthentication("not_working");
     }
+    
     /**
      * Runs action without JWT token.
      */
