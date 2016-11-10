@@ -23,6 +23,19 @@
 
 package fi.okm.mpass.idp.authn.impl;
 
+import javax.servlet.http.HttpSession;
+
+import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.social.oauth2.AccessGrant;
+import org.springframework.social.oauth2.OAuth2Operations;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import fi.okm.mpass.idp.authn.SocialUserAuthenticationException;
+
 /**
  * Unit tests for {@link AbstractSpringSocialOAuth2Identity}.
  */
@@ -34,4 +47,64 @@ public class AbstractSpringSocialOAuth2IdentityTest {
     
     protected String appSecret;
     
+    @Test
+    public void testAccessGrantNoCode() throws Exception {
+        identity = new AbstractSpringSocialOAuth2Identity() {};
+        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        Assert.assertNull(identity.getAccessGrant(httpRequest));
+    }
+
+    @Test(expectedExceptions = SocialUserAuthenticationException.class)
+    public void testAccessGrantNoState() throws Exception {
+        identity = new AbstractSpringSocialOAuth2Identity() {};
+        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        httpRequest.addParameter("code", "mockCode");
+        Assert.assertNull(identity.getAccessGrant(httpRequest));
+    }
+
+    @Test(expectedExceptions = SocialUserAuthenticationException.class)
+    public void testAccessGrantInvalidState() throws Exception {
+        identity = new AbstractSpringSocialOAuth2Identity() {};
+        final MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        httpRequest.addParameter("code", "mockCode");
+        httpRequest.addParameter("state", "mockState");
+        Assert.assertNull(identity.getAccessGrant(httpRequest));
+    }
+
+    @Test(expectedExceptions = SocialUserAuthenticationException.class)
+    public void testAccessGrantThrow() throws Exception {
+        identity = new AbstractSpringSocialOAuth2Identity() {};
+        OAuth2Operations operations = Mockito.mock(OAuth2Operations.class);
+        Mockito.when(operations.exchangeForAccess(Mockito.anyString(), Mockito.anyString(), 
+                (MultiValueMap<String, String>)Mockito.any())).thenThrow(HttpClientErrorException.class);
+        identity.setOauthOperations(operations);
+        identity.getAccessGrant(initHttpRequestWithState());
+    }
+    
+    @Test
+    public void testAccessGrantSuccess() throws Exception {
+        identity = new AbstractSpringSocialOAuth2Identity() {};
+        OAuth2Operations operations = Mockito.mock(OAuth2Operations.class);
+        String accessToken = "mockAccessToken";
+        AccessGrant accessGrant = new AccessGrant(accessToken);
+        Mockito.when(operations.exchangeForAccess(Mockito.anyString(), Mockito.anyString(), 
+                (MultiValueMap<String, String>)Mockito.any())).thenReturn(accessGrant);
+        identity.setOauthOperations(operations);
+        AccessGrant resultGrant = identity.getAccessGrant(initHttpRequestWithState());
+        Assert.assertNotNull(resultGrant);
+        Assert.assertEquals(resultGrant.getAccessToken(), accessToken);
+    }
+    
+    protected MockHttpServletRequest initHttpRequestWithState() {
+        MockHttpServletRequest httpRequest = Mockito.mock(MockHttpServletRequest.class);
+        final String sessionId = "mockSessionId";
+        HttpSession httpSession = Mockito.mock(HttpSession.class);
+        Mockito.when(httpSession.getId()).thenReturn(sessionId);
+        Mockito.when(httpRequest.getSession()).thenReturn(httpSession);
+        Mockito.when(httpRequest.getParameter("code")).thenReturn("mockCode");
+        Mockito.when(httpRequest.getParameter("state")).thenReturn(
+                AbstractSpringSocialOAuth2Identity.calculateHash(sessionId));
+        Mockito.when(httpRequest.getRequestURL()).thenReturn(new StringBuffer());
+        return httpRequest;
+    }
 }
