@@ -62,6 +62,18 @@
           "type" : "string",
           "description" : "Set period starting from this day. Options are \"5d\", \"10d\", \"15d\", \"30d\". Option 5d gives 5 days history of performance objects (if available).  \n",
           "required" : false
+        }, {
+          "in" : "query",
+          "name" : "startdate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tstart of the date range\n",
+          "required" : false
+        }, {
+          "in" : "query",
+          "name" : "enddate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tend of the date range\n",
+          "required" : false
         } ],
         "responses" : {
           "200" : {
