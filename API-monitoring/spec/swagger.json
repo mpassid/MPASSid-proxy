@@ -47,7 +47,7 @@
     "/attributesources/{id}" : {
       "get" : {
         "summary" : "Returns data set of performance objects for specific attribute source",
-        "description" : "Get list of performance objects related to one specific data srource MPASS.id proxy. \n",
+        "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
         "produces" : [ "application/json" ],
         "tags" : [ "source" ],
         "parameters" : [ {
