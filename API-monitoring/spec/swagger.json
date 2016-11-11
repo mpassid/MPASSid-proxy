@@ -14,9 +14,9 @@
       "url" : "https://github.com/Digipalvelutehdas/MPASS-proxy/blob/master/API/license.md"
     }
   },
-  "host" : "api.mpass.fi",
+  "host" : "mpass-proxy-test.csc.fi",
   "schemes" : [ "https" ],
-  "basePath" : "/monitoring",
+  "basePath" : "/idp/profile/monitor/api",
   "produces" : [ "application/json" ],
   "paths" : {
     "/attributesources" : {
