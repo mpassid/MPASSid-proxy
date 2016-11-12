@@ -1,7 +1,7 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "title" : "MPASS.id SSO proxy metadata API",
+    "title" : "MPASSid Proxy API",
     "description" : "This is work in progress version of Metadata API for Education sector SSO http://mpass.id. Provide metadata information about proxy operations and information such as statistics, connected services and municipalities.\nAPI is CORS enabled.\n\n------------------------------",
     "version" : "MVP",
     "contact" : {
