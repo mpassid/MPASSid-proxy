@@ -19,7 +19,7 @@
   "basePath" : "/idp/profile/monitor/api",
   "produces" : [ "application/json" ],
   "paths" : {
-    "/attributesources" : {
+    "/sources" : {
       "get" : {
         "summary" : "Returns list of integrated municipalities",
         "description" : "Returns list of attribute source systems integrated to MPASS.id proxy. \n",
@@ -44,7 +44,107 @@
         } ]
       }
     },
-    "/attributesources/{id}" : {
+    "/sources/{id}" : {
+      "get" : {
+        "summary" : "Returns data set of performance objects for specific attribute source",
+        "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
+        "produces" : [ "application/json" ],
+        "tags" : [ "source" ],
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "type" : "string",
+          "description" : "attribute source identifier which you can get with above method",
+          "required" : true
+        }, {
+          "in" : "query",
+          "name" : "duration",
+          "type" : "string",
+          "description" : "Set period starting from this day. Options are \"5d\", \"10d\", \"15d\", \"30d\". Option 5d gives 5 days history of performance objects (if available).  \n",
+          "required" : false
+        }, {
+          "in" : "query",
+          "name" : "startdate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tstart of the date range\n",
+          "required" : false
+        }, {
+          "in" : "query",
+          "name" : "enddate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tend of the date range\n",
+          "required" : false
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Performance information package",
+            "schema" : {
+              "$ref" : "#/definitions/performance"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        },
+        "security" : [ {
+          "api_key" : [ ]
+        } ]
+      }
+    },
+    "/sources/{id}/authentication" : {
+      "get" : {
+        "summary" : "Returns data set of performance objects for specific attribute source",
+        "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
+        "produces" : [ "application/json" ],
+        "tags" : [ "source" ],
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "type" : "string",
+          "description" : "attribute source identifier which you can get with above method",
+          "required" : true
+        }, {
+          "in" : "query",
+          "name" : "duration",
+          "type" : "string",
+          "description" : "Set period starting from this day. Options are \"5d\", \"10d\", \"15d\", \"30d\". Option 5d gives 5 days history of performance objects (if available).  \n",
+          "required" : false
+        }, {
+          "in" : "query",
+          "name" : "startdate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tstart of the date range\n",
+          "required" : false
+        }, {
+          "in" : "query",
+          "name" : "enddate",
+          "type" : "string",
+          "description" : "timestamp in text form: 2015-06-26T00:00 \tend of the date range\n",
+          "required" : false
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Performance information package",
+            "schema" : {
+              "$ref" : "#/definitions/performance"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        },
+        "security" : [ {
+          "api_key" : [ ]
+        } ]
+      }
+    },
+    "/sources/{id}/attributes" : {
       "get" : {
         "summary" : "Returns data set of performance objects for specific attribute source",
         "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
