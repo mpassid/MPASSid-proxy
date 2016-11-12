@@ -163,6 +163,10 @@
     "step" : {
       "type" : "object",
       "properties" : {
+        "id" : {
+          "type" : "string",
+          "description" : "Identifies step"
+        },
         "status" : {
           "type" : "boolean",
           "description" : "success or failure?"
