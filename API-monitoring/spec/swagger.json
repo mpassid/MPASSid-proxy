@@ -96,7 +96,7 @@
     },
     "/sources/{id}/authentication" : {
       "get" : {
-        "summary" : "Returns data set of performance objects for specific attribute source",
+        "summary" : "Returns data set of authentication performance objects for specific attribute source",
         "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
         "produces" : [ "application/json" ],
         "tags" : [ "source" ],
@@ -146,7 +146,7 @@
     },
     "/sources/{id}/attributes" : {
       "get" : {
-        "summary" : "Returns data set of performance objects for specific attribute source",
+        "summary" : "Returns data set of user attribute retrieval   performance objects for specific attribute source",
         "description" : "Get list of performance objects related to one specific data source MPASS.id proxy. \n",
         "produces" : [ "application/json" ],
         "tags" : [ "source" ],
@@ -285,15 +285,7 @@
         },
         "process_time" : {
           "type" : "integer",
-          "description" : "how long the whole process took in milliseconds"
-        },
-        "sub_auth_to_ext_system" : {
-          "type" : "string",
-          "description" : "How long it takes for MPASSid proxy to authenticate to attribute system to gain access. Time is in milliseonds."
-        },
-        "sub_get_attributes" : {
-          "type" : "string",
-          "description" : "How long getting attributes from system took in milliseconds."
+          "description" : "how long process took in milliseconds"
         }
       }
     },
