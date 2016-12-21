@@ -224,6 +224,24 @@
         </property>
     </bean>
 
+    <bean id="GoogleOpenIdConnectInformation"
+        class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
+        <property name="clientId" value=""/>
+        <property name="clientSecret" value=""/>
+        <property name="providerMetadataLocation" value="https://accounts.google.com"/>
+        <property name="redirectURI" value=""/>
+
+
+    <!-- webflow based oidc beans -->
+
+    <bean id="SetOIDCInformation"
+            class="fi.okm.mpass.idp.authn.impl.SetOIDCInformation" >
+            <property name="clientId" value="put_here"/>
+            <property name="clientSecret" value="put_here"/>
+            <property name="providerMetadataLocation" value="put_here"/>
+            <property name="redirectURI" value="put_here"/>
+    </bean>
+
     <bean id="SetOIDCInformation"
             class="fi.okm.mpass.idp.authn.impl.SetOIDCInformation" 
             p:openIdConnectInformation-ref="GoogleOpenIdConnectInformation"/>
@@ -259,14 +277,5 @@
     <bean id="GetOIDCTokenResponse"
           class="fi.okm.mpass.idp.authn.impl.GetOIDCTokenResponse" 
           p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
-
-    
-    <bean id="GoogleOpenIdConnectInformation"
-        class="fi.okm.mpass.idp.authn.impl.OpenIdConnectIdentity">
-        <property name="clientId" value=""/>
-        <property name="clientSecret" value=""/>
-        <property name="providerMetadataLocation" value="https://accounts.google.com"/>
-        <property name="redirectURI" value=""/>
-    </bean>
 
 </beans>
