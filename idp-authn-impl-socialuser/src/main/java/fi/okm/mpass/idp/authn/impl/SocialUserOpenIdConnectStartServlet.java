@@ -42,14 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extracts Social identity and places it in a request attribute to be used by the IdP's external authentication
- * interface.
+ * Extracts Social identity and places it in a request attribute to be used by
+ * the IdP's external authentication interface.
  */
-@WebServlet(name = "SocialUserOpenIdConnectStartServlet", urlPatterns = {"/Authn/SocialUserOpenIdConnectStart"})
+@WebServlet(name = "SocialUserOpenIdConnectStartServlet", urlPatterns = { "/Authn/SocialUserOpenIdConnectStart" })
 public class SocialUserOpenIdConnectStartServlet extends HttpServlet {
-    
+
     /** Prefix for the session attribute ids. */
-    protected static final String SESSION_ATTR_PREFIX = "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.";
+    public static final String SESSION_ATTR_PREFIX = "fi.okm.mpass.idp.authn.impl.SocialUserOpenIdConnectStartServlet.";
 
     /** Session attribute id for flow conversation key. */
     public static final String SESSION_ATTR_FLOWKEY = SESSION_ATTR_PREFIX + "key";
@@ -83,22 +83,23 @@ public class SocialUserOpenIdConnectStartServlet extends HttpServlet {
             final String key = ExternalAuthentication.startExternalAuthentication(httpRequest);
             httpRequest.getSession().setAttribute(SESSION_ATTR_FLOWKEY, key);
 
-            @SuppressWarnings("rawtypes") 
-            final ProfileRequestContext profileRequestContext =
-                    (ProfileRequestContext) httpRequest.getAttribute(ProfileRequestContext.BINDING_KEY);
+            @SuppressWarnings("rawtypes")
+            final ProfileRequestContext profileRequestContext = (ProfileRequestContext) httpRequest
+                    .getAttribute(ProfileRequestContext.BINDING_KEY);
             if (profileRequestContext == null) {
                 throw new ExternalAuthenticationException("Could not access profileRequestContext from the request");
             }
-            final AuthenticationContext authenticationContext =
-                    (AuthenticationContext) profileRequestContext.getSubcontext(AuthenticationContext.class);
+            final AuthenticationContext authenticationContext = (AuthenticationContext) profileRequestContext
+                    .getSubcontext(AuthenticationContext.class);
             if (authenticationContext == null) {
                 throw new ExternalAuthenticationException("Could not find AuthenticationContext from the request");
             }
-            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext =
+            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = 
                     (SocialUserOpenIdConnectContext) authenticationContext
-                            .getSubcontext(SocialUserOpenIdConnectContext.class);
+                    .getSubcontext(SocialUserOpenIdConnectContext.class);
             if (socialUserOpenIdConnectContext == null) {
-                throw new ExternalAuthenticationException("Could not find SocialUserOpenIdConnectContext from the request");
+                throw new ExternalAuthenticationException(
+                        "Could not find SocialUserOpenIdConnectContext from the request");
             }
             httpRequest.getSession().setAttribute(SESSION_ATTR_SUCTX, socialUserOpenIdConnectContext);
             log.debug("Redirecting user browser to {}", socialUserOpenIdConnectContext.getAuthenticationRequestURI());
