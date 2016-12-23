@@ -33,6 +33,7 @@ import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.jwt.JWT;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.id.ClientID;
@@ -50,43 +51,35 @@ import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
  */
 public class SocialUserOpenIdConnectContext extends BaseContext {
 
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
-
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SocialUserOpenIdConnectContext.class);
+    private final Logger log = LoggerFactory.getLogger(SocialUserOpenIdConnectContext.class);
 
     /** Client Id. */
     @Nonnull
     private ClientID clientID;
-    
+
     /** Client Secret. */
     @Nonnull
     private Secret clientSecret;
-    
+
     /** Scope. */
     @Nonnull
     private Scope scope;
-    
+
     /** OIDC Prompt. */
     private Prompt prompt;
-    
+
     /** OIDC Authentication Class Reference values. */
     private List<ACR> acrs;
-    
+
     /** OIDC Display. */
     private Display display;
-    
+
     /** OIDC provider metadata. */
     private OIDCProviderMetadata oIDCProviderMetadata;
-   
-    /** oidc authentication request */
+
+    /** oidc authentication request. */
     private URI authenticationRequestURI;
 
     /** oidc authentication response URI. */
@@ -100,30 +93,55 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
 
     /** State parameter. */
     private State state;
-    
+
     /** Redirect URI. */
     private URI redirectURI;
 
+    /** ID Token. */
+    private JWT idToken;
+
     /**
+     * Get the id token received from op.
      * 
-     * @return
+     * @return id token or null if not set.
+     */
+    public JWT getIDToken() {
+        return idToken;
+    }
+
+    /**
+     * Set the id token received from op.
+     * 
+     * @param token
+     *            from op.
+     */
+    public void setIDToken(JWT token) {
+        this.idToken = token;
+    }
+
+    /**
+     * Get the redirect uri of the client.
+     * 
+     * @return redirect uri
      */
     public URI getRedirectURI() {
         return redirectURI;
     }
 
     /**
+     * Get the redirect uri of the client.
      * 
-     * @param redirectURI
+     * @param uri
+     *            of the client.
      */
-    public void setRedirectURI(URI redirectURI) {
-        this.redirectURI = redirectURI;
+    public void setRedirectURI(URI uri) {
+        this.redirectURI = uri;
     }
 
     /**
      * Getter for Oauth2 client id.
      * 
-     * @return
+     * @return client id.
      */
     public ClientID getClientID() {
         return clientID;
@@ -132,104 +150,121 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     /**
      * Setter for Oauth2 client id.
      * 
-     * @param clientID
+     * @param id
      *            Oauth2 Client ID
      */
-    public void setClientID(ClientID clientID) {
-        this.clientID = clientID;
+    public void setClientID(ClientID id) {
+        this.clientID = id;
     }
 
-    
     /**
+     * Set the client secret.
      * 
-     * @param clientSecret
+     * @param secret
+     *            of the client
      */
-    public void setClientSecret(Secret clientSecret) {
-        this.clientSecret = clientSecret;
+    public void setClientSecret(Secret secret) {
+        this.clientSecret = secret;
     }
 
     /**
+     * Get the scope used for authentication request.
      * 
-     * @return
+     * @return scope
      */
     public Scope getScope() {
         return scope;
     }
 
     /**
+     * Set the scope used for forming authentication request.
      * 
-     * @param scope
+     * @param scp
+     *            scope of the request
      */
-    public void setScope(Scope scope) {
-        this.scope = scope;
+    public void setScope(Scope scp) {
+        this.scope = scp;
     }
 
     /**
+     * Get the value for prompt used for forming authentication request.
      * 
-     * @return
+     * @return prompt
      */
     public Prompt getPrompt() {
         return prompt;
     }
 
     /**
+     * Get the value for prompt used for forming authentication request.
      * 
-     * @param prompt
+     * @param prmpt
+     *            used for for forming authentication request
      */
-    public void setPrompt(Prompt prompt) {
-        this.prompt = prompt;
+    public void setPrompt(Prompt prmpt) {
+        this.prompt = prmpt;
     }
 
     /**
+     * Get the values for acr used for forming authentication request.
      * 
-     * @return
+     * @return acrs
      */
     public List<ACR> getAcrs() {
         return acrs;
     }
 
     /**
+     * Set the values for acr used for forming authentication request.
      * 
-     * @param acrs
+     * @param acrList
+     *            values used for forming authentication request
      */
-    public void setAcrs(List<ACR> acrs) {
-        this.acrs = acrs;
+    public void setAcrs(List<ACR> acrList) {
+        this.acrs = acrList;
     }
 
     /**
+     * Get the display value used for forming authentication request.
      * 
-     * @return
+     * @return display
      */
     public Display getDisplay() {
         return display;
     }
 
     /**
+     * Set the display value used for forming authentication request.
      * 
-     * @param display
+     * @param dspl
+     *            value for forming authentication request.
      */
-    public void setDisplay(Display display) {
-        this.display = display;
+    public void setDisplay(Display dspl) {
+        this.display = dspl;
     }
 
     /**
+     * Get op metadata.
      * 
-     * @return
+     * @return op metadata
      */
     public OIDCProviderMetadata getoIDCProviderMetadata() {
         return oIDCProviderMetadata;
     }
 
     /**
+     * Set op metatadata.
      * 
-     * @param oIDCProviderMetadata
+     * @param oIDCPrvdrMtdt
+     *            op metadata.
      */
-    public void setoIDCProviderMetadata(OIDCProviderMetadata oIDCProviderMetadata) {
-        this.oIDCProviderMetadata = oIDCProviderMetadata;
+    public void setoIDCProviderMetadata(OIDCProviderMetadata oIDCPrvdrMtdt) {
+        this.oIDCProviderMetadata = oIDCPrvdrMtdt;
     }
 
     /**
-     * Returns the oidc authentication request URI to be used for authentication.
+     * Returns the oidc authentication request URI to be used for
+     * authentication.
      * 
      * @return request URI for authentication
      */
@@ -246,7 +281,7 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
      */
     public void setAuthenticationRequestURI(URI request) {
         log.trace("Entering");
-        log.debug("Setting auth request redirect to "+request.toString());
+        log.debug("Setting auth request redirect to " + request.toString());
         this.authenticationRequestURI = request;
         log.trace("Leaving");
     }
@@ -270,6 +305,9 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     public void setOidcTokenResponse(OIDCTokenResponse oidcTokenResponse) {
         log.trace("Entering");
         this.oidcTknResponse = oidcTokenResponse;
+        if (oidcTokenResponse != null && oidcTokenResponse.getOIDCTokens() != null) {
+            this.idToken = oidcTokenResponse.getOIDCTokens().getIDToken();
+        }
         log.trace("Leaving");
     }
 
@@ -308,8 +346,7 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
      * @param authenticationSuccessResponse
      *            response from ther provider
      */
-    public void setAuthenticationSuccessResponse(
-            AuthenticationSuccessResponse authenticationSuccessResponse) {
+    public void setAuthenticationSuccessResponse(AuthenticationSuccessResponse authenticationSuccessResponse) {
         log.trace("Entering");
         this.authSuccessResponse = authenticationSuccessResponse;
         log.trace("Leaving");
@@ -334,8 +371,7 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
      * @throws URISyntaxException
      *             if request has malformed URL and/or query parameters
      */
-    public void setAuthenticationResponseURI(
-            HttpServletRequest authenticationResponseHttpRequest)
+    public void setAuthenticationResponseURI(HttpServletRequest authenticationResponseHttpRequest)
             throws URISyntaxException {
         log.trace("Entering");
         String temp = authenticationResponseHttpRequest.getRequestURL() + "?"
@@ -346,12 +382,12 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     }
 
     /**
+     * Get client secret.
      * 
-     * @return
+     * @return client secret.
      */
     Secret getClientSecret() {
         return clientSecret;
     }
-    
 
 }
