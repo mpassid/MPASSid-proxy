@@ -59,6 +59,8 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
     public static final String DEFAULT_ISSUER = "mockIssuer";
 
     public static final String DEFAULT_CLIENT_ID = "mockClientId";
+    
+    public boolean nullifyIdToken; 
 
     /**
      * Returns the action to be tested.
@@ -171,23 +173,31 @@ public abstract class AbstractOIDCIDTokenTest extends PopulateAuthenticationCont
     /**
      * Runs action with unparseable OIDC token.
      */
+    
+    
     @SuppressWarnings("unchecked")
     @Test
     public void testUnparseable() throws Exception {
+        // TODO: replace with new relevant or target the correct ones only
         final AccessToken accessToken = new BearerAccessToken();
         final RefreshToken refreshToken = new RefreshToken();
         final JWT jwt = Mockito.mock(JWT.class);
         Mockito.when(jwt.getJWTClaimsSet()).thenThrow(java.text.ParseException.class);
-
         final OIDCTokens oidcTokens = new OIDCTokens(jwt, accessToken, refreshToken);
         final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
         final AbstractProfileAction<?, ?> action = getAction();
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setOidcTokenResponse(oidcTokenResponse);
+        if (nullifyIdToken){
+            suCtx.setIDToken(null);
+        }
         suCtx.setoIDCProviderMetadata(buildOidcMetadata(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+        
     }
+    
+    
 }

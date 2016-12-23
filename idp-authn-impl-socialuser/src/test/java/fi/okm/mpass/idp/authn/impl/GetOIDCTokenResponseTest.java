@@ -87,6 +87,7 @@ public class GetOIDCTokenResponseTest extends AbstractOIDCIDTokenTest {
     @BeforeMethod
     public void setUp() throws Exception {
         super.setUp();
+        nullifyIdToken=true;
         action = new GetOIDCTokenResponse();
         tokenUri = new URI("http://localhost:" + SetOIDCInformationTest.CONTAINER_PORT + "/");
         jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gR"
