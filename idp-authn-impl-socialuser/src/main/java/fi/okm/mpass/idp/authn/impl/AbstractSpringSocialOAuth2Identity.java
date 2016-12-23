@@ -47,7 +47,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
 
     /** Class logger. */
     @Nonnull
-    private final static Logger log = LoggerFactory
+    private static final Logger LOG = LoggerFactory
             .getLogger(AbstractSpringSocialOAuth2Identity.class);
 
     /** Oauth2 Application id. */
@@ -69,7 +69,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      *            Oauth2 operations
      */
     public void setOauthOperations(OAuth2Operations operations) {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         this.oauthOperations = operations;
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      *            Oauth2 state
      */
     public void setScope(String oauth2Scope) {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         this.scope = oauth2Scope;
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      *            Oauth2 Application ID
      */
     public void setAppId(String oauth2AppId) {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         this.appId = oauth2AppId;
     }
 
@@ -102,7 +102,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      *            Oauth2 Application Secret
      */
     public void setAppSecret(String oauth2AppSecret) {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         this.appSecret = oauth2AppSecret;
     }
 
@@ -112,7 +112,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @return Oauth2 application id
      */
     protected String getAppId() {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         return this.appId;
     }
 
@@ -122,7 +122,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @return Oauth2 application secret
      */
     protected String getAppSecret() {
-        log.trace("Entering & Leaving");
+        LOG.trace("Entering & Leaving");
         return this.appSecret;
     }
 
@@ -135,9 +135,9 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * @return redirect url
      */
     public String getRedirectUrl(HttpServletRequest httpRequest) {
-        log.trace("Entering");
+        LOG.trace("Entering");
         if (httpRequest == null) {
-            log.trace("Leaving");
+            LOG.trace("Leaving");
             return null;
         }
         OAuth2Parameters params = new OAuth2Parameters();
@@ -148,7 +148,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         params.setRedirectUri(httpRequest.getRequestURL().toString());
         String authorizeUrl = oauthOperations.buildAuthorizeUrl(
                 GrantType.AUTHORIZATION_CODE, params);
-        log.trace("Leaving");
+        LOG.trace("Leaving");
         return authorizeUrl;
     }
 
@@ -162,24 +162,27 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      * */
     private void validateState(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
-        log.trace("Entering");
+        LOG.trace("Entering");
         String state = httpRequest.getParameter("state");
         if (state == null) {
-            log.trace("Leaving");
+            LOG.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "State parameter missing", SocialUserErrorIds.EXCEPTION);
         }
-        if (!state.equalsIgnoreCase(calculateHash(httpRequest.getSession().getId()))) {
-            log.error("state parameter mismatch");
-            log.trace("Leaving");
+        if (!state.equalsIgnoreCase(calculateHash(httpRequest.getSession()
+                .getId()))) {
+            LOG.error("state parameter mismatch");
+            LOG.trace("Leaving");
             throw new SocialUserAuthenticationException(
                     "State parameter mismatch", SocialUserErrorIds.EXCEPTION);
         }
     }
-    
+
     /**
      * Calculates a SHA-256 hash for the given input.
-     * @param input The input to be hashed.
+     * 
+     * @param input
+     *            The input to be hashed.
      * @return The hash of the input.
      */
     protected static String calculateHash(final String input) {
@@ -187,13 +190,14 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
         try {
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            log.error("Unable to generate state", e);
+            LOG.error("Unable to generate state", e);
             return null;
         }
         md.reset();
         md.update(input.getBytes());
         return new String(Hex.encode(md.digest()));
     }
+
     /**
      * Throws an error if user authentication has failed Returns Authorization
      * Code if such exists Returns null if authentication has not been performed
@@ -208,15 +212,13 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
     // Checkstyle: CyclomaticComplexity OFF
     private String getAuthorizationCode(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
-        log.trace("Entering");
+        LOG.trace("Entering");
         String error = httpRequest.getParameter("error");
-        // TODO .. this needs some bean injection magic. FB for instance has
-        // error_code
         if (error == null) {
             error = httpRequest.getParameter("error_code");
         }
         if (error != null && !error.isEmpty()) {
-            log.trace("Leaving");
+            LOG.trace("Leaving");
             String event = SocialUserErrorIds.EXCEPTION;
             switch (error) {
             case "invalid_request":
@@ -235,18 +237,16 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             String errorDescription = httpRequest
                     .getParameter("error_description");
             if (errorDescription == null) {
-                // TODO .. this needs some bean injection magic. FB for instance
-                // has error_message
                 errorDescription = httpRequest.getParameter("error_message");
             }
             if (errorDescription != null && !errorDescription.isEmpty()) {
                 error += " : " + errorDescription;
             }
-            log.debug("Authentication failed: " + error);
+            LOG.debug("Authentication failed: " + error);
             throw new SocialUserAuthenticationException(error, event);
         }
         String authorizationCode = httpRequest.getParameter("code");
-        log.trace("Leaving");
+        LOG.trace("Leaving");
         return authorizationCode;
     }
 
@@ -263,7 +263,7 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
      */
     public AccessGrant getAccessGrant(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException {
-        log.trace("Entering");
+        LOG.trace("Entering");
         AccessGrant accessGrant = null;
         try {
             String authorizationCode = getAuthorizationCode(httpRequest);
@@ -274,12 +274,12 @@ public abstract class AbstractSpringSocialOAuth2Identity extends
             accessGrant = oauthOperations.exchangeForAccess(authorizationCode,
                     httpRequest.getRequestURL().toString(), null);
         } catch (HttpClientErrorException e) {
-            log.error("Could not get access grant", e);
-            log.trace("Leaving");
+            LOG.error("Could not get access grant", e);
+            LOG.trace("Leaving");
             throw new SocialUserAuthenticationException(e.getMessage(),
                     SocialUserErrorIds.EXCEPTION);
         }
-        log.trace("Leaving");
+        LOG.trace("Leaving");
         return accessGrant;
     }
 
