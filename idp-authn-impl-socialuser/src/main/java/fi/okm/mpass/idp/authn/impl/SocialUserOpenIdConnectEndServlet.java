@@ -43,10 +43,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extracts Social identity and places it in a request attribute to be used by the IdP's external authentication
- * interface.
+ * Extracts Social identity and places it in a request attribute to be used by
+ * the IdP's external authentication interface.
  */
-@WebServlet(name = "SocialUserOpenIdConnectEndServlet", urlPatterns = {"/Authn/SocialUserOpenIdConnectEnd"})
+@WebServlet(name = "SocialUserOpenIdConnectEndServlet", urlPatterns = { "/Authn/SocialUserOpenIdConnectEnd" })
 public class SocialUserOpenIdConnectEndServlet extends HttpServlet {
 
     /** Serial UID. */
@@ -76,17 +76,18 @@ public class SocialUserOpenIdConnectEndServlet extends HttpServlet {
             if (session == null) {
                 throw new ExternalAuthenticationException("No session exist, this URL shouldn't be called directly!");
             }
-            final String key = StringSupport.trimOrNull((String) httpRequest.getSession()
-                    .getAttribute(SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY));
+            final String key = StringSupport.trimOrNull((String) httpRequest.getSession().getAttribute(
+                    SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY));
             if (key == null) {
-                throw new ExternalAuthenticationException(
-                        "Could not find value for " + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY);
+                throw new ExternalAuthenticationException("Could not find value for "
+                        + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_FLOWKEY);
             }
-            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = (SocialUserOpenIdConnectContext) httpRequest
+            final SocialUserOpenIdConnectContext socialUserOpenIdConnectContext = 
+                    (SocialUserOpenIdConnectContext) httpRequest
                     .getSession().getAttribute(SocialUserOpenIdConnectStartServlet.SESSION_ATTR_SUCTX);
             if (socialUserOpenIdConnectContext == null) {
-                throw new ExternalAuthenticationException(
-                        "Could not find value for " + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_SUCTX);                
+                throw new ExternalAuthenticationException("Could not find value for "
+                        + SocialUserOpenIdConnectStartServlet.SESSION_ATTR_SUCTX);
             }
             log.debug("Attempting URL {}?{}", httpRequest.getRequestURL(), httpRequest.getQueryString());
             try {
