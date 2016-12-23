@@ -65,8 +65,9 @@ import fi.okm.mpass.idp.authn.principal.SocialUserPrincipal;
 /** Implements OAuth2/OpenId basics for classes using Nimbus library. */
 public abstract class AbstractOAuth2Identity {
 
+    /** key for state parameter. */
     public static final String SESSION_ATTR_STATE = "fi.okm.mpass.state";
-    
+
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
@@ -392,7 +393,7 @@ public abstract class AbstractOAuth2Identity {
      * This method forms Token request.
      * 
      * @param httpRequest
-     *            the request back from the oauth2 server
+     *            the request formed by the oauth2 server
      * @return returns token request or null if the user has not authorized yet.
      * @throws SocialUserAuthenticationException
      *             If tokenrequest fails to other than non-authorization reason.
@@ -511,14 +512,12 @@ public abstract class AbstractOAuth2Identity {
                 first = false;
                 continue;
             }
-            // Read raw string
             String value = potClaims.get(claim) != null ? potClaims.get(claim)
                     .toString() : null;
             if (value == null || value.isEmpty()) {
                 first = false;
                 continue;
             }
-
             String[] values = null;
             if (customClaimsTypes == null
                     || !customClaimsTypes.containsKey(claim)) {
@@ -526,10 +525,6 @@ public abstract class AbstractOAuth2Identity {
                 values = new String[1];
                 values[0] = value;
             } else {
-                /*
-                 * All other types except jsonarray are handled as string
-                 * currently
-                 */
                 switch (customClaimsTypes.get(claim)) {
                 case customClaimTypeJsonArray:
                     try {
@@ -540,22 +535,24 @@ public abstract class AbstractOAuth2Identity {
                         }
                     } catch (ParseException e) {
                         /* json parsing failed, we revert to string type */
-                        log.warn("claim type set as jsonarray but parsing failed. claim: {}", value);
+                        log.warn(
+                                "claim type set as jsonarray but parsing failed. claim: {}",
+                                value);
                         values = new String[1];
                         values[0] = value;
                     }
                     break;
                 default:
                     /* type definition is unkown to us, we revert to string type */
-                    log.warn("unknown type definition for claim, type is {}", value);
+                    log.warn("unknown type definition for claim, type is {}",
+                            value);
                     values = new String[1];
                     values[0] = value;
                 }
-
             }
-
             for (String newValue : values) {
-                log.debug("Adding socialuserprincipal {} of type {}", newValue, entry.getValue());
+                log.debug("Adding socialuserprincipal {} of type {}", newValue,
+                        entry.getValue());
                 subject.getPrincipals().add(
                         new SocialUserPrincipal(entry.getValue(), newValue));
                 // First value is treated as usernameprincipal
@@ -570,14 +567,18 @@ public abstract class AbstractOAuth2Identity {
         }
         log.trace("Leaving");
     }
+
     // Checkstyle: CyclomaticComplexity ON
-    
+
     /**
-     * Obtains access token, calls user info endpoint and finally populates the principals from the claims
-     * provided by the user info endpoint.
+     * Obtains access token, calls user info endpoint and finally populates the
+     * principals from the claims provided by the user info endpoint.
+     * 
      * @param httpRequest
-     * @return
+     *            the request formed by the oauth2 server
+     * @return principals in subject
      * @throws SocialUserAuthenticationException
+     *             if something unexpected occurs.
      */
     public abstract Subject getSubject(HttpServletRequest httpRequest)
             throws SocialUserAuthenticationException;
