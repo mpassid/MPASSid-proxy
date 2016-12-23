@@ -83,33 +83,16 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
             log.trace("Leaving");
             return false;
         }
-
-        if (suCtx.getOidcTokenResponse() == null) {
-            log.error("{} Token response not set", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
-
-        if (suCtx.getOidcTokenResponse().getOIDCTokens() == null) {
-            log.error("{} No Tokens in response", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
-
-        if (suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken() == null) {
+        
+        if (suCtx.getIDToken() == null) {
             log.error("{} No ID Token in response", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return false;
         }
-
         try {
-            oidcSubject = suCtx.getOidcTokenResponse().getOIDCTokens()
+            oidcSubject = suCtx
                     .getIDToken().getJWTClaimsSet().getSubject();
         } catch (ParseException e) {
             log.error("{} unable to parse ID Token", getLogPrefix());

@@ -121,7 +121,8 @@ public class ValidateOIDCAuthenticationResponse extends
             return;
         }
         AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) response;
-
+        //implicit and hybrid flows return id token in response.
+        suCtx.setIDToken(successResponse.getIDToken());
         State state = suCtx.getState();
         if (state == null || !state.equals(successResponse.getState())) {
             // TODO: FIX ERROR VALUE

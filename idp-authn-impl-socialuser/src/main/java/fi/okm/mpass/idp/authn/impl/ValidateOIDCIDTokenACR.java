@@ -80,7 +80,7 @@ public class ValidateOIDCIDTokenACR extends AbstractAuthenticationAction {
             }
             final String acr;
             try {
-                acr = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet().getStringClaim("acr");
+                acr = suCtx.getIDToken().getJWTClaimsSet().getStringClaim("acr");
             } catch (ParseException e) {
                 log.error("{} Error parsing id token", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);

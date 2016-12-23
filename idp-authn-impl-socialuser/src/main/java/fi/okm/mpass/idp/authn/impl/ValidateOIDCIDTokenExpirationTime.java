@@ -76,7 +76,7 @@ public class ValidateOIDCIDTokenExpirationTime extends
         // The current time MUST be before the time represented by the exp
         Date currentDate = new Date();
         try {
-            Date expDate = suCtx.getOidcTokenResponse().getOIDCTokens()
+            Date expDate = suCtx
                     .getIDToken().getJWTClaimsSet().getExpirationTime();
             if (currentDate.after(expDate)) {
                 log.error("{} Current date {} is past exp date {}", getLogPrefix(), 

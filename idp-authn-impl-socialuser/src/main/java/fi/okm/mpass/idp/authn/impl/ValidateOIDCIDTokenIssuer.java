@@ -75,7 +75,7 @@ public class ValidateOIDCIDTokenIssuer extends AbstractAuthenticationAction {
         // obtained during Discovery) MUST exactly match the value of the
         // iss (issuer) Claim.
         try {
-            if (!issuer.equals(suCtx.getOidcTokenResponse().getOIDCTokens()
+            if (!issuer.equals(suCtx
                     .getIDToken().getJWTClaimsSet().getIssuer())) {
                 log.error("{} issuer mismatch", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext,

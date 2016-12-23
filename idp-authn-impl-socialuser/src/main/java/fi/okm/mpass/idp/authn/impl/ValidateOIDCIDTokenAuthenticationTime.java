@@ -135,7 +135,7 @@ public class ValidateOIDCIDTokenAuthenticationTime extends AbstractAuthenticatio
         }
         final Date authTimeDate;
         try {
-            authTimeDate = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet()
+            authTimeDate = suCtx.getIDToken().getJWTClaimsSet()
                     .getDateClaim("auth_time");
         } catch (ParseException e) {
             log.error("{} Error parsing id token", getLogPrefix());

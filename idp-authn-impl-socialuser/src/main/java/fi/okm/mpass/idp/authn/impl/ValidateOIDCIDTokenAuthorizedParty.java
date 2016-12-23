@@ -68,8 +68,8 @@ public class ValidateOIDCIDTokenAuthorizedParty extends AbstractAuthenticationAc
         // If an azp (authorized party) Claim is present, the Client SHOULD
         // verify that its client_id is the Claim Value.
         try {
-            if (suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet().getAudience().size() > 1) {
-                final String azp = suCtx.getOidcTokenResponse().getOIDCTokens().getIDToken().getJWTClaimsSet()
+            if (suCtx.getIDToken().getJWTClaimsSet().getAudience().size() > 1) {
+                final String azp = suCtx.getIDToken().getJWTClaimsSet()
                         .getStringClaim("azp");
                 if (!suCtx.getClientID().getValue().equals(azp)) {
                     log.error("{} multiple audiences, client is not the azp", getLogPrefix());
