@@ -77,6 +77,10 @@ public class SetOIDCInformation extends AbstractExtractionAction {
     @Nonnull
     private Secret clientSecret;
     
+    /** Response type, default is code flow. */
+    @Nonnull
+    private ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
+    
     /** Scope. */
     @Nonnull
     private Scope scope = new Scope(OIDCScopeValue.OPENID);
@@ -93,7 +97,18 @@ public class SetOIDCInformation extends AbstractExtractionAction {
     /** OIDC provider metadata. */
     private OIDCProviderMetadata oIDCProviderMetadata;
    
-       
+   
+    /**
+     * Sets the response type. Default is code.
+     *      * 
+     * @param type space-delimited list of one or more authorisation response types.
+     * @throws ParseException if response type cannot be parsed
+     */
+    public void setResponseType(String type) throws ParseException{
+        log.trace("Entering & Leaving");
+        this.responseType = ResponseType.parse(type);
+    }
+    
     /**
      * Setter for Oauth2 client id.
      * 
@@ -260,8 +275,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         suCtx.setDisplay(display);
         suCtx.setoIDCProviderMetadata(oIDCProviderMetadata);
         suCtx.setRedirectURI(redirectURI);
-
-        ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
         State state = new State();
         suCtx.setState(state);
         if (authenticationContext.isForceAuthn()) {
