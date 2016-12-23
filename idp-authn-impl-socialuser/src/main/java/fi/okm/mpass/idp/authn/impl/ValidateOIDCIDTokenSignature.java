@@ -117,8 +117,7 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
         }
         SignedJWT signedJWT = null;
         try {
-            signedJWT = SignedJWT.parse(suCtx.getOidcTokenResponse()
-                    .getOIDCTokens().getIDToken().serialize());
+            signedJWT = SignedJWT.parse(suCtx.getIDToken().serialize());
         } catch (ParseException e) {
             log.error("{} Error when forming signed JWT", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
@@ -158,6 +157,7 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
      * @throws ParseException
      *             if parsing fails.
      * @throws IOException
+     *             if something unexpected happens.
      */
     private JSONObject getProviderRSAJWK(InputStream is) throws ParseException,
             IOException {
