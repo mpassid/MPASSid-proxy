@@ -49,7 +49,8 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 
 /**
- * An action that calls the token endpoint and populates the information to {@link SocialUserOpenIdConnectContext}.
+ * An action that calls the token endpoint and populates the information to
+ * {@link SocialUserOpenIdConnectContext}.
  * 
  * @event {@link org.opensaml.profile.action.EventIds#PROCEED_EVENT_ID}
  * @event {@link AuthnEventIds#NO_CREDENTIALS}
@@ -67,11 +68,16 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        final SocialUserOpenIdConnectContext suCtx =
-                authenticationContext.getSubcontext(SocialUserOpenIdConnectContext.class);
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext
+                .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
+        if (suCtx.getIDToken() != null) {
+            log.debug("id token exists already, no need to fetch it from token endpoint");
             log.trace("Leaving");
             return;
         }
@@ -85,8 +91,10 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
         final AuthorizationCode code = response.getAuthorizationCode();
         final AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, suCtx.getRedirectURI());
         final ClientAuthentication clientAuth = new ClientSecretBasic(suCtx.getClientID(), suCtx.getClientSecret());
-        log.debug("{} Using the following token endpoint URI: {}", getLogPrefix(), suCtx.getoIDCProviderMetadata().getTokenEndpointURI());
-        final TokenRequest tokenRequest = new TokenRequest(suCtx.getoIDCProviderMetadata().getTokenEndpointURI(), clientAuth, codeGrant);
+        log.debug("{} Using the following token endpoint URI: {}", getLogPrefix(), suCtx.getoIDCProviderMetadata()
+                .getTokenEndpointURI());
+        final TokenRequest tokenRequest = new TokenRequest(suCtx.getoIDCProviderMetadata().getTokenEndpointURI(),
+                clientAuth, codeGrant);
         final OIDCTokenResponse oidcTokenResponse;
         try {
             oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
