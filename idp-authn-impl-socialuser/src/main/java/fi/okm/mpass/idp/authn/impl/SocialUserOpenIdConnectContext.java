@@ -40,6 +40,7 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.Display;
+import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
@@ -93,6 +94,9 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
 
     /** State parameter. */
     private State state;
+
+    /** Nonce parameter. */
+    private Nonce nonce;
 
     /** Redirect URI. */
     private URI redirectURI;
@@ -328,6 +332,25 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
      */
     public void setState(State stateParam) {
         this.state = stateParam;
+    }
+
+    /**
+     * Getter for Nonce parameter.
+     * 
+     * @return nonce parameter.
+     */
+    public Nonce getNonce() {
+        return nonce;
+    }
+
+    /**
+     * Setter for Nonce parameter.
+     * 
+     * @param newNonce
+     *            nonce parameter
+     */
+    public void setNonce(Nonce newNonce) {
+        this.nonce = newNonce;
     }
 
     /**
