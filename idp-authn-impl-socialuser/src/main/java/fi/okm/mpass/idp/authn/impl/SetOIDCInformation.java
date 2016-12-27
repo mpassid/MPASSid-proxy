@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.ResponseMode;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.auth.Secret;
@@ -48,6 +49,7 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.Display;
+import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.Prompt;
 import com.nimbusds.openid.connect.sdk.Prompt.Type;
@@ -55,60 +57,62 @@ import com.nimbusds.openid.connect.sdk.claims.ACR;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 /**
- * An action that sets oidc information to {@link SocialUserOpenIdConnectContext} and
- * attaches it to {@link AuthenticationContext}.
+ * An action that sets oidc information to
+ * {@link SocialUserOpenIdConnectContext} and attaches it to
+ * {@link AuthenticationContext}.
  */
 @SuppressWarnings("rawtypes")
 public class SetOIDCInformation extends AbstractExtractionAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SetOIDCInformation.class);
+    private final Logger log = LoggerFactory.getLogger(SetOIDCInformation.class);
 
     /** Redirect URI. */
     private URI redirectURI;
-   
+
     /** Client Id. */
     @Nonnull
     private ClientID clientID;
-    
+
     /** Client Secret. */
     @Nonnull
     private Secret clientSecret;
-    
+
     /** Response type, default is code flow. */
     @Nonnull
     private ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
-    
+
     /** Scope. */
     @Nonnull
     private Scope scope = new Scope(OIDCScopeValue.OPENID);
-    
+
     /** OIDC Prompt. */
     private Prompt prompt;
-    
+
     /** OIDC Authentication Class Reference values. */
     private List<ACR> acrs;
-    
+
     /** OIDC Display. */
     private Display display;
-    
+
     /** OIDC provider metadata. */
     private OIDCProviderMetadata oIDCProviderMetadata;
-   
-   
+
     /**
-     * Sets the response type. Default is code.
-     *      * 
-     * @param type space-delimited list of one or more authorisation response types.
-     * @throws ParseException if response type cannot be parsed
+     * Sets the response type. Default is code. *
+     * 
+     * @param type
+     *            space-delimited list of one or more authorisation response
+     *            types.
+     * @throws ParseException
+     *             if response type cannot be parsed
      */
-    public void setResponseType(String type) throws ParseException{
+    public void setResponseType(String type) throws ParseException {
         log.trace("Entering & Leaving");
         this.responseType = ResponseType.parse(type);
     }
-    
+
     /**
      * Setter for Oauth2 client id.
      * 
@@ -120,7 +124,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         this.clientID = new ClientID(oauth2ClientId);
     }
 
-   
     /**
      * Setter for Oauth2 Client secret.
      * 
@@ -132,7 +135,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         this.clientSecret = new Secret(oauth2ClientSecret);
     }
 
-   
     /**
      * Setter for OAuth2 redirect uri for provider to return to.
      * 
@@ -143,7 +145,7 @@ public class SetOIDCInformation extends AbstractExtractionAction {
     public void setRedirectURI(URI redirect) {
         this.redirectURI = redirect;
     }
-    
+
     /**
      * Setter for OpenId Provider Metadata location.
      * 
@@ -156,12 +158,11 @@ public class SetOIDCInformation extends AbstractExtractionAction {
      * @throws ParseException
      *             if metadataLocation has wrong content
      */
-    public void setProviderMetadataLocation(String metadataLocation)
-            throws URISyntaxException, IOException, ParseException {
+    public void setProviderMetadataLocation(String metadataLocation) throws URISyntaxException, IOException,
+            ParseException {
         log.trace("Entering");
         URI issuerURI = new URI(metadataLocation);
-        URL providerConfigurationURL = issuerURI.resolve(
-                "/.well-known/openid-configuration").toURL();
+        URL providerConfigurationURL = issuerURI.resolve("/.well-known/openid-configuration").toURL();
         InputStream stream = providerConfigurationURL.openStream();
         String providerInfo = null;
         try (java.util.Scanner s = new java.util.Scanner(stream)) {
@@ -202,7 +203,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         log.trace("Leaving");
     }
 
-    
     /**
      * Setter for OpenId Prompt value.
      * 
@@ -215,7 +215,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         log.trace("Leaving");
     }
 
-    
     /**
      * Setter for OpenId ACR values.
      * 
@@ -234,7 +233,6 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         log.trace("Leaving");
     }
 
-    
     /**
      * Setter for OpenId Display value.
      * 
@@ -251,24 +249,19 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         log.trace("Leaving");
     }
 
-    
-    
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
 
-       
-        final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class, true);
-       
+        final SocialUserOpenIdConnectContext suCtx = authenticationContext.getSubcontext(
+                SocialUserOpenIdConnectContext.class, true);
+
         // We initialize the context
         // If request is passive we override default prompt value
-        Prompt ovrPrompt = authenticationContext.isPassive() ? new Prompt(
-                Type.NONE) : prompt;
-        suCtx.setPrompt(ovrPrompt);    
+        Prompt ovrPrompt = authenticationContext.isPassive() ? new Prompt(Type.NONE) : prompt;
+        suCtx.setPrompt(ovrPrompt);
         suCtx.setAcrs(acrs);
         suCtx.setClientID(clientID);
         suCtx.setClientSecret(clientSecret);
@@ -277,21 +270,34 @@ public class SetOIDCInformation extends AbstractExtractionAction {
         suCtx.setRedirectURI(redirectURI);
         State state = new State();
         suCtx.setState(state);
+        Nonce nonce = new Nonce();
+        suCtx.setNonce(nonce);
         if (authenticationContext.isForceAuthn()) {
             // We set max age to 0 if forcedauth is set
-            // TODO: Currently the underlying library doesn't accept value 0, so we set it to 1
+            // TODO: Currently the underlying library doesn't accept value 0, so
+            // we set it to 1
             final int maxAge = 1;
-            suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
-                    responseType, scope, clientID, redirectURI)
-                    .endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI())
-                    .display(display).acrValues(acrs)
-                    .maxAge(maxAge).prompt(ovrPrompt).state(state).build().toURI());
+            if (responseType.equals(ResponseType.Value.CODE)) {
+                suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(responseType, scope, clientID,
+                        redirectURI).endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI()).display(display)
+                        .acrValues(acrs).maxAge(maxAge).prompt(ovrPrompt).state(state).nonce(nonce).build().toURI());
+            } else {
+                suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(responseType, scope, clientID,
+                        redirectURI).endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI()).display(display)
+                        .acrValues(acrs).responseMode(ResponseMode.QUERY).maxAge(maxAge).prompt(ovrPrompt).state(state)
+                        .nonce(nonce).build().toURI());
+            }
         } else {
-            suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(
-                    responseType, scope, clientID, redirectURI)
-                    .endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI())
-                    .display(display).acrValues(acrs)
-                    .prompt(ovrPrompt).state(state).build().toURI());
+            if (responseType.equals(ResponseType.Value.CODE)) {
+                suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(responseType, scope, clientID,
+                        redirectURI).endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI()).display(display)
+                        .acrValues(acrs).prompt(ovrPrompt).state(state).nonce(nonce).build().toURI());
+            } else {
+                suCtx.setAuthenticationRequestURI(new AuthenticationRequest.Builder(responseType, scope, clientID,
+                        redirectURI).endpointURI(oIDCProviderMetadata.getAuthorizationEndpointURI()).display(display)
+                        .acrValues(acrs).responseMode(ResponseMode.QUERY).prompt(ovrPrompt).state(state).nonce(nonce)
+                        .build().toURI());
+            }
         }
 
         log.trace("Leaving");
