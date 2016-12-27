@@ -36,7 +36,6 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * An action that verifies Audience of ID Token.
  * 
@@ -45,22 +44,13 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("rawtypes")
 public class ValidateOIDCIDTokenAudience extends AbstractAuthenticationAction {
 
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
-
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(ValidateOIDCIDTokenAudience.class);
+    private final Logger log = LoggerFactory.getLogger(ValidateOIDCIDTokenAudience.class);
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
 
@@ -68,12 +58,16 @@ public class ValidateOIDCIDTokenAudience extends AbstractAuthenticationAction {
                 .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
-
+        if (suCtx.getIDToken() == null) {
+            log.error("{} Not able to find id token", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
         // The Client MUST validate that the aud (audience) Claim contains
         // its client_id value registered at the Issuer identified by the
         // iss (issuer) Claim as an audience. The aud (audience) Claim MAY
@@ -82,26 +76,15 @@ public class ValidateOIDCIDTokenAudience extends AbstractAuthenticationAction {
         // audience, or if it contains additional audiences not trusted by
         // the Client.
         try {
-            if (!suCtx
-                    .getOidcTokenResponse()
-                    .getOIDCTokens()
-                    .getIDToken()
-                    .getJWTClaimsSet()
-                    .getAudience()
-                    .contains(
-                            suCtx.getClientID()
-                                    .getValue())) {
-                log.error("{} client is not the intended audience",
-                        getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext,
-                        AuthnEventIds.NO_CREDENTIALS);
+            if (!suCtx.getIDToken().getJWTClaimsSet().getAudience().contains(suCtx.getClientID().getValue())) {
+                log.error("{} client is not the intended audience", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
                 log.trace("Leaving");
                 return;
             }
         } catch (ParseException e) {
             log.error("{} Error parsing id token", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
