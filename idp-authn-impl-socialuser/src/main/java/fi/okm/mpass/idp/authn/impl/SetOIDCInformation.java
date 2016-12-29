@@ -398,30 +398,30 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
             String value = entry.getValue();
             String claim = entry.getKey();
             if (value == null) {
+                //1. null value
                 log.debug("Setting claim " + claim + " to null");
                 idToken.put(entry.getKey(), value);
                 continue;
             }
-            if (value != null) {
-                log.debug("locating attribute for " + value);
-                String attrValue = attributeToString(attributeContext, value);
-                if (attrValue != null) {
-                    log.debug("Setting claim " + claim + " to value " + attrValue);
-                    idToken.put(claim, attrValue);
-                } else {
-                    if (value.equals("essential")) {
-                        JSONObject obj = new JSONObject();
-                        obj.put("essential", true);
-                        log.debug("Setting claim " + claim + " to value " + obj.toJSONString());
-                        idToken.put(claim, obj);
-                    } else {
-                        // treat the value as a string
-                        log.debug("Setting claim " + claim + " to value " + value);
-                        idToken.put(claim, value);
-                    }
-                }
-
-            }
+            log.debug("locating attribute for " + value);
+            String attrValue = attributeToString(attributeContext, value);
+            if (attrValue != null) {
+                //2. attribute value
+                log.debug("Setting claim " + claim + " to value " + attrValue);
+                idToken.put(claim, attrValue);
+                continue;
+            } 
+            if (value.equals("essential")) {
+                //3. essential value
+                JSONObject obj = new JSONObject();
+                obj.put("essential", true);
+                log.debug("Setting claim " + claim + " to value " + obj.toJSONString());
+                idToken.put(claim, obj);
+                continue;
+            }   
+            // 4. string value
+            log.debug("Setting claim " + claim + " to value " + value);
+            idToken.put(claim, value);
         }
         log.trace("Leaving");
         return idToken;
