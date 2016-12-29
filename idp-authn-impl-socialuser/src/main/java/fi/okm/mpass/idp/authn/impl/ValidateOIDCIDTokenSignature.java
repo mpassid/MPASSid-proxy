@@ -164,7 +164,8 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
         log.trace("Entering");
         StringWriter writer = new StringWriter();
         IOUtils.copy(is, writer, "UTF-8");
-        JSONObject json = JSONObjectUtils.parseJSONObject(writer.toString());
+        JSONObject json = JSONObjectUtils.parse(writer.toString());
+        //TODO: USE KEYID TO FETCH CORRECT KEY
         JSONArray keyList = (JSONArray) json.get("keys");
         if (keyList == null){
             log.trace("Leaving");
