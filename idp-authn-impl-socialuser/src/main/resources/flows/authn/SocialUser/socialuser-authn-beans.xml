@@ -242,10 +242,6 @@
             <property name="redirectURI" value="put_here"/>
     </bean>
 
-    <bean id="SetOIDCInformation"
-            class="fi.okm.mpass.idp.authn.impl.SetOIDCInformation" 
-            p:openIdConnectInformation-ref="GoogleOpenIdConnectInformation"/>
-            
     <bean id="ValidateOIDCAuthenticationResponse"
           class="fi.okm.mpass.idp.authn.impl.ValidateOIDCAuthenticationResponse" 
           p:httpServletRequest-ref="shibboleth.HttpServletRequest"/>
