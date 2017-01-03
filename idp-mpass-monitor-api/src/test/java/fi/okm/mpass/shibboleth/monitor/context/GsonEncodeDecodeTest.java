@@ -42,17 +42,28 @@ public class GsonEncodeDecodeTest {
     
     private String id2;
     
+    private int phaseId1;
+    
+    private int phaseId2;
+    
     private long seqStart;
+    
     private long seqEnd;
+    
     private long step1Start;
+    
     private long step1End;
+    
     private long step2Start;
+    
     private long step2End;
     
     @BeforeMethod
     public void init() {
         id1 = "mockId1";
         id2 = "mockId2";
+        phaseId1 = 1;
+        phaseId2 = 2;
         seqStart = 10000;
         seqEnd = 60000;
         step1Start = 20000;
@@ -71,11 +82,13 @@ public class GsonEncodeDecodeTest {
         stepResult1.setStartTime(step1Start);
         stepResult1.setEndTime(step1End);
         stepResult1.setId(id1);
+        stepResult1.setPhaseId(phaseId1);
         seqResult.addStepResult(stepResult1);
         final MonitoringSequenceStepResult stepResult2 = new MonitoringSequenceStepResult();
         stepResult2.setStartTime(step2Start);
         stepResult2.setEndTime(step2End);
         stepResult2.setId(id2);
+        stepResult2.setPhaseId(phaseId2);
         final String errorMessage = "mockError";
         final ResponseValidatorException exception = new ResponseValidatorException("mockError", 
                 "mockBody", new IOException("IOError"));
@@ -90,9 +103,11 @@ public class GsonEncodeDecodeTest {
         Assert.assertEquals(jsonResult.getStepResults().get(0).getEndTime(), step1End);
         Assert.assertEquals(jsonResult.getStepResults().get(0).getStartTime(), step1Start);
         Assert.assertEquals(jsonResult.getStepResults().get(0).getId(), id1);
+        Assert.assertEquals(jsonResult.getStepResults().get(0).getPhaseId(), phaseId1);
         Assert.assertEquals(jsonResult.getStepResults().get(1).getEndTime(), step2End);
         Assert.assertEquals(jsonResult.getStepResults().get(1).getStartTime(), step2Start);
         Assert.assertEquals(jsonResult.getStepResults().get(1).getId(), id2);
+        Assert.assertEquals(jsonResult.getStepResults().get(1).getPhaseId(), phaseId2);
         Assert.assertEquals(jsonResult.getStepResults().get(1).getErrorMessage(), errorMessage);
         Assert.assertEquals(jsonResult.getStepResults().get(1).getValidatorException().getMessage(),
                 exception.getMessage());
