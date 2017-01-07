@@ -25,9 +25,12 @@ package fi.okm.mpass.idp.authn.impl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
+
+import net.shibboleth.idp.attribute.IdPAttribute;
 
 import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
@@ -103,6 +106,28 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
 
     /** ID Token. */
     private JWT idToken;
+    
+    /** Resolved attributes.*/
+    public Map<String, IdPAttribute> resolvedIdPAttributes;
+
+    /**
+     * Get the resolved attributes.
+     * 
+     * @return resolved attributes, may be null.
+     */
+    public Map<String, IdPAttribute> getResolvedIdPAttributes() {
+        return resolvedIdPAttributes;
+    }
+
+    /**
+     * Set resolved attributes to context to help form
+     * requested objects.
+     * 
+     * @param idPAttributes resolved attributes
+     */
+    public void setResolvedIdPAttributes(Map<String, IdPAttribute> idPAttributes) {
+        this.resolvedIdPAttributes = idPAttributes;
+    }
 
     /**
      * Get the id token received from op.
