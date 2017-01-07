@@ -32,6 +32,9 @@ public class MonitoringSequenceStepResult extends AbstractTimestampedResult {
 
     /** The identifier for the step. */
     private String id;
+    
+    /** The phase identifier for the step. */
+    private int phaseId;
 
     /** The one-line error message for the step, if any. */
     private String errorMessage;
@@ -53,6 +56,22 @@ public class MonitoringSequenceStepResult extends AbstractTimestampedResult {
      */
     public void setId(String newId) {
         this.id = newId;
+    }
+    
+    /**
+     * Get the phase identifier for the step.
+     * @return The phase identifier for the step.
+     */
+    public int getPhaseId() {
+        return phaseId;
+    }
+    
+    /**
+     * Set the phase identifier for the step.
+     * @param newPhaseId What to set.
+     */
+    public void setPhaseId(int newPhaseId) {
+        this.phaseId = newPhaseId;
     }
 
     /**
