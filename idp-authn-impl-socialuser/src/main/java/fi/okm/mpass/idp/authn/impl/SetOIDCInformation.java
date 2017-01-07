@@ -33,7 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
+
 import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
@@ -361,14 +363,14 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      *            of the attribute
      * @return attribute value if found, null otherwise
      */
-    private String attributeToString(AttributeContext attributeContext, String name) {
+    private String attributeToString(@Nonnull final SocialUserOpenIdConnectContext suCtx, String name) {
         log.trace("Entering");
-        if (attributeContext == null) {
+        if (suCtx.getResolvedIdPAttributes() == null) {
             log.warn("Attribute context not available");
             log.trace("Leaving");
             return null;
         }
-        IdPAttribute attribute = attributeContext.getIdPAttributes().get(name);
+        IdPAttribute attribute = suCtx.getResolvedIdPAttributes().get(name);
         if (attribute == null || attribute.getValues().size() == 0) {
             log.debug("attribute " + name + " not found or has no values");
             log.trace("Leaving");
@@ -391,7 +393,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      *            to look values for
      * @return id token.
      */
-    private JSONObject buildIDToken(AttributeContext attributeContext) {
+    private JSONObject buildIDToken(@Nonnull final SocialUserOpenIdConnectContext suCtx) {
         log.trace("Entering");
         JSONObject idToken = new JSONObject();
         for (Map.Entry<String, String> entry : requestClaims.entrySet()) {
@@ -404,7 +406,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
                 continue;
             }
             log.debug("locating attribute for " + value);
-            String attrValue = attributeToString(attributeContext, value);
+            String attrValue = attributeToString(suCtx, value);
             if (attrValue != null) {
                 //2. attribute value
                 log.debug("Setting claim " + claim + " to value " + attrValue);
@@ -441,7 +443,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      *             if attribute context is not available or parsing/signing
      *             fails.
      */
-    private JWT getRequestObject(@Nonnull final ProfileRequestContext profileRequestContext, State state)
+    private JWT getRequestObject(@Nonnull final SocialUserOpenIdConnectContext suCtx, State state)
             throws Exception {
         log.trace("Entering");
 
@@ -449,7 +451,6 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
             log.trace("Leaving");
             return null;
         }
-        AttributeContext attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
         JSONObject request = new JSONObject();
         request.put("client_id", clientID.getValue());
         request.put("response_type", responseType.toString());
@@ -461,7 +462,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
             request.put("iat", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         }
         // Build the id token as instructed.
-        JSONObject idToken = buildIDToken(attributeContext);
+        JSONObject idToken = buildIDToken(suCtx);
         JSONObject claims = new JSONObject();
         claims.put("id_token", idToken);
         request.put("claims", claims);
@@ -505,7 +506,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
         JWT requestObject = null;
         try {
             // must be called as a last step
-            requestObject = getRequestObject(profileRequestContext, state);
+            requestObject = getRequestObject(suCtx, state);
         } catch (Exception e) {
             // TODO: better error id
             log.error("{} unable to create request object", getLogPrefix());
