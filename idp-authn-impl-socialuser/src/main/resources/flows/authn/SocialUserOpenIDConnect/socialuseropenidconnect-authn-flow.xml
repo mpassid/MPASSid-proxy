@@ -78,6 +78,6 @@
 
 	<bean-import
 		resource="../SocialUserOpenIDConnect/socialuseropenidconnect-authn-beans.xml" />
-	<bean-import resource="../SocialUser/socialuser-authn-beans.xml" />
+
 
 </flow>
