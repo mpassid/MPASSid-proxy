@@ -25,6 +25,16 @@
 	default-init-method="initialize" default-destroy-method="destroy">
 
 
+	<import resource="../../../conf/authn/socialuser-authn-config.xml" />
+
+	<bean id="SetRPUIInformation" class="net.shibboleth.idp.ui.impl.SetRPUIInformation"
+		scope="prototype" p:activationCondition-ref="shibboleth.authn.SocialUser.populateUIInfo"
+		p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		<property name="fallbackLanguages">
+			<bean parent="shibboleth.CommaDelimStringArray" c:_0="%{idp.ui.fallbackLanguages:}" />
+		</property>
+	</bean>
+
 	<bean id="SetOIDCInformation" class="fi.okm.mpass.idp.authn.impl.SetOIDCInformation">
 		<property name="clientId" value="put_here" />
 		<property name="clientSecret" value="put_here" />
