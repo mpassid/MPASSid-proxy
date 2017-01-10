@@ -76,6 +76,7 @@ public class GsonEncodeDecodeTest {
     public void testGson() throws Exception {
         Gson gson = new Gson();
         final MonitoringSequenceResult seqResult = new MonitoringSequenceResult();
+        seqResult.setId(id1);
         seqResult.setStartTime(seqStart);
         seqResult.setEndTime(seqEnd);
         final MonitoringSequenceStepResult stepResult1 = new MonitoringSequenceStepResult();
@@ -99,6 +100,7 @@ public class GsonEncodeDecodeTest {
         final MonitoringSequenceResult jsonResult = gson.fromJson(json, MonitoringSequenceResult.class);
         Assert.assertEquals(jsonResult.getStartTime(), seqStart);
         Assert.assertEquals(jsonResult.getEndTime(), seqEnd);
+        Assert.assertEquals(jsonResult.getId(), id1);
         Assert.assertEquals(jsonResult.getStepResults().size(), 2);
         Assert.assertEquals(jsonResult.getStepResults().get(0).getEndTime(), step1End);
         Assert.assertEquals(jsonResult.getStepResults().get(0).getStartTime(), step1Start);

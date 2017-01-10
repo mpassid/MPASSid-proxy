@@ -30,6 +30,9 @@ import java.util.List;
  * Class containing results of each step for one monitoring sequence result.
  */
 public class MonitoringSequenceResult extends AbstractTimestampedResult {
+    
+    /** The identifier for the monitored sequence. */
+    private String id;
 
     /** The list of step results for one sequence. */
     private final List<MonitoringSequenceStepResult> stepResults;
@@ -41,6 +44,22 @@ public class MonitoringSequenceResult extends AbstractTimestampedResult {
         stepResults = new ArrayList<>();
     }
 
+    /**
+     * Get the identifier for the monitored sequence.
+     * @return The identifier for the monitored sequence.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set the identifier for the monitored sequence.
+     * @param newId What to set.
+     */
+    public void setId(String newId) {
+        this.id = newId;
+    }
+    
     /**
      * Get the list of step results for the sequence.
      * @return The list of step results for the sequence.
