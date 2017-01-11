@@ -62,6 +62,9 @@ public class RunMonitoringSequence extends AbstractProfileAction {
     /** The initial URL for the initial monitoring step. */
     @Nonnull @NotEmpty private String initialUrl;
     
+    /** The identifier for the monitoring sequence. */
+    @Nonnull @NotEmpty private String sequenceId;
+    
     /**
      * Set the list of attached resolvers.
      * @param newResolvers What to set.
@@ -74,8 +77,16 @@ public class RunMonitoringSequence extends AbstractProfileAction {
      * Set the initial URL for the initial monitoring step.
      * @param url What to set.
      */
-    public void setInitialUrl(final String url) {
+    public void setInitialUrl(@Nonnull @NotEmpty final String url) {
         initialUrl = Constraint.isNotEmpty(url, "The initial URL cannot be empty");
+    }
+    
+    /**
+     * Set the identifier for the monitoring sequence.
+     * @param id What to set.
+     */
+    public void setSequenceId(@Nonnull @NotEmpty final String id) {
+        sequenceId = id;
     }
     
     /** {@inheritDoc} */
@@ -98,6 +109,7 @@ public class RunMonitoringSequence extends AbstractProfileAction {
         final CookieStore cookieStore = new BasicCookieStore();
         context.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
         final MonitoringSequenceResult seqResult = new MonitoringSequenceResult();
+        seqResult.setId(sequenceId);
         seqResult.setStartTime(System.currentTimeMillis());
         SequenceStep initial = new SequenceStep();
         initial.setUrl(initialUrl);
