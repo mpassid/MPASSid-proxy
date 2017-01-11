@@ -29,9 +29,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,14 +92,21 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
         final String redirectUrl = getHeaderValue(response.getHeaders(), "Location");
         if (!isFollowRedirects() && redirectUrl != null) {
             final SequenceStep resultStep = new SequenceStep();
-            resultStep.setUrl(redirectUrl);
+            if (!redirectUrl.contains("://")) {
+                //TODO: should support non-standard http/https ports
+                final HttpHost target = (HttpHost) context.getAttribute(
+                        HttpCoreContext.HTTP_TARGET_HOST);
+                resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + redirectUrl);
+            } else {
+                resultStep.setUrl(redirectUrl);
+            }
             return resultStep;
         }
         final String result = response.getResponse();
         if (StringSupport.trimOrNull(result) == null) {
             throw new ResponseValidatorException("The response is empty!");
         }
-        final SequenceStep resultStep = new SequenceStep();
+        final SequenceStep resultStep = initResultStep();
         final List<NameValuePair> resultParameters = new ArrayList<>();
         final String action = getValue(result, "action");
         for (final String item : outputParameters) {

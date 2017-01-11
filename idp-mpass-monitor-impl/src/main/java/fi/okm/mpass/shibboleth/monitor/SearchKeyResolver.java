@@ -80,7 +80,7 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
         if (StringSupport.trimOrNull(responseStr) == null) {
             throw new ResponseValidatorException("Empty response content from the server");
         }
-        final SequenceStep result = new SequenceStep();
+        final SequenceStep resultStep = initResultStep();
         final String url = getValue(responseStr, key);
         if (StringSupport.trimOrNull(url) == null) {
             throw new ResponseValidatorException("Could not find an URL with the key " + key);
@@ -91,9 +91,9 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
             //TODO: should support non-standard http/https ports
             final HttpHost target = (HttpHost) context.getAttribute(
                     HttpCoreContext.HTTP_TARGET_HOST);
-            result.setUrl(target.getSchemeName() + "://" + target.getHostName() + normalizedUrl);
+            resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + normalizedUrl);
         } else {
-            result.setUrl(normalizedUrl);
+            resultStep.setUrl(normalizedUrl);
         }
         log.debug("Starting to process parameter keys {}", paramKeys.size());
         for (final String paramKey : paramKeys) {
@@ -101,9 +101,9 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
             final String value = getParamValue(responseStr, paramKey);
             if (value != null) {
                 log.debug("Found value {} for {}", value, paramKey);
-                result.getParameters().add(new BasicNameValuePair(paramKey, value));
+                resultStep.getParameters().add(new BasicNameValuePair(paramKey, value));
             }
         }
-        return result;
+        return resultStep;
     }
 }

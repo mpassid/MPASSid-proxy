@@ -68,6 +68,9 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
     
     /** The switch whether or not to follow HTTP redirects automatically. */
     private boolean followRedirects = true;
+    
+    /** The default result URL if it cannot be resolved dynamically. */
+    protected String resultUrl;
 
     /**
      * Constructor.
@@ -107,6 +110,22 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      */
     public boolean isFollowRedirects() {
         return followRedirects;
+    }
+    
+    /**
+     * Set the default result URL if it cannot be resolved dynamically.
+     * @param url What to set.
+     */
+    public void setResultUrl(final String url) {
+        resultUrl = url;
+    }
+    
+    /**
+     * Get default result URL if it cannot be resolved dynamically.
+     * @return The default result URL if it cannot be resolved dynamically.
+     */
+    public String getResultUrl() {
+        return resultUrl;
     }
     
     /**
@@ -281,6 +300,19 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
         }
         log.trace("Could not find a value for {}", headerName);
         return null;
+    }
+    
+    /**
+     * Initializes the resulting {@link SequenceStep}. If the default resultUrl has been set, it will
+     * be set to the resulting step.
+     * @return The resulting {@link SequenceStep}.
+     */
+    protected SequenceStep initResultStep() {
+        final SequenceStep resultStep = new SequenceStep();
+        if (getResultUrl() != null) {
+            resultStep.setUrl(getResultUrl());
+        }
+        return resultStep;
     }
     
     /**

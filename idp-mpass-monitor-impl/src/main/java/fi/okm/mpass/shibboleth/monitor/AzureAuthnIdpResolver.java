@@ -58,9 +58,11 @@ public class AzureAuthnIdpResolver extends BaseSequenceStepResolver {
         if (valueEndIndex < 0) {
             throw new ResponseValidatorException("No trailing \" for the '" + authUrlKey + "'", responseStr);
         }
-        final SequenceStep result = new SequenceStep();
+        final SequenceStep resultStep = initResultStep();
         final String authUrl = responseStr.substring(valueStartIndex, valueEndIndex);
-        result.setUrl(authUrl);
-        return result;
+        if (authUrl != null) {
+            resultStep.setUrl(authUrl);
+        }
+        return resultStep;
     }
 }
