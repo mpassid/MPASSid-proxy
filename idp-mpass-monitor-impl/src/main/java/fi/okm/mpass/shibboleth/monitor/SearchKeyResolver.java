@@ -28,10 +28,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.apache.http.HttpHost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpCoreContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,15 +84,7 @@ public class SearchKeyResolver extends BaseSequenceStepResolver {
             throw new ResponseValidatorException("Could not find an URL with the key " + key);
         }
         final String normalizedUrl = url.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/");
-
-        if (!normalizedUrl.contains("://")) {
-            //TODO: should support non-standard http/https ports
-            final HttpHost target = (HttpHost) context.getAttribute(
-                    HttpCoreContext.HTTP_TARGET_HOST);
-            resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + normalizedUrl);
-        } else {
-            resultStep.setUrl(normalizedUrl);
-        }
+        resultStep.setUrl(completeUrl(context, normalizedUrl));
         log.debug("Starting to process parameter keys {}", paramKeys.size());
         for (final String paramKey : paramKeys) {
             log.debug("Processing parameter key {}", paramKey);

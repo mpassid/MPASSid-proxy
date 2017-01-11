@@ -70,7 +70,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
     private boolean followRedirects = true;
     
     /** The default result URL if it cannot be resolved dynamically. */
-    protected String resultUrl;
+    private String resultUrl;
 
     /**
      * Constructor.
@@ -313,6 +313,22 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
             resultStep.setUrl(getResultUrl());
         }
         return resultStep;
+    }
+    
+    /**
+     * Adds the scheme and host to the given URL, if it's missing.
+     * @param context The HTTP context.
+     * @param sourceUrl The URL to be completed.
+     * @return The completed URL.
+     */
+    protected String completeUrl(final HttpContext context, final String sourceUrl) {
+        if (!sourceUrl.contains("://")) {
+            //TODO: should support non-standard http/https ports
+            final HttpHost target = (HttpHost) context.getAttribute(
+                    HttpCoreContext.HTTP_TARGET_HOST);
+            return target.getSchemeName() + "://" + target.getHostName() + sourceUrl;
+        }
+        return sourceUrl;
     }
     
     /**
