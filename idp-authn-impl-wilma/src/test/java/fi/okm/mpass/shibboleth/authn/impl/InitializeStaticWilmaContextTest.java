@@ -43,12 +43,12 @@ import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 
 /**
- * Unit tests for {@link InitializeWilmaContext}.
+ * Unit tests for {@link InitializeStaticWilmaContext}.
  */
-public class InitializeWilmaContextTest extends PopulateAuthenticationContextTest {
+public class InitializeStaticWilmaContextTest extends PopulateAuthenticationContextTest {
     
     /** The action to be tested. */
-    private InitializeWilmaContext action;
+    private InitializeStaticWilmaContext action;
     
     /** The shared secret for calculating the checksum. */
     private String sharedSecret;
@@ -61,7 +61,7 @@ public class InitializeWilmaContextTest extends PopulateAuthenticationContextTes
         super.setUp();
         sharedSecret = "mockSharedSecret";
         wilmaEndpoint = "https://wilma.example.org/mpass";
-        action = new InitializeWilmaContext(sharedSecret, wilmaEndpoint);
+        action = new InitializeStaticWilmaContext(sharedSecret, wilmaEndpoint);
         action.setHttpServletRequest(initializeServletRequest());
     }
     
@@ -92,7 +92,7 @@ public class InitializeWilmaContextTest extends PopulateAuthenticationContextTes
      * Runs action with invalid MAC algorithm.
      */
     @Test public void testInvalidAlgorithm() throws Exception {
-        action = new InitializeWilmaContext(sharedSecret, wilmaEndpoint, "InvalidAlgorithm");
+        action = new InitializeStaticWilmaContext(sharedSecret, wilmaEndpoint, "InvalidAlgorithm");
         action.setHttpServletRequest(initializeServletRequest());
         action.initialize();
         final AuthenticationContext authnContext = prc.getSubcontext(AuthenticationContext.class, false);

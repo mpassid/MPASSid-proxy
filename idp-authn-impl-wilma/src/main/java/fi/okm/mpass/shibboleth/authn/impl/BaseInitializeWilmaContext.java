@@ -36,10 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.lang.RandomStringUtils;
-import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
-import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,74 +46,34 @@ import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 /**
- * Constructs a new {@link WilmaAuthenticationContext} and attaches it to {@link AuthenticationContext}.
+ * Base class for constructing a new {@link WilmaAuthenticationContext} and attaching it to 
+ * {@link AuthenticationContext}.
  */
 @SuppressWarnings("rawtypes")
-public class InitializeWilmaContext extends AbstractAuthenticationAction {
+public abstract class BaseInitializeWilmaContext extends AbstractAuthenticationAction {
 
     /** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(InitializeWilmaContext.class);
-
+    @Nonnull private final Logger log = LoggerFactory.getLogger(BaseInitializeWilmaContext.class);
+    
     /** The secret key used for calculating the checksum. */
     @Nonnull private final SecretKeySpec signatureKey;
-
-    /** The endpoint where the user is forwarded for authentication. */
-    @Nonnull @NotEmpty private final String endpoint;
 
     /** The algorithm used for calculating the checksum. */
     @Nonnull @NotEmpty private final String algorithm;
 
     /**
-     * Constructor, using a default MAC algorithm {@link WilmaAuthenticationContext.MAC_ALGORITHM}.
-     * @param sharedSecret The secret key used for calculating the checksum.
-     * @param wilmaEndpoint The endpoint where the authentication request is sent.
-     * @throws UnsupportedEncodingException If the key cannot be constructed.
-     */
-    public InitializeWilmaContext(final String sharedSecret, final String wilmaEndpoint)
-            throws UnsupportedEncodingException {
-        this(sharedSecret, wilmaEndpoint, WilmaAuthenticationContext.MAC_ALGORITHM);
-    }
-    
-    /**
      * Constructor.
      * @param sharedSecret The secret key used for calculating the checksum.
-     * @param wilmaEndpoint The endpoint where the authentication request is sent.
      * @param macAlgorithm The algorithm used for calculating the checksum.
      * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
-    public InitializeWilmaContext(final String sharedSecret, final String wilmaEndpoint, final String macAlgorithm)
+    public BaseInitializeWilmaContext(final String sharedSecret, final String macAlgorithm)
             throws UnsupportedEncodingException {
-        super();
         Constraint.isNotEmpty(sharedSecret, "sharedSecret cannot be null!");
-        endpoint = Constraint.isNotEmpty(wilmaEndpoint, "wilmaEndpoint cannot be null!");
         algorithm = Constraint.isNotEmpty(macAlgorithm, "macAlgorithm cannot be null!");
         signatureKey = new SecretKeySpec(sharedSecret.getBytes("UTF-8"), algorithm);
     }
-
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-        if (authenticationContext.getAttemptedFlow() == null) {
-            log.info("{} No attempted flow within authentication context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-        final WilmaAuthenticationContext wilmaContext =
-                authenticationContext.getSubcontext(WilmaAuthenticationContext.class, true);
-        final String nonce = RandomStringUtils.randomAlphanumeric(24);
-        wilmaContext.setNonce(nonce);
-        wilmaContext.setRedirectUrl(endpoint);
-        log.debug("{}: Added nonce {} and redirectUrl to context", getLogPrefix(), nonce);
-    }
-
+    
     /**
      * Constructs an URL where the user is redirected for authentication.
      * @param flowExecutionUrl The current flow execution URL, to be included in the redirect URL.
@@ -179,9 +135,9 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
             final byte[] bytes = mac.doFinal(string.getBytes("UTF-8"));
             return new String(Hex.encodeHex(bytes));
         } catch (InvalidKeyException | UnsupportedEncodingException e) {
-            LoggerFactory.getLogger(InitializeWilmaContext.class).
+            LoggerFactory.getLogger(InitializeStaticWilmaContext.class).
                 error("Could not sign the input data {} with the key", string);
         }
         return null;
     }
-}   
+}
