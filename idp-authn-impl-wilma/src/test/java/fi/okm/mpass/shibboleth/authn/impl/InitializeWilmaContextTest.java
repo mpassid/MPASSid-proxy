@@ -95,11 +95,11 @@ public class InitializeWilmaContextTest extends PopulateAuthenticationContextTes
         action = new InitializeWilmaContext(sharedSecret, wilmaEndpoint, "InvalidAlgorithm");
         action.setHttpServletRequest(initializeServletRequest());
         action.initialize();
-        prc.getSubcontext(AuthenticationContext.class, false).setAttemptedFlow(authenticationFlows.get(0));
+        final AuthenticationContext authnContext = prc.getSubcontext(AuthenticationContext.class, false);
+        authnContext.setAttemptedFlow(authenticationFlows.get(0));
         final Event event = action.execute(src);
         Assert.assertNull(event);
-        final WilmaAuthenticationContext wilmaContext = prc.getSubcontext(AuthenticationContext.class, false).getSubcontext(WilmaAuthenticationContext.class, false);
-        Assert.assertNull(wilmaContext.getRedirectUrl());
+        Assert.assertNull(action.getRedirect("?mock=mock", authnContext));
     }
     
     /**

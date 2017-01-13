@@ -114,7 +114,8 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
                 authenticationContext.getSubcontext(WilmaAuthenticationContext.class, true);
         final String nonce = RandomStringUtils.randomAlphanumeric(24);
         wilmaContext.setNonce(nonce);
-        log.debug("{}: Added nonce {} to context", getLogPrefix(), nonce);
+        wilmaContext.setRedirectUrl(endpoint);
+        log.debug("{}: Added nonce {} and redirectUrl to context", getLogPrefix(), nonce);
     }
 
     /**
@@ -138,7 +139,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
                 wilmaContext.getNonce()));
         final URLCodec urlCodec = new URLCodec();
         try {
-            final StringBuffer unsignedUrlBuffer = new StringBuffer(endpoint);
+            final StringBuffer unsignedUrlBuffer = new StringBuffer(wilmaContext.getRedirectUrl());
             unsignedUrlBuffer.append(getAsParameter("?", WilmaAuthenticationContext.PARAM_NAME_REDIRECT_TO, 
                     urlCodec.encode(redirectToBuffer.toString())));
             if (authenticationContext.isForceAuthn()) {
@@ -149,7 +150,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
                     calculateChecksum(Mac.getInstance(algorithm), unsignedUrlBuffer.toString(), signatureKey));
             return redirectUrl;
         } catch (EncoderException | NoSuchAlgorithmException e) {
-            log.error("{}: Could not encode the following URL {}", getLogPrefix(), redirectToBuffer);
+            log.error("{}: Could not encode the following URL {}", getLogPrefix(), redirectToBuffer, e);
         }
         return null;    
     }
@@ -161,7 +162,7 @@ public class InitializeWilmaContext extends AbstractAuthenticationAction {
      * @param value The value of the parameter.
      * @return The parameter and value in query fraction.
      */
-    protected String getAsParameter(final String divider, final String name, final String value) {
+    protected static String getAsParameter(final String divider, final String name, final String value) {
         return divider + name + "=" + value;
     }
 

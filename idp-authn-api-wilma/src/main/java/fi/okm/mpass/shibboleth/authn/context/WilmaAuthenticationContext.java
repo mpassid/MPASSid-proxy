@@ -56,7 +56,7 @@ public class WilmaAuthenticationContext extends BaseContext {
     /** The nonce included to the redirect URL. */
     @Nonnull @NotEmpty private String nonce;
 
-    /** The URL where the user is redirected for authentication. */
+    /** The base URL where the user is redirected for authentication. */
     @Nonnull @NotEmpty private String redirectUrl;
 
     /**
@@ -80,16 +80,16 @@ public class WilmaAuthenticationContext extends BaseContext {
     }
 
     /**
-     * Get the URL where the user is redirected for authentication.
+     * Get the base URL where the user is redirected for authentication.
      * 
-     * @return redirectUrl
+     * @return redirectUrl the base URL where the user is redirected for authentication.
      */
     @Nonnull @NotEmpty public String getRedirectUrl() {
         return redirectUrl;
     }
 
     /**
-     * Set the URL where the user is redirected for authentication.
+     * Set the base URL where the user is redirected for authentication.
      * 
      * @param newRedirectUrl What to set.
      * @return redirectUrl
