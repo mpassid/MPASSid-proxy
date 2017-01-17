@@ -100,14 +100,14 @@ public class GetOIDCTokenResponse extends AbstractExtractionAction {
             oidcTokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
             if (!oidcTokenResponse.indicatesSuccess()) {
                 log.warn("{} Token response does not indicate success", getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_CREDENTIALS);
                 log.trace("Leaving");
                 return;
             }
 
         } catch (SerializeException | IOException | ParseException e) {
             log.error("{} token response failed", getLogPrefix(), e);
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
