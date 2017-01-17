@@ -23,38 +23,65 @@
 
 package fi.okm.mpass.shibboleth.rest.data;
 
+/**
+ * Data transfer object for the error API responses.
+ */
 public class ErrorDTO {
     
+    /** The error code. */
     private int code;
     
+    /** The error message. */
     private String message;
     
+    /** The error fields. */
     private String fields;
 
+    /**
+     * Get the error code.
+     * @return The error code.
+     */
     public int getCode() {
         return code;
     }
 
+    /**
+     * Set the error code.
+     * @param newCode What to set.
+     */
     public void setCode(int newCode) {
         this.code = newCode;
     }
 
+    /**
+     * Get the error message.
+     * @return The error message.
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Set the error message.
+     * @param newMessage What to set.
+     */
     public void setMessage(String newMessage) {
         this.message = newMessage;
     }
 
+    /**
+     * Get the error fields.
+     * @return The error fields.
+     */
     public String getFields() {
         return fields;
     }
 
+    /**
+     * Set the error fields.
+     * @param newFields What to set.
+     */
     public void setFields(String newFields) {
         this.fields = newFields;
     }
-    
-    
-
 }
