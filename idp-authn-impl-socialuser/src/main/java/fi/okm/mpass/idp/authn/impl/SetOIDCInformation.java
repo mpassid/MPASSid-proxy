@@ -136,6 +136,9 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
     /** Request object claims. */
     private Map<String, String> requestClaims;
 
+    /** OIDC provider metadata. */
+    private OIDCProviderMetadata oIDCProviderMetadata;
+
     /** Constructor. */
     public SetOIDCInformation() {
         log.trace("Entering");
@@ -158,6 +161,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      * Set the RSA algorithm used for signing. Default is RS256.
      * 
      * @param algorithm
+     *            used for signing
      */
     public void setJwsAlgorithm(JWSAlgorithm algorithm) {
         this.jwsAlgorithm = algorithm;
@@ -167,6 +171,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      * Set the key id of the key.
      * 
      * @param id
+     *            for the key.
      */
     public void setKeyID(String id) {
         this.keyID = id;
@@ -186,9 +191,6 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
     public void setRequestClaims(Map<String, String> claims) {
         this.requestClaims = claims;
     }
-
-    /** OIDC provider metadata. */
-    private OIDCProviderMetadata oIDCProviderMetadata;
 
     /**
      * Sets the response type. Default is code. *
@@ -357,7 +359,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
     /**
      * Returns the first found string value for attribute.
      * 
-     * @param attributeContext
+     * @param suCtx
      *            to look attributes for
      * @param name
      *            of the attribute
@@ -389,7 +391,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
     /**
      * Constructs the id token.
      * 
-     * @param attributeContext
+     * @param suCtx
      *            to look values for
      * @return id token.
      */
@@ -400,7 +402,7 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
             String value = entry.getValue();
             String claim = entry.getKey();
             if (value == null) {
-                //1. null value
+                // 1. null value
                 log.debug("Setting claim " + claim + " to null");
                 idToken.put(entry.getKey(), value);
                 continue;
@@ -408,19 +410,19 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
             log.debug("locating attribute for " + value);
             String attrValue = attributeToString(suCtx, value);
             if (attrValue != null) {
-                //2. attribute value
+                // 2. attribute value
                 log.debug("Setting claim " + claim + " to value " + attrValue);
                 idToken.put(claim, attrValue);
                 continue;
-            } 
+            }
             if (value.equals("essential")) {
-                //3. essential value
+                // 3. essential value
                 JSONObject obj = new JSONObject();
                 obj.put("essential", true);
                 log.debug("Setting claim " + claim + " to value " + obj.toJSONString());
                 idToken.put(claim, obj);
                 continue;
-            }   
+            }
             // 4. string value
             log.debug("Setting claim " + claim + " to value " + value);
             idToken.put(claim, value);
@@ -436,15 +438,16 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
      * claims and then signs it.
      * 
      * 
-     * @param profileRequestContext
+     * @param suCtx
      *            for accessing attributes.
-     * @return request object.
+     * @param state
+     *            to be added to request object.
+     * @return request object
      * @throws Exception
      *             if attribute context is not available or parsing/signing
      *             fails.
      */
-    private JWT getRequestObject(@Nonnull final SocialUserOpenIdConnectContext suCtx, State state)
-            throws Exception {
+    private JWT getRequestObject(@Nonnull final SocialUserOpenIdConnectContext suCtx, State state) throws Exception {
         log.trace("Entering");
 
         if (requestClaims == null || requestClaims.size() == 0) {
