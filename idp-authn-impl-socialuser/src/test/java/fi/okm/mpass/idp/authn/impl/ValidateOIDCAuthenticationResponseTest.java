@@ -68,7 +68,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         final AbstractProfileAction<?, ?> action = getAction();
         action.initialize();
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
     
     /**
@@ -80,7 +80,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
         
     }
 
@@ -99,7 +99,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         suCtx.setAuthenticationResponseURI(getHttpServletRequest(state));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         suCtx.setState(State.parse("invalid"));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
     
     /**
@@ -144,7 +144,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         suCtx.setState(State.parse(state));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
     /**
@@ -158,7 +158,7 @@ public class ValidateOIDCAuthenticationResponseTest extends AbstractOIDCIDTokenT
         suCtx.setState(State.parse(state));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
     /**

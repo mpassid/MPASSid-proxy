@@ -130,7 +130,7 @@ public class GetOIDCTokenResponseTest extends AbstractOIDCIDTokenTest {
         suCtx.setoIDCProviderMetadata(metadata);
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = executeWithServer(action, null);
-        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_CREDENTIALS);
     }   
 
     /**
