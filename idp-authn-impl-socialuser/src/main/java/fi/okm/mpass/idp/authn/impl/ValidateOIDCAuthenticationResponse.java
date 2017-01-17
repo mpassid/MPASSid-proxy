@@ -77,7 +77,7 @@ public class ValidateOIDCAuthenticationResponse extends
         if (suCtx == null) {
             log.info("{} Not able to find su oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+                    AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
@@ -85,7 +85,7 @@ public class ValidateOIDCAuthenticationResponse extends
         if (suCtx.getAuthenticationResponseURI() == null) {
             log.info("{} response uri not set", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+                    AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
@@ -96,10 +96,9 @@ public class ValidateOIDCAuthenticationResponse extends
             response = AuthenticationResponseParser.parse(suCtx
                     .getAuthenticationResponseURI());
         } catch (ParseException e) {
-            // TODO: FIX ERROR VALUE
             log.info("{} response parsing failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+                    AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
@@ -113,10 +112,9 @@ public class ValidateOIDCAuthenticationResponse extends
                 error += " : " + errorDescription;
             }
             log.trace("Leaving");
-            // TODO: FIX ERROR VALUE
             log.info("{} response indicated error: {}", getLogPrefix(), error);
             ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+                    AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return;
         }
@@ -125,10 +123,9 @@ public class ValidateOIDCAuthenticationResponse extends
         suCtx.setIDToken(successResponse.getIDToken());
         State state = suCtx.getState();
         if (state == null || !state.equals(successResponse.getState())) {
-            // TODO: FIX ERROR VALUE
             log.info("{} state mismatch:", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.INVALID_AUTHN_CTX);
+                    AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
         }
 
