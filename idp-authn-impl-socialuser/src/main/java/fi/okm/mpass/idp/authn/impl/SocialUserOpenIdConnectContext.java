@@ -108,7 +108,7 @@ public class SocialUserOpenIdConnectContext extends BaseContext {
     private JWT idToken;
     
     /** Resolved attributes.*/
-    public Map<String, IdPAttribute> resolvedIdPAttributes;
+    private Map<String, IdPAttribute> resolvedIdPAttributes;
 
     /**
      * Get the resolved attributes.
