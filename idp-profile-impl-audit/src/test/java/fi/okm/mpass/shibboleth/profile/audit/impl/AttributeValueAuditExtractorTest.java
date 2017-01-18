@@ -127,7 +127,7 @@ public class AttributeValueAuditExtractorTest {
         IdPAttribute attribute = new IdPAttribute(attributeId);
         attribute.setValues(populateValue(attributeValue));
         attributes.add(attribute);
-        attributeContext.setIdPAttributes(attributes);
+        attributeContext.setUnfilteredIdPAttributes(attributes);
         Collection<String> result = auditExtractor.apply(prc);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.iterator().next(), attributeValue);
@@ -142,7 +142,7 @@ public class AttributeValueAuditExtractorTest {
         IdPAttribute attribute = new IdPAttribute(attributeId);
         attribute.setValues(populateValue(attributeValue, "mockValue2"));
         attributes.add(attribute);
-        attributeContext.setIdPAttributes(attributes);
+        attributeContext.setUnfilteredIdPAttributes(attributes);
         Collection<String> result = auditExtractor.apply(prc);
         Assert.assertEquals(result.size(), 2);
     }

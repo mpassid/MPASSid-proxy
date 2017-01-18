@@ -46,8 +46,11 @@ import com.google.common.base.Functions;
 
 /** 
  * A {@link Function} that returns the value for the configured attribute ID from an 
- * {@link AttributeContext}.
+ * {@link AttributeContext}. The value will be searched from the unfiltered set of
+ * resolved attributes, thus it doesn't have to be distributed to the relying party of
+ * the sequence.
  */
+@SuppressWarnings("rawtypes")
 public class AttributeValueAuditExtractor implements Function<ProfileRequestContext,Collection<String>> {
     
     /** Class logger. */
@@ -87,8 +90,9 @@ public class AttributeValueAuditExtractor implements Function<ProfileRequestCont
     @Override
     @Nullable public Collection<String> apply(@Nullable final ProfileRequestContext input) {
         final AttributeContext attributeCtx = attributeContextLookupStrategy.apply(input);
-        if (attributeCtx != null && attributeCtx.getIdPAttributes().keySet().contains(attributeId)) {
-            final List<IdPAttributeValue<?>> values = attributeCtx.getIdPAttributes().get(attributeId).getValues();
+        if (attributeCtx != null && attributeCtx.getUnfilteredIdPAttributes().keySet().contains(attributeId)) {
+            final List<IdPAttributeValue<?>> values = 
+                    attributeCtx.getUnfilteredIdPAttributes().get(attributeId).getValues();
             final Collection<String> attributeValue = new ArrayList<String>();
             log.debug("Iterating through the set of {} attribute values", values.size());
             for (int i = 0; i < values.size(); i++) {
