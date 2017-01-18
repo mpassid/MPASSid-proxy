@@ -36,6 +36,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.lang.RandomStringUtils;
+import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +76,18 @@ public abstract class BaseInitializeWilmaContext extends AbstractAuthenticationA
         Constraint.isNotEmpty(sharedSecret, "sharedSecret cannot be null!");
         algorithm = Constraint.isNotEmpty(macAlgorithm, "macAlgorithm cannot be null!");
         signatureKey = new SecretKeySpec(sharedSecret.getBytes("UTF-8"), algorithm);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
+        if (authenticationContext.getAttemptedFlow() == null) {
+            log.info("{} No attempted flow within authentication context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -139,5 +155,13 @@ public abstract class BaseInitializeWilmaContext extends AbstractAuthenticationA
                 error("Could not sign the input data {} with the key", string);
         }
         return null;
+    }
+    
+    /**
+     * Calculates a random nonce to be used in the communication with a Wilma instance.
+     * @return A random alphanumeric 24-digit nonce.
+     */
+    protected static String getRandomNonce() {
+        return RandomStringUtils.randomAlphanumeric(24);
     }
 }

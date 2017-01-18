@@ -27,9 +27,6 @@ import java.io.UnsupportedEncodingException;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,22 +66,10 @@ public class InitializeStaticWilmaContext extends BaseInitializeWilmaContext {
      * @param macAlgorithm The algorithm used for calculating the checksum.
      * @throws UnsupportedEncodingException If the key cannot be constructed.
      */
-    public InitializeStaticWilmaContext(final String sharedSecret, final String wilmaEndpoint, final String macAlgorithm)
-            throws UnsupportedEncodingException {
+    public InitializeStaticWilmaContext(final String sharedSecret, final String wilmaEndpoint, 
+            final String macAlgorithm) throws UnsupportedEncodingException {
         super(sharedSecret, macAlgorithm);
         endpoint = Constraint.isNotEmpty(wilmaEndpoint, "wilmaEndpoint cannot be null!");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-        if (authenticationContext.getAttemptedFlow() == null) {
-            log.info("{} No attempted flow within authentication context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        return true;
     }
 
     /** {@inheritDoc} */
@@ -93,7 +78,7 @@ public class InitializeStaticWilmaContext extends BaseInitializeWilmaContext {
             @Nonnull final AuthenticationContext authenticationContext) {
         final WilmaAuthenticationContext wilmaContext =
                 authenticationContext.getSubcontext(WilmaAuthenticationContext.class, true);
-        final String nonce = RandomStringUtils.randomAlphanumeric(24);
+        final String nonce = getRandomNonce();
         wilmaContext.setNonce(nonce);
         wilmaContext.setRedirectUrl(endpoint);
         log.debug("{}: Added nonce {} and redirectUrl to context", getLogPrefix(), nonce);
