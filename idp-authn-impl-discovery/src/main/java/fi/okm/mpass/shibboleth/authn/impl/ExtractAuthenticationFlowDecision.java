@@ -56,7 +56,13 @@ public class ExtractAuthenticationFlowDecision extends AbstractExtractionAction 
     @Nonnull private final Logger log = LoggerFactory.getLogger(ExtractAuthenticationFlowDecision.class);
 
     /** Parameter name for authentication flow id. */
-    @Nonnull @NotEmpty  private String authnFlowFieldName;
+    @Nonnull @NotEmpty private String authnFlowFieldName;
+    
+    /** Parameter name for selected authentication detail to be put to authentication state map. */
+    private String selectedAuthnFieldName = null;
+    
+    /** Authentication state map key name for the selected authentication detail. */
+    private String selectedAuthnStateKey = null;
     
     /**
      * Set the authnFlow parameter name.
@@ -68,6 +74,26 @@ public class ExtractAuthenticationFlowDecision extends AbstractExtractionAction 
         
         authnFlowFieldName = Constraint.isNotNull(
                 StringSupport.trimOrNull(fieldName), "AuthnFlow field name cannot be null or empty.");
+    }
+    
+    /**
+     * Set the parameter name for selected authentication detail to be put to authentication state map.
+     * @param fieldName What to set.
+     */
+    public void setSelectedAuthnFieldName(final String fieldName) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        
+        selectedAuthnFieldName = fieldName;
+    }
+    
+    /**
+     * Set the authentication state map key name for the selected authentication detail.
+     * @param keyName What to set.
+     */
+    public void setSelectedAuthnStateKey(final String keyName) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+
+        selectedAuthnStateKey = keyName;
     }
     
     /** {@inheritDoc} */
@@ -90,6 +116,14 @@ public class ExtractAuthenticationFlowDecision extends AbstractExtractionAction 
         }
         log.debug("{} User selected authnFlow {}", getLogPrefix(), authnFlow);
         authenticationContext.setSignaledFlowId(authnFlow);
+        if (selectedAuthnFieldName != null && selectedAuthnStateKey != null) {
+            final String selectedAuthn = request.getParameter(selectedAuthnFieldName);
+            if (StringSupport.trimOrNull(selectedAuthn) != null) {
+                authenticationContext.getAuthenticationStateMap().put(selectedAuthnStateKey, selectedAuthn);
+                log.debug("{} Selected authentication detail set to {} as parameter {}", 
+                        getLogPrefix(), selectedAuthn, selectedAuthnStateKey);
+            }
+        }
         ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.RESELECT_FLOW);
     }   
 }
