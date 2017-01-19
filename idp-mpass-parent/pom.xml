@@ -141,6 +141,11 @@ THE SOFTWARE.
             </dependency>
             <dependency>
                 <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-profile-spring</artifactId>
+                <version>${shib.idp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.shibboleth.idp</groupId>
                 <artifactId>idp-saml-api</artifactId>
                 <version>${shib.idp.version}</version>
             </dependency>
@@ -290,6 +295,13 @@ THE SOFTWARE.
             <dependency>
                 <groupId>net.shibboleth.idp</groupId>
                 <artifactId>idp-profile-api</artifactId>
+                <version>${shib.idp.version}</version>
+                <scope>test</scope>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-profile-spring</artifactId>
                 <version>${shib.idp.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
