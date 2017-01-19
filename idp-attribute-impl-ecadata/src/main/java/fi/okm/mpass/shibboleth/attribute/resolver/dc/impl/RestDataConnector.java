@@ -189,14 +189,21 @@ public class RestDataConnector extends AbstractDataConnector {
             throw new ResolutionException("Could not resolve idpId value");
         }
         final String attributeCallUrl = endpointUrl + "?" + idpIdValue + "=" + authnIdValue;
+
+        final HttpClient httpClient;
+        try {
+            httpClient = buildClient();
+        } catch (Exception e) {
+            log.error("Could not build HTTP client, skipping attribute resolution", e);
+            return attributes;
+        }
+        log.debug("Calling URL {}", attributeCallUrl);
+        final HttpContext context = HttpClientContext.create();          
+        final HttpUriRequest getMethod = RequestBuilder.get().setUri(attributeCallUrl)
+                .setHeader("Authorization", "Token " + token).build();
         final HttpResponse restResponse;
         final long timestamp = System.currentTimeMillis();
         try {
-            final HttpClient httpClient = getHttpClientBuilder().buildClient();
-            log.debug("Calling URL {}", attributeCallUrl);
-            final HttpContext context = HttpClientContext.create();          
-            final HttpUriRequest getMethod = RequestBuilder.get().setUri(attributeCallUrl)
-                    .setHeader("Authorization", "Token " + token).build();
             restResponse = httpClient.execute(getMethod, context);
         } catch (Exception e) {
             log.error("Could not open connection to REST API, skipping attribute resolution", e);
@@ -223,7 +230,7 @@ public class RestDataConnector extends AbstractDataConnector {
                 populateAttributes(attributes, ecaUser);
                 log.debug("{} attributes are now populated", attributes.size());
             } else {
-                log.warn("No attributes found for session, http status {}", status);
+                log.warn("No attributes found for session with idpId {}, http status {}", idpIdValue, status);
             }
         } catch (Exception e) {
             log.error("Error in connection to Data API", e);
@@ -490,6 +497,15 @@ public class RestDataConnector extends AbstractDataConnector {
      */
     protected HttpClientBuilder getHttpClientBuilder() {
         return httpClientBuilder;
+    }
+    
+    /**
+     * Builds a {@link HttpClient} using current {@link HttpClientBuilder}.
+     * @return The built client.
+     * @throws Exception If the building fails.
+     */
+    protected synchronized HttpClient buildClient() throws Exception {
+        return getHttpClientBuilder().buildClient();
     }
     
     /**
