@@ -1,0 +1,7 @@
+CREATE TABLE mpass_services (
+    id BIGINT IDENTITY NOT NULL PRIMARY KEY,
+    samlEntityId VARCHAR(255) NOT NULL,
+    samlAcsUrl VARCHAR(255) NOT NULL,
+    startTime TIMESTAMP NOT NULL,
+    endTime TIMESTAMP
+	);
