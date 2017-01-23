@@ -157,15 +157,15 @@ public class MetaDTO {
     }
 
     /**
-     * Get the service description of the proxy
-     * @return The service description of the proxy
+     * Get the service description of the proxy.
+     * @return The service description of the proxy.
      */
     public String getServiceDescription() {
         return serviceDescription;
     }
 
     /**
-     * Set the service description of the proxy
+     * Set the service description of the proxy.
      * @param description What to set.
      */
     public void setServiceDescription(final String description) {
