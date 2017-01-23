@@ -83,7 +83,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
     @Nonnull private final JWSVerifier jmsVerifier;
     
     /** Current incoming JWT token, if available. */
-    SignedJWT jwt;
+    private SignedJWT jwt;
     
     /**
      * Constructor.
@@ -131,6 +131,22 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
         usernameId = username;
     }
     
+    /**
+     * Get the current incoming JWT token.
+     * @return The current incoming JWT token.
+     */
+    protected SignedJWT getJwt() {
+        return jwt;
+    }
+    
+    /**
+     * Set the current incoming JWT token.
+     * @param signedJwt What to set.
+     */
+    protected void setJwt(SignedJWT signedJwt) {
+        jwt = signedJwt;
+    }
+    
     /** {@inheritDoc} */
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -163,8 +179,8 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
             @Nonnull final AuthenticationContext authenticationContext) {
         final HttpServletRequest servletRequest = getHttpServletRequest();
         try {
-            jwt = SignedJWT.parse(servletRequest.getParameter(jwtParameter));
-            if (!jwt.verify(jmsVerifier)) {
+            setJwt(SignedJWT.parse(servletRequest.getParameter(jwtParameter)));
+            if (!getJwt().verify(jmsVerifier)) {
                 log.warn("{}: Invalid signature in the incoming JWT token!", getLogPrefix());
                 handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
                         AuthnEventIds.NO_CREDENTIALS);
@@ -176,7 +192,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
                     AuthnEventIds.NO_CREDENTIALS);
             return;            
         }
-        final Object username = jwt.getPayload().toJSONObject().get(usernameId);
+        final Object username = getJwt().getPayload().toJSONObject().get(usernameId);
         if (username == null || StringSupport.trimOrNull(String.valueOf(username)) == null) {
             handleError(profileRequestContext, authenticationContext, AuthnEventIds.NO_CREDENTIALS,
                     AuthnEventIds.NO_CREDENTIALS);
@@ -190,7 +206,7 @@ public class ValidateJwtTokenAuthentication extends AbstractValidationAction {
     @Override
     @Nonnull protected Subject populateSubject(@Nonnull final Subject subject) {
         subject.getPrincipals().add(
-                new UsernamePrincipal(String.valueOf(jwt.getPayload().toJSONObject().get(usernameId))));
+                new UsernamePrincipal(String.valueOf(getJwt().getPayload().toJSONObject().get(usernameId))));
         log.trace("{}: Subject successfully populated", getLogPrefix());
         return subject;
     }    
