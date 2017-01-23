@@ -29,6 +29,7 @@ For more information about the MPASS project, see http://www.mpass.id/.
 - _idp-mpass-rest-api_: Interface module for metadata API.
 - _idp-mpass-rest-impl_: Implementation module for metadata API.
 - _idp-profile-impl-audit_: Some extensions for audit logging.
+- _idp-profile-impl-metadata_: Some extensions for metadata resolution.
 
 ## Prerequisities and build instructions
 

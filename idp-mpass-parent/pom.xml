@@ -50,6 +50,7 @@ THE SOFTWARE.
         <module>../idp-mpass-rest-api</module>
         <module>../idp-mpass-rest-impl</module>
         <module>../idp-profile-impl-audit</module>
+        <module>../idp-profile-impl-metadata</module>
     </modules>
 
     <properties>
