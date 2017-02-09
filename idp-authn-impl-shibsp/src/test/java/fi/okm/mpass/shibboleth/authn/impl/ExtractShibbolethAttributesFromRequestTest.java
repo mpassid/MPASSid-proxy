@@ -25,9 +25,14 @@ package fi.okm.mpass.shibboleth.authn.impl;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.authn.context.ExternalAuthenticationContext;
 import net.shibboleth.idp.authn.impl.PopulateAuthenticationContextTest;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+
+import java.util.Map;
+
+import javax.security.auth.Subject;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
@@ -37,6 +42,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
+import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
 
 /**
  * Unit tests for {@link ExtractShibbolethAttributesFromRequest}.
@@ -94,7 +100,7 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
      */
     @Test
     public void testNoServlet() throws ComponentInitializationException {
-        action = new ExtractShibbolethAttributesFromRequest("");
+        action = new ExtractShibbolethAttributesFromRequest();
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
@@ -156,5 +162,79 @@ public class ExtractShibbolethAttributesFromRequestTest extends PopulateAuthenti
         Assert.assertEquals(shibCtx.getAttributes().get(expectedAttribute), expectedAttribute);
         Assert.assertEquals(shibCtx.getHeaders().size(), 6);
         Assert.assertEquals(shibCtx.getHeaders().get(expectedHeader), expectedHeader);
+    }
+    
+    /**
+     * Tests external authentication method without {@link ExternalAuthenticationContext}.
+     * @throws ComponentInitializationException
+     */
+    @Test
+    public void testExternalNoContext() throws ComponentInitializationException {
+        action = initAction(true);
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
+     * Tests external authentication method without subject in {@link ExternalAuthenticationContext}.
+     * @throws ComponentInitializationException
+     */
+    @Test
+    public void testExternalNoSubject() throws ComponentInitializationException {
+        action = initAction(true);
+        final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
+        authCtx.getSubcontext(ExternalAuthenticationContext.class, true);
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
+     * Tests external authentication method with empty subject in {@link ExternalAuthenticationContext}.
+     * @throws ComponentInitializationException
+     */
+    @Test
+    public void testExternalEmptySubject() throws ComponentInitializationException {
+        action = initAction(true);
+        final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
+        final ExternalAuthenticationContext extCtx = authCtx.getSubcontext(ExternalAuthenticationContext.class, true);
+        extCtx.setSubject(new Subject());
+        final Event event = action.execute(src);
+        Assert.assertNull(event);
+        Assert.assertEquals(authCtx.getSubcontext(ShibbolethSpAuthenticationContext.class).getHeaders().size(), 0);
+    }
+    
+    /**
+     * Tests successful construction of {@link ShibbolethSpAuthenticationContext} with external authentication method.
+     * @throws ComponentInitializationException
+     */
+    @Test
+    public void testExternalSuccess() throws ComponentInitializationException {
+        action = initAction(true);
+        final AuthenticationContext authCtx = prc.getSubcontext(AuthenticationContext.class, false);
+        final ExternalAuthenticationContext extCtx = authCtx.getSubcontext(ExternalAuthenticationContext.class, true);
+        final String headerName = "mockName";
+        final String headerValue = "mockValue";
+        final Subject subject = new Subject();
+        subject.getPrincipals().add(new ShibHeaderPrincipal(headerName, headerValue));
+        extCtx.setSubject(subject);
+        final Event event = action.execute(src);
+        Assert.assertNull(event);
+        final Map<String, String> headers = authCtx.getSubcontext(ShibbolethSpAuthenticationContext.class).getHeaders();
+        Assert.assertEquals(headers.size(), 1);
+        Assert.assertEquals(headers.get(headerName), headerValue);
+    }
+    
+    /**
+     * Initializes the action.
+     * @param exploitExternal
+     * @return
+     * @throws ComponentInitializationException
+     */
+    protected ExtractShibbolethAttributesFromRequest initAction(boolean exploitExternal) throws ComponentInitializationException {
+        ExtractShibbolethAttributesFromRequest action = new ExtractShibbolethAttributesFromRequest();
+        action.setHttpServletRequest(new MockHttpServletRequest());
+        action.setExploitExternal(true);
+        action.initialize();
+        return action;
     }
 }
