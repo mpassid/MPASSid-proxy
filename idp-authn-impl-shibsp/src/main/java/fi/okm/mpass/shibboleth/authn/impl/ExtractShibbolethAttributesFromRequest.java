@@ -26,11 +26,13 @@ package fi.okm.mpass.shibboleth.authn.impl;
 import java.util.Enumeration;
 
 import javax.annotation.Nonnull;
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.authn.context.ExternalAuthenticationContext;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.opensaml.profile.action.ActionSupport;
@@ -39,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
+import fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipal;
 
 /**
  * An action that extracts a Http headers and request attributes, creates and populates a 
@@ -57,6 +60,9 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
     
     /** The possible prefix for the Shibboleth attribute names. */
     private final String variablePrefix;
+    
+    /** Whether exploit the external authentication context. */
+    private boolean exploitExternal;
 
     /**
      * Constructor.
@@ -73,6 +79,23 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
     public ExtractShibbolethAttributesFromRequest(String prefix) {
         super();
         variablePrefix = prefix;
+        setExploitExternal(false);
+    }
+
+    /**
+     * Set whether exploit the external authentication context.
+     * @param check What to set.
+     */
+    public void setExploitExternal(final boolean check) {
+        exploitExternal = check;
+    }
+    
+    /**
+     * Whether exploit the external authentication context.
+     * @return Whether exploit the external authentication context.
+     */
+    public boolean isExploitExternal() {
+        return exploitExternal;
     }
     
     /** {@inheritDoc} */
@@ -91,20 +114,43 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         }
         final ShibbolethSpAuthenticationContext shibbolethContext =
                 authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class, true);
-        final Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            final String header = headerNames.nextElement();
-            final String value = StringSupport.trimOrNull(request.getHeader(header));
-            updateShibbolethContext(shibbolethContext, header, value, true);
-        }
-        final Enumeration<String> attributeNames = request.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            final String name = attributeNames.nextElement();
-            if (request.getAttribute(name) instanceof String) {
-                final String value = StringSupport.trimOrNull((String)request.getAttribute(name));
-                updateShibbolethContext(shibbolethContext, name, value, false);
-            } else {
-                log.debug("{} Ignoring request attribute {}", getLogPrefix(), name);
+        if (isExploitExternal()) {
+            log.debug("{} Exploiting External Authentication", getLogPrefix());
+            final ExternalAuthenticationContext extContext =
+                    authenticationContext.getSubcontext(ExternalAuthenticationContext.class);
+            if (extContext == null) {
+                log.error("{} External Authentication context not found!", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+                return;
+            }
+            final Subject subject = extContext.getSubject();
+            if (subject == null) {
+                log.error("{} No subject in the External Authentication context!", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
+                return;
+            }
+            for (final ShibHeaderPrincipal principal : subject.getPrincipals(ShibHeaderPrincipal.class)) {
+                final String header = principal.getKey();
+                final String value = principal.getValue();
+                updateShibbolethContext(shibbolethContext, header, value, true);
+            }
+        } else {
+            log.debug("{} Checking headers and attributes, not External Authentication", getLogPrefix());
+            final Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                final String header = headerNames.nextElement();
+                final String value = StringSupport.trimOrNull(request.getHeader(header));
+                updateShibbolethContext(shibbolethContext, header, value, true);
+            }
+            final Enumeration<String> attributeNames = request.getAttributeNames();
+            while (attributeNames.hasMoreElements()) {
+                final String name = attributeNames.nextElement();
+                if (request.getAttribute(name) instanceof String) {
+                    final String value = StringSupport.trimOrNull((String)request.getAttribute(name));
+                    updateShibbolethContext(shibbolethContext, name, value, false);
+                } else {
+                    log.debug("{} Ignoring request attribute {}", getLogPrefix(), name);
+                }
             }
         }
     }
