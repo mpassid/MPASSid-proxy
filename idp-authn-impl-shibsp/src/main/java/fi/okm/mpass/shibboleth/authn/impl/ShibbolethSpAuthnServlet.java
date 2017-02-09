@@ -94,10 +94,12 @@ public class ShibbolethSpAuthnServlet extends HttpServlet {
                     log.debug("Header {} added to the set of Principals", header);
                 }
             }
-            final Enumeration<String> attributeNames = request.getAttributeNames();
-            while (attributeNames.hasMoreElements()) {
-                final String attribute = attributeNames.nextElement();
-                log.trace("Attribute name {} has value {}", attribute, request.getAttribute(attribute));
+            if (log.isTraceEnabled()) { // attributes are currently only logged for trace level
+                final Enumeration<String> attributeNames = request.getAttributeNames();
+                while (attributeNames.hasMoreElements()) {
+                    final String attribute = attributeNames.nextElement();
+                    log.trace("Attribute name {} has value {}", attribute, request.getAttribute(attribute));
+                }
             }
             request.setAttribute(ExternalAuthentication.SUBJECT_KEY, subject);
             log.debug("Subject populated and added to the request");
