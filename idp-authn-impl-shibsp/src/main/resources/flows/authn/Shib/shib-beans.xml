@@ -48,4 +48,10 @@ THE SOFTWARE.
        <constructor-arg type="String" value="AJP_"/>
     </bean>
 
+    <bean id="ExtractShibbolethPrincipals" class="fi.okm.mpass.shibboleth.authn.impl.ExtractShibbolethAttributesFromRequest" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+        p:trim="true" p:exploitExternal="true">
+       <constructor-arg type="String" value="AJP_"/>
+    </bean>
+
 </beans>

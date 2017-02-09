@@ -37,6 +37,15 @@ THE SOFTWARE.
     <bean id="shibboleth.authn.ShibExample.externalAuthnPath" class="java.lang.String"
         c:_0="https://example.org/Shibboleth.sso/Login?entityID=https://example.org/idp/shibboleth" />
 
+    <!-- Uses another Shibboleth SP handler URL for making the request using different SP EntityID. -->
+    <bean id="shibboleth.authn.ShibExternal.externalHandler" class="java.lang.String"
+        c:_0="https://example.org/override/Shibboleth.sso/Login?entityID=https://example.org/idp/shibboleth" />
+
+    <!-- This endpoint must be configured in web.xml for fi.okm.mpass.shibboleth.authn.impl.ShibbolethSpAuthnServlet -->
+    <!-- It must also be protected by the SP handler configured in the externalHandler bean above -->
+    <bean id="shibboleth.authn.ShibExternal.externalAuthServlet" class="java.lang.String"
+        c:_0="https://example.org/idp/Authn/ShibExternal" />
+
     <!--
     Define entries here to map error messages returned by external modules and classify them as particular
     kinds of errors for use in your templates and as events in flows.
