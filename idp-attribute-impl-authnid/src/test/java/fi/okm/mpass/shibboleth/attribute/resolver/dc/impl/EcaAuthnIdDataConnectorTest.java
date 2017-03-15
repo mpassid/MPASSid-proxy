@@ -28,9 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.shibboleth.idp.attribute.EmptyAttributeValue;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
+import net.shibboleth.idp.attribute.EmptyAttributeValue.EmptyType;
 import net.shibboleth.idp.attribute.resolver.AttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.ResolutionException;
 import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
@@ -154,6 +156,7 @@ public class EcaAuthnIdDataConnectorTest {
         source.add("mock3");
         source.add("mock4");
         Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));
+        target.add(new EmptyAttributeValue(EmptyType.NULL_VALUE));
         target.add(new StringAttributeValue("mock5"));
         target.add(new StringAttributeValue("mock6"));
         Assert.assertFalse(dataConnector.sourceExistsInAnother(source, target));

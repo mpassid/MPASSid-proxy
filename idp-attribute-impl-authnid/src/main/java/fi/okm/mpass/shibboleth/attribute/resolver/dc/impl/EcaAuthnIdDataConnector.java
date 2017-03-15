@@ -182,7 +182,8 @@ public class EcaAuthnIdDataConnector extends AbstractDataConnector {
         for (int i = 0; i < source.size(); i++) {
             for (int j = 0; j < targetValues.size(); j++) {
                 log.trace("Comparing {} to {}", source.get(i), targetValues.get(j).getDisplayValue());
-                if (source.get(i).equals((String) targetValues.get(j).getValue())) {
+                final Object targetValue = targetValues.get(j).getValue();
+                if (targetValue instanceof String && source.get(i).equals((String) targetValue)) {
                     log.debug("Strings are corresponding, returning true");
                     return true;
                 }
