@@ -56,56 +56,48 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(ValidateOIDCAuthentication.class);
+    private final Logger log = LoggerFactory.getLogger(ValidateOIDCAuthentication.class);
 
     /** the subject received from id token. */
     private String oidcSubject;
 
     /** {@inheritDoc} */
     @Override
-    protected boolean doPreExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
         if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
             return false;
         }
-        log.trace("{}: Prerequisities fulfilled to start doPreExecute",
-                getLogPrefix());
+        log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
 
         final SocialUserOpenIdConnectContext suCtx = authenticationContext
                 .getSubcontext(SocialUserOpenIdConnectContext.class);
         if (suCtx == null) {
             log.error("{} Not able to find su oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return false;
         }
-        
+
         if (suCtx.getIDToken() == null) {
             log.error("{} No ID Token in response", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return false;
         }
         try {
-            oidcSubject = suCtx
-                    .getIDToken().getJWTClaimsSet().getSubject();
+            oidcSubject = suCtx.getIDToken().getJWTClaimsSet().getSubject();
         } catch (ParseException e) {
             log.error("{} unable to parse ID Token", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return false;
         }
 
         if (oidcSubject == null) {
             log.error("{} Subject is null in ID Token response", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
             return false;
         }
@@ -114,8 +106,7 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
         buildAuthenticationResult(profileRequestContext, authenticationContext);
@@ -126,6 +117,7 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
     @Override
     protected Subject populateSubject(Subject subject) {
         log.trace("Entering");
+        log.debug("{}Setting usernameprincipal to " + oidcSubject, getLogPrefix());
         subject.getPrincipals().add(new UsernamePrincipal(oidcSubject));
         log.trace("Leaving");
         return subject;
