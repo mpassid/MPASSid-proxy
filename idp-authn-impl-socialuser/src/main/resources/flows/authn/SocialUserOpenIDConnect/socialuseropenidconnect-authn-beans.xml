@@ -64,7 +64,7 @@
 	<bean id="ValidateOIDCIDTokenSignature"
 		class="fi.okm.mpass.idp.authn.impl.ValidateOIDCIDTokenSignature" />
 
-	<bean id="ValidateOIDCAuthentication" class="fi.okm.mpass.idp.authn.impl.ValidateOIDCAuthentication" />
+	<bean id="ValidateOIDCAuthentication" class="fi.okm.mpass.idp.authn.impl.ValidateOIDCAuthentication" scope="prototype" />
 
 	<bean id="GetOIDCTokenResponse" class="fi.okm.mpass.idp.authn.impl.GetOIDCTokenResponse"
 		p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
