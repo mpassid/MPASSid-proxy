@@ -73,7 +73,6 @@ public class ExtractSocialPrincipalsFromSubject extends
         final SocialUserContext suCtx = authenticationContext.getSubcontext(
                 SocialUserContext.class, true);
         final HttpServletRequest request = getHttpServletRequest();
-        authenticationContext.setResultCacheable(false);
         if (request == null) {
             log.info(
                     "{} Profile action does not contain an HttpServletRequest",
