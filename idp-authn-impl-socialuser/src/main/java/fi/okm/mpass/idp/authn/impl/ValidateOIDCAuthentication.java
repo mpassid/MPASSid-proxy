@@ -47,80 +47,103 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ValidateOIDCAuthentication extends AbstractValidationAction {
 
-    /*
-     * A DRAFT PROTO CLASS!! NOT TO BE USED YET.
-     * 
-     * FINAL GOAL IS TO MOVE FROM CURRENT OIDC TO MORE WEBFLOW LIKE
-     * IMPLEMENTATION.
-     */
+	/** Class logger. */
+	@Nonnull
+	private final Logger log = LoggerFactory
+			.getLogger(ValidateOIDCAuthentication.class);
 
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory.getLogger(ValidateOIDCAuthentication.class);
+	/** Avoid creating multiple principals. */
+	private boolean avoidMultiplePrincipal;
 
-    /** the subject received from id token. */
-    private String oidcSubject;
+	/**
+	 * In MFA use case prior authentication may have created a usernameprincipal
+	 * already with value not matching to MFA.
+	 * 
+	 * @param avoidMultiplePrincipal
+	 *            true if additional principals should be avoided.
+	 */
+	public void setAvoidMultiplePrincipal(boolean avoid) {
+		this.avoidMultiplePrincipal = avoid;
+	}
 
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
+	/** the subject received from id token. */
+	private String oidcSubject;
 
-        if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
-            return false;
-        }
-        log.trace("{}: Prerequisities fulfilled to start doPreExecute", getLogPrefix());
+	/** {@inheritDoc} */
+	@Override
+	protected boolean doPreExecute(
+			@Nonnull final ProfileRequestContext profileRequestContext,
+			@Nonnull final AuthenticationContext authenticationContext) {
 
-        final SocialUserOpenIdConnectContext suCtx = authenticationContext
-                .getSubcontext(SocialUserOpenIdConnectContext.class);
-        if (suCtx == null) {
-            log.error("{} Not able to find su oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
+		if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
+			return false;
+		}
+		log.trace("{}: Prerequisities fulfilled to start doPreExecute",
+				getLogPrefix());
 
-        if (suCtx.getIDToken() == null) {
-            log.error("{} No ID Token in response", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
-        try {
-            oidcSubject = suCtx.getIDToken().getJWTClaimsSet().getSubject();
-        } catch (ParseException e) {
-            log.error("{} unable to parse ID Token", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
+		final SocialUserOpenIdConnectContext suCtx = authenticationContext
+				.getSubcontext(SocialUserOpenIdConnectContext.class);
+		if (suCtx == null) {
+			log.error("{} Not able to find su oidc context", getLogPrefix());
+			ActionSupport.buildEvent(profileRequestContext,
+					AuthnEventIds.NO_CREDENTIALS);
+			log.trace("Leaving");
+			return false;
+		}
 
-        if (oidcSubject == null) {
-            log.error("{} Subject is null in ID Token response", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return false;
-        }
-        return true;
-    }
+		if (suCtx.getIDToken() == null) {
+			log.error("{} No ID Token in response", getLogPrefix());
+			ActionSupport.buildEvent(profileRequestContext,
+					AuthnEventIds.NO_CREDENTIALS);
+			log.trace("Leaving");
+			return false;
+		}
+		try {
+			oidcSubject = suCtx.getIDToken().getJWTClaimsSet().getSubject();
+		} catch (ParseException e) {
+			log.error("{} unable to parse ID Token", getLogPrefix());
+			ActionSupport.buildEvent(profileRequestContext,
+					AuthnEventIds.NO_CREDENTIALS);
+			log.trace("Leaving");
+			return false;
+		}
 
-    /** {@inheritDoc} */
-    @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
-        buildAuthenticationResult(profileRequestContext, authenticationContext);
-        log.trace("Leaving");
-        return;
-    }
+		if (oidcSubject == null) {
+			log.error("{} Subject is null in ID Token response", getLogPrefix());
+			ActionSupport.buildEvent(profileRequestContext,
+					AuthnEventIds.NO_CREDENTIALS);
+			log.trace("Leaving");
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    protected Subject populateSubject(Subject subject) {
-        log.trace("Entering");
-        log.debug("{} Setting usernameprincipal to {}", getLogPrefix(), oidcSubject);
-        subject.getPrincipals().add(new UsernamePrincipal(oidcSubject));
-        log.trace("Leaving");
-        return subject;
-    }
+	/** {@inheritDoc} */
+	@Override
+	protected void doExecute(
+			@Nonnull final ProfileRequestContext profileRequestContext,
+			@Nonnull final AuthenticationContext authenticationContext) {
+		log.trace("Entering");
+		buildAuthenticationResult(profileRequestContext, authenticationContext);
+		log.trace("Leaving");
+		return;
+	}
+
+	@Override
+	protected Subject populateSubject(Subject subject) {
+		log.trace("Entering");
+		if (avoidMultiplePrincipal && subject.getPrincipals().size() > 0) {
+			log.debug("{} Subject contains already principal, not populated",
+					getLogPrefix());
+
+		} else {
+			log.debug("{} Setting usernameprincipal to {}", getLogPrefix(),
+					oidcSubject);
+			subject.getPrincipals().add(new UsernamePrincipal(oidcSubject));
+
+		}
+		log.trace("Leaving");
+		return subject;
+	}
 
 }
