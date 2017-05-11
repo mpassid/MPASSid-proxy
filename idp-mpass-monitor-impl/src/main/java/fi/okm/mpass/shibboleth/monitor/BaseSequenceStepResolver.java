@@ -223,8 +223,9 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                 EntityUtils.consume(response.getEntity());                
             }
         } catch (IOException e) {
-            log.error("Could not perform a http request", e);
-            throw new ResponseValidatorException(getId() + ": Could not perform a http request", e);
+            log.error("Could not perform a http request to {}", request.getURI(), e);
+            throw new ResponseValidatorException(getId() + ": Could not perform a http request to "
+                    + request.getURI(), e);
         }
     }
     
