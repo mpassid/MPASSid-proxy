@@ -117,7 +117,7 @@ public class ValidateOIDCAuthentication extends AbstractValidationAction {
     @Override
     protected Subject populateSubject(Subject subject) {
         log.trace("Entering");
-        log.debug("{}Setting usernameprincipal to " + oidcSubject, getLogPrefix());
+        log.debug("{} Setting usernameprincipal to {}", getLogPrefix(), oidcSubject);
         subject.getPrincipals().add(new UsernamePrincipal(oidcSubject));
         log.trace("Leaving");
         return subject;
