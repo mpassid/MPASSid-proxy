@@ -27,7 +27,7 @@ THE SOFTWARE.
         <artifactId>idp-mpass-parent</artifactId>
         <groupId>fi.okm.mpass</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../idp-mpass-parent</relativePath>
+        <relativePath>..</relativePath>
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-authn-impl-wilma</artifactId>

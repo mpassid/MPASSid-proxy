@@ -6,7 +6,7 @@ jdk:
   - openjdk7
 
 script:
-  cd idp-mpass-parent && mvn clean package
+  mvn clean package
 
 after_failure:
   - cat target/surefire-reports/*.txt

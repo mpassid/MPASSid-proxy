@@ -35,22 +35,22 @@ THE SOFTWARE.
     <packaging>pom</packaging>
 
     <modules>
-        <module>../idp-attribute-impl-authnid</module>
-        <module>../idp-attribute-impl-ecadata</module>
-        <module>../idp-authn-api-shibsp</module>
-        <module>../idp-authn-api-socialuser</module>
-        <module>../idp-authn-api-wilma</module>
-        <module>../idp-authn-impl-discovery</module>
-        <module>../idp-authn-impl-jwt</module>
-        <module>../idp-authn-impl-shibsp</module>
-        <module>../idp-authn-impl-socialuser</module>
-        <module>../idp-authn-impl-wilma</module>
-        <module>../idp-mpass-monitor-api</module>
-        <module>../idp-mpass-monitor-impl</module>
-        <module>../idp-mpass-rest-api</module>
-        <module>../idp-mpass-rest-impl</module>
-        <module>../idp-profile-impl-audit</module>
-        <module>../idp-profile-impl-metadata</module>
+        <module>idp-attribute-impl-authnid</module>
+        <module>idp-attribute-impl-ecadata</module>
+        <module>idp-authn-api-shibsp</module>
+        <module>idp-authn-api-socialuser</module>
+        <module>idp-authn-api-wilma</module>
+        <module>idp-authn-impl-discovery</module>
+        <module>idp-authn-impl-jwt</module>
+        <module>idp-authn-impl-shibsp</module>
+        <module>idp-authn-impl-socialuser</module>
+        <module>idp-authn-impl-wilma</module>
+        <module>idp-mpass-monitor-api</module>
+        <module>idp-mpass-monitor-impl</module>
+        <module>idp-mpass-rest-api</module>
+        <module>idp-mpass-rest-impl</module>
+        <module>idp-profile-impl-audit</module>
+        <module>idp-profile-impl-metadata</module>
     </modules>
 
     <properties>
@@ -61,9 +61,7 @@ THE SOFTWARE.
         <shib.idp.version>3.2.1</shib.idp.version>
         <gson.version>2.6.2</gson.version>
         <simpleframework.version>6.0.1</simpleframework.version>
-        <checkstyle.configLocation>
-            conf/checkstyle.xml
-        </checkstyle.configLocation>
+        <checkstyle.configLocation>mpassid-checkstyle.xml</checkstyle.configLocation>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
     </properties>
 

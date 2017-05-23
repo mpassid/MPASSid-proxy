@@ -29,7 +29,7 @@ THE SOFTWARE.
         <groupId>fi.okm.mpass</groupId>
         <artifactId>idp-mpass-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../idp-mpass-parent</relativePath>
+        <relativePath>..</relativePath>
     </parent>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
