@@ -27,7 +27,7 @@ THE SOFTWARE.
     <parent>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.1</version>
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-mpass-parent</artifactId>
@@ -64,6 +64,7 @@ THE SOFTWARE.
         <checkstyle.configLocation>
             conf/checkstyle.xml
         </checkstyle.configLocation>
+        <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
     </properties>
 
     <repositories>
@@ -366,7 +367,7 @@ THE SOFTWARE.
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle.version}</version>
+                    <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -467,7 +468,7 @@ THE SOFTWARE.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
+                <version>${checkstyle.plugin.version}</version>
                 <configuration>
                     <configLocation>${checkstyle.configLocation}</configLocation>
                 </configuration>
