@@ -20,8 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,7 +30,7 @@ THE SOFTWARE.
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-mpass-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -94,7 +93,7 @@ THE SOFTWARE.
         <url>https://github.com/Digipalvelutehdas/MPASSid-proxy</url>
         <connection>scm:git:git://github.com/Digipalvelutehdas/MPASSid-proxy.git</connection>
         <developerConnection>scm:git:https://github.com/Digipalvelutehdas/MPASSid-proxy</developerConnection>
-        <tag>HEAD</tag>
+        <tag>MPASSid-proxy-0.9.0</tag>
     </scm>
 
     <dependencyManagement>
