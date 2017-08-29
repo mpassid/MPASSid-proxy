@@ -72,16 +72,16 @@ public class SearchKeyResolverTest extends AbstractSequenceStepResolverTest {
 
     @Test
     public void testKeyFoundNoUrl() throws Exception {
-        final String value = "mockValue";
+        final String value = "/mockValue";
         final SequenceStep result = 
                 executeWithServer(resolver, context, startingStep, searchKey + "=\"" + value + "\"");
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getUrl(), "http://localhost" + value);
+        Assert.assertEquals(result.getUrl(), "http://localhost:" + CONTAINER_PORT + value);
     }
 
     @Test
     public void testKeyFoundWithUrl() throws Exception {
-        final String value = "http://localhost/mockValue";
+        final String value = "http://localhost:" + CONTAINER_PORT + "/mockValue";
         final SequenceStep result = 
                 executeWithServer(resolver, context, startingStep, searchKey + "=\"" + value + "\"");
         Assert.assertNotNull(result);

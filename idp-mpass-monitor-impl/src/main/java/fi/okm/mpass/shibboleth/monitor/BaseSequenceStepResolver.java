@@ -324,10 +324,14 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      */
     protected String completeUrl(final HttpContext context, final String sourceUrl) {
         if (!sourceUrl.contains("://")) {
-            //TODO: should support non-standard http/https ports
             final HttpHost target = (HttpHost) context.getAttribute(
                     HttpCoreContext.HTTP_TARGET_HOST);
-            return target.getSchemeName() + "://" + target.getHostName() + sourceUrl;
+            final String scheme = target.getSchemeName();
+            final int port = target.getPort();
+            if (("https".equals(scheme) && port != 443) || ("http".equals(scheme) && port != 80)) {
+                return scheme + "://" + target.getHostName() + ":" + port + sourceUrl;                
+            }
+            return scheme + "://" + target.getHostName() + sourceUrl;
         }
         return sourceUrl;
     }
