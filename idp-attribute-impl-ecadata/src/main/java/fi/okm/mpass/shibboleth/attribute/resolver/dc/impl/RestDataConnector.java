@@ -256,7 +256,7 @@ public class RestDataConnector extends AbstractDataConnector {
                 final String mappedSchool = getSchoolName(getHttpClientBuilder(), rawSchool, nameApiBaseUrl);
                 if (mappedSchool == null) {
                     populateAttribute(attributes, ATTR_ID_SCHOOLS, rawSchool);                    
-                    populateStructuredRole(attributes, rawSchool, null, ecaUser.getRoles()[i]);
+                    populateStructuredRole(attributes, rawSchool, "", ecaUser.getRoles()[i]);
                 } else {
                     populateAttribute(attributes, ATTR_ID_SCHOOLS, mappedSchool);
                     populateAttribute(attributes, ATTR_ID_SCHOOL_IDS, rawSchool);
@@ -292,10 +292,8 @@ public class RestDataConnector extends AbstractDataConnector {
         final String municipality = role.getMunicipality() != null ? role.getMunicipality() : "";
         final String structuredRole = municipality + ";" + school + ";" + group + ";" + aRole;
         populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES, structuredRole);
-        if (schoolId != null) {
-            final String structuredRoleWid = municipality + ";" + schoolId + ";" + group + ";" + aRole;
-            populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES_WID, structuredRoleWid);
-        }
+        final String structuredRoleWid = municipality + ";" + schoolId + ";" + group + ";" + aRole;
+        populateAttribute(attributes, ATTR_ID_STRUCTURED_ROLES_WID, structuredRoleWid);
     }
     
     /**
