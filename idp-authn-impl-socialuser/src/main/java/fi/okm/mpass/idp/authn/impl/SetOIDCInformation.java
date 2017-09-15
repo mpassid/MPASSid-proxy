@@ -381,7 +381,8 @@ public class SetOIDCInformation extends AbstractAuthenticationAction {
         for (IdPAttributeValue attrValue : attribute.getValues()) {
             if (attrValue instanceof StringAttributeValue) {
                 log.trace("Leaving");
-                return attrValue.getValue().toString();
+                //We set the value
+                return attrValue.getDisplayValue();
             }
         }
         log.trace("Leaving");
