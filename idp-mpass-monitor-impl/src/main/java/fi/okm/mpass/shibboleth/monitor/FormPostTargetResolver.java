@@ -29,9 +29,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +109,15 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
             }
         }
         if (action != null) {
-            resultStep.setUrl(action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/"));            
+            final String url = action.replaceAll("&#x3a;", ":").replaceAll("&#x2f;", "/");
+            resultStep.setUrl(url);
+            if (!url.startsWith("http")) {
+                final HttpHost target = (HttpHost) context.getAttribute(
+                        HttpCoreContext.HTTP_TARGET_HOST);
+                resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + url);
+            } else {
+                resultStep.setUrl(url);
+            }
         }
         if (resultParameters.size() > 0) {
             resultStep.setParameters(resultParameters);
