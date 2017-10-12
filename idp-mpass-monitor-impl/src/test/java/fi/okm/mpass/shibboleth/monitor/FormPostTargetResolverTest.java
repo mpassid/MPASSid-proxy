@@ -24,7 +24,7 @@
 package fi.okm.mpass.shibboleth.monitor;
 
 import org.apache.http.client.protocol.HttpClientContext;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -59,11 +59,11 @@ public class FormPostTargetResolverTest extends AbstractSequenceStepResolverTest
 
     @Test
     public void testWithAction() throws Exception {
-        final String action = "mockAction";
+        final String action = "/mockAction";
         final String content = "<form action=\"" + action + "\">";
         final SequenceStep result = executeWithServer(resolver, context, startingStep, content);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getUrl(), action);
+        Assert.assertEquals(result.getUrl(), BASE_URL + action);
         Assert.assertEquals(result.getParameters().size(), 0);
     }
 
@@ -73,13 +73,13 @@ public class FormPostTargetResolverTest extends AbstractSequenceStepResolverTest
         final String param2 = "mockParam2";
         final String param1value = "mockParam1Value";
         resolver = new FormPostTargetResolver(clientBuilder, param1, param2);
-        final String action = "mockAction";
+        final String action = "/mockAction";
         final String content = "<form action=\"" + action + "\">"
                 + "<input name=\"" + param1 + "\" value=\"" + param1value + "\">"
                 + "<input name=\"" + param2 + "\"></form>";
         final SequenceStep result = executeWithServer(resolver, context, startingStep, content);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getUrl(), action);
+        Assert.assertEquals(result.getUrl(), BASE_URL + action);
         Assert.assertEquals(result.getParameters().size(), 1);
         Assert.assertEquals(result.getParameters().get(0).getValue(), param1value);
     }
