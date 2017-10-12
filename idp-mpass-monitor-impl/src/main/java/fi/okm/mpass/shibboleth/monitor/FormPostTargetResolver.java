@@ -114,7 +114,7 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
             if (!url.startsWith("http")) {
                 final HttpHost target = (HttpHost) context.getAttribute(
                         HttpCoreContext.HTTP_TARGET_HOST);
-                resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + url);
+                resultStep.setUrl(target.getSchemeName() + "://" + target.getHostName() + ":" + target.getPort() + url);
             } else {
                 resultStep.setUrl(url);
             }
