@@ -53,6 +53,8 @@ import fi.okm.mpass.shibboleth.support.HttpClientBuilder;
 public class AbstractSequenceStepResolverTest {
 
     public static int CONTAINER_PORT = 8997;
+    
+    public static String BASE_URL = "http://localhost:" + CONTAINER_PORT;
 
     /** Class logger. */
     @Nonnull
@@ -68,7 +70,7 @@ public class AbstractSequenceStepResolverTest {
  
     protected SequenceStep initStep() {
         final SequenceStep sequenceStep = new SequenceStep();
-        sequenceStep.setUrl("http://localhost:" + CONTAINER_PORT + "/");
+        sequenceStep.setUrl(BASE_URL);
         return sequenceStep;
     }
     
