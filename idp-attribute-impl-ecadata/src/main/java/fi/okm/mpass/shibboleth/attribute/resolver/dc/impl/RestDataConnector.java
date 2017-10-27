@@ -533,7 +533,7 @@ public class RestDataConnector extends AbstractDataConnector {
         }
         final String output;
         try {
-            output = EntityUtils.toString(response.getEntity());
+            output = EntityUtils.toString(response.getEntity(), "UTF-8");
         } catch (ParseException | IOException e) {
             log.error("Could not parse school information response with id {}", id, e);
             return null;
