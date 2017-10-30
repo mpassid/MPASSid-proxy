@@ -102,6 +102,7 @@ public class FormPostTargetResolver extends BaseSequenceStepResolver {
         final SequenceStep resultStep = initResultStep();
         final List<NameValuePair> resultParameters = new ArrayList<>();
         final String action = getValue(result, "action");
+        log.debug("Parsed action {}", action);
         for (final String item : outputParameters) {
             final String value = getParamValue(result, item);
             if (value != null) {

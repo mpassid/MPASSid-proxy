@@ -171,6 +171,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                 throw new ResponseValidatorException(getId() + ": Could not encode the request parameters!");
             }
         }
+        log.debug("Successfully built a request to URI {}", request.getURI());
         return request;
     }
     
@@ -203,6 +204,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
                     log.trace("Following redirect automatically");
                     final SequenceStep redirectStep = new SequenceStep();
                     final String url = response.getHeaders("Location")[0].getValue();
+                    log.debug("Found a value for Location-header: {}", url);
                     if (!url.contains("://")) {
                         final HttpHost target = (HttpHost) context.getAttribute(
                                 HttpCoreContext.HTTP_TARGET_HOST);
@@ -254,7 +256,7 @@ public abstract class BaseSequenceStepResolver implements SequenceStepResolver {
      */
     protected String getValue(final String string, final String key) {
         int index = string.indexOf(key + "=\"");
-        log.trace("Found index: ", index);
+        log.trace("Found index: {} for key {}", index, key);
         int offset = index + new String(key + "=\"").length();
         if (index != -1) {
             return string.substring(offset, string.indexOf("\"", offset));
