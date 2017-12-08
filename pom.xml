@@ -30,7 +30,7 @@ THE SOFTWARE.
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-mpass-parent</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -93,7 +93,7 @@ THE SOFTWARE.
         <url>https://github.com/Digipalvelutehdas/MPASSid-proxy</url>
         <connection>scm:git:git://github.com/Digipalvelutehdas/MPASSid-proxy.git</connection>
         <developerConnection>scm:git:https://github.com/Digipalvelutehdas/MPASSid-proxy</developerConnection>
-        <tag>MPASSid-proxy-0.9.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
