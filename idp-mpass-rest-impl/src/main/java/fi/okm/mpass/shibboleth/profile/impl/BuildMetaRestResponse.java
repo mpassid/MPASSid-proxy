@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.apache.http.entity.ContentType;
 import org.opensaml.profile.action.EventIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,21 +41,17 @@ import org.springframework.webflow.execution.RequestContext;
 
 import com.google.gson.Gson;
 
-import fi.okm.mpass.shibboleth.rest.data.ErrorDTO;
 import fi.okm.mpass.shibboleth.rest.data.MetaDTO;
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.profile.ActionSupport;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-import net.shibboleth.utilities.java.support.net.HttpServletSupport;
 
 /**
  * This class builds a JSON response corresponding to the attached {@link MetaDTO} object.
  * The JSON is directly to the {@link HttpServletResponse}'s output.
  */
-@SuppressWarnings("rawtypes")
-public class BuildMetaRestResponse extends AbstractProfileAction {
+public class BuildMetaRestResponse extends AbstractRestResponseAction {
 
     /** Class logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(BuildMetaRestResponse.class);
@@ -94,26 +89,21 @@ public class BuildMetaRestResponse extends AbstractProfileAction {
     @Nonnull public Event execute(@Nonnull final RequestContext springRequestContext) {
         ComponentSupport.ifNotInitializedThrowUninitializedComponentException(this);        
         final HttpServletRequest httpRequest = getHttpServletRequest();
+        pushHttpResponseProperties();
         final HttpServletResponse httpResponse = getHttpServletResponse();
-        HttpServletSupport.addNoCacheHeaders(httpResponse);
-        HttpServletSupport.setUTF8Encoding(httpResponse);
-        HttpServletSupport.setContentType(httpResponse, ContentType.APPLICATION_JSON.toString());
-
-        final Gson gson = new Gson();
 
         try {
             final Writer out = new OutputStreamWriter(httpResponse.getOutputStream(), "UTF-8");
 
             if (!HttpMethod.GET.toString().equals(httpRequest.getMethod())) {
                 log.warn("{}: Unsupported method attempted {}", getLogPrefix(), httpRequest.getMethod());
-                out.append(gson.toJson(makeErrorResponse(HttpStatus.SC_METHOD_NOT_ALLOWED, httpRequest.getMethod() + " not allowed", "Only GET is allowed")));
-                httpResponse.setStatus(HttpStatus.SC_METHOD_NOT_ALLOWED);
+                out.append(makeErrorResponse(HttpStatus.SC_METHOD_NOT_ALLOWED, httpRequest.getMethod() + " not allowed", "Only GET is allowed"));
             } else if (metaDTO != null) {
+                final Gson gson = new Gson();
                 out.append(gson.toJson(getMetaDTO()));
                 httpResponse.setStatus(HttpStatus.SC_OK);
             } else {
-                out.append(gson.toJson(makeErrorResponse(HttpStatus.SC_NOT_IMPLEMENTED, "Not implemented on the server side", "")));
-                httpResponse.setStatus(HttpStatus.SC_NOT_IMPLEMENTED);
+                out.append(makeErrorResponse(HttpStatus.SC_NOT_IMPLEMENTED, "Not implemented on the server side", ""));
             }
             out.flush();
         } catch (IOException e) {
@@ -122,20 +112,5 @@ public class BuildMetaRestResponse extends AbstractProfileAction {
             return ActionSupport.buildEvent(this, EventIds.IO_ERROR);
         }
         return ActionSupport.buildProceedEvent(this);
-    }
-    
-    /**
-     * Helper method for constructing a {@link ErrorDTO} with desired content.
-     * @param code The status code of the error.
-     * @param message The message of the error.
-     * @param fields The fields for the error.
-     * @return
-     */
-    protected ErrorDTO makeErrorResponse(final int code, final String message, final String fields) {
-        final ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setCode(code);
-        errorDTO.setMessage(message);
-        errorDTO.setFields(fields);
-        return errorDTO;
     }
 }
