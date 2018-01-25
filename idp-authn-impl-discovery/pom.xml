@@ -64,6 +64,10 @@ THE SOFTWARE.
             <groupId>${opensaml.groupId}</groupId>
             <artifactId>opensaml-soap-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>idp-authn-api-discovery</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>net.shibboleth.ext</groupId>
