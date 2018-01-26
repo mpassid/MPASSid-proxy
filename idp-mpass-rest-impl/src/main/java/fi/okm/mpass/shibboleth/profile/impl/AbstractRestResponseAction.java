@@ -23,17 +23,12 @@
 
 package fi.okm.mpass.shibboleth.profile.impl;
 
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
 
 import com.google.gson.Gson;
 
@@ -42,7 +37,7 @@ import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.utilities.java.support.net.HttpServletSupport;
 
 /**
- *
+ * A base class for actions publishing JSON information.
  */
 @SuppressWarnings("rawtypes")
 public class AbstractRestResponseAction extends AbstractProfileAction {
