@@ -28,13 +28,7 @@ import java.util.List;
 /**
  * Data transfer object for the information about authentication source.
  */
-public class AuthnSourceDTO {
-
-    /** The identifier for this authentication source. */
-    private String id;
-    
-    /** The human-readable title for this authentication source. */
-    private String title;
+public class AuthnSourceDTO extends TitledDTO {
     
     /** The tags for this authentication source. */
     private List<String> tags;
@@ -50,33 +44,27 @@ public class AuthnSourceDTO {
     
     /** Flag whether this authentication source supports passive authentication. */
     private boolean supportsPassive;
-
+    
     /**
-     * @return Returns the id.
+     * Constructor.
+     *
+     * @param id The identifier for this authentication source.
+     * @param title The human-readable title reference for this authentication source.
+     * @param tags The tags for this authentication source.
+     * @param iconUrl The icon URL for this authentication source.
+     * @param directRegistryConnection Flag whether this authentication source is directly connected to user registry.
+     * @param supportsForced Flag whether this authentication source supports forced authentication.
+     * @param supportsPassive Flag whether this authentication source supports passive authentication.
      */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id The id to set.
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * @return Returns the title.
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * @param title The title to set.
-     */
-    public void setTitle(String title) {
-        this.title = title;
+    public AuthnSourceDTO(final String id, final String title, final List<String> tags, final String iconUrl, 
+            final boolean directRegistryConnection, final boolean supportsForced, final boolean supportsPassive) {
+        setId(id);
+        setTitle(title);
+        setTags(tags);
+        setIconUrl(iconUrl);
+        setDirectRegistryConnection(directRegistryConnection);
+        setSupportsForced(supportsForced);
+        setSupportsPassive(supportsPassive);
     }
 
     /**
