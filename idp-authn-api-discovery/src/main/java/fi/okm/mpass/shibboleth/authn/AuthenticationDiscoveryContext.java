@@ -38,10 +38,13 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
 public class AuthenticationDiscoveryContext extends BaseContext {
     
     /** The prefix for the principal names used in the ACRs. */
-    public static final String PRINCIPAL_PREFIX = "urn:mpass.id";
-    
+    public static final String PRINCIPAL_PREFIX = "urn:mpass.id:";
+
+    /** The prefix for the source principal names used in the ACRs. */
+    public static final String SOURCE_PRINCIPAL_PREFIX = PRINCIPAL_PREFIX + "authnsource:";
+
     /** The prefix for the tag principal names used in the ACRs. */
-    public static final String TAG_PRINCIPAL_PREFIX = PRINCIPAL_PREFIX + ":group";
+    public static final String TAG_PRINCIPAL_PREFIX = PRINCIPAL_PREFIX + "authntag:";
     
     /** The list of authentication methods by their tag. */
     private List<AuthenticationMethodsByTag> methodsByTag;
