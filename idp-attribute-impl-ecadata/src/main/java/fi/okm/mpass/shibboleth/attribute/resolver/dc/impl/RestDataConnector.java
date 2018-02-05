@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import fi.okm.mpass.shibboleth.attribute.resolver.data.OpintopolkuOppilaitosDTO;
 import fi.okm.mpass.shibboleth.attribute.resolver.data.UserDTO;
@@ -541,11 +542,15 @@ public class RestDataConnector extends AbstractDataConnector {
             EntityUtils.consumeQuietly(response.getEntity());
         }
         log.trace("Fetched the following response body: {}", output);
-        Gson gson = new Gson();
-        OpintopolkuOppilaitosDTO[] oResponse = gson.fromJson(output, OpintopolkuOppilaitosDTO[].class);
-        if (oResponse.length == 1 && oResponse[0].getMetadata() != null && oResponse[0].getMetadata().length == 1) {
-            log.debug("Successfully fetched name for id {}", id);
-            return oResponse[0].getMetadata()[0].getName();
+        final Gson gson = new Gson();
+        try {
+            final OpintopolkuOppilaitosDTO[] oResponse = gson.fromJson(output, OpintopolkuOppilaitosDTO[].class);
+            if (oResponse.length == 1 && oResponse[0].getMetadata() != null && oResponse[0].getMetadata().length == 1) {
+                log.debug("Successfully fetched name for id {}", id);
+                return oResponse[0].getMetadata()[0].getName();
+            }
+        } catch (JsonSyntaxException | IllegalStateException e) {
+            log.warn("Could not parse the response {}", output, e);
         }
         log.warn("Could not find name for id {}", id);
         return null;
