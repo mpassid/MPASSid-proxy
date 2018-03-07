@@ -10,7 +10,7 @@ implementation for the [ECA Authentication](http://docs.educloudalliance.org/en/
 [Auth proxy](http://docs.educloudalliance.org/en/latest/auth/proxy/index.html) component. The standard is specified by the 
 [EduCloud Alliance](https://portal.educloudalliance.org/).
 
-For more information about the MPASS project, see http://www.mpass.id/.
+For more information about the MPASS project, see http://www.mpass.fi/.
 
 ## Module descriptions
 
