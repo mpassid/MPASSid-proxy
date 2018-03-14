@@ -136,3 +136,72 @@ Finally, you will need to add the new authentication flow definition(s) to _/opt
 ```
 
 The flow definition must also be enabled via _idp.authn.flows_ variable in _/opt/shibboleth-idp/conf/idp.properties_.
+
+## Attribute resolution
+
+The attributes provided by Shibboleth SP can be converted into IdP attributes in the following way:
+
+### 1. Enable attribute and/or header population into Subject
+
+In the _/opt/shibboleth-idp/flows/authn/Shib/shib-beans.xml_, enable _populateAttributes_ and/or _populateHeaders_ settings for the bean _ValidateShibbolethAuthentication_.
+
+The example above enables population of both attributes and headers:
+
+```
+   <bean id="ValidateShibbolethAuthentication"
+            class="fi.okm.mpass.shibboleth.authn.impl.ValidateShibbolethAuthentication" scope="prototype"
+            p:classifiedMessages-ref="shibboleth.authn.Shib.ClassifiedMessageMap"
+            p:resultCachingPredicate="#{getObject('shibboleth.authn.Shib.resultCachingPredicate')}"
+            p:usernameAttribute="eppn" p:populateHeaders="true" p:populateAttributes="true" />
+```
+
+### 2. Enable principal serializers
+
+In order to serialize the Shibboleth attributes and/or headers, the following serializers need to be added into _shibboleth.PrincipalSerializers_ list in _opt/shibboleth-idp/conf/global.xml_: 
+
+* _fi.okm.mpass.shibboleth.authn.principal.impl.ShibAttributePrincipalSerializer_ for attributes
+* _fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipalSerializer_ for headers
+
+The example below enables serialization of both attributes and headers. The other serializers are the same ones that are defined in the _/opt/shibboleth-idp/system/conf/general-authn-system.xml_ (see bean _shibboleth.DefaultPrincipalSerializers_).
+
+```
+<bean id="shibboleth.PrincipalSerializers"
+        class="org.springframework.beans.factory.config.ListFactoryBean">
+    <property name="sourceList">
+        <list>
+            <bean class="fi.okm.mpass.shibboleth.authn.principal.impl.ShibAttributePrincipalSerializer" />
+            <bean class="fi.okm.mpass.shibboleth.authn.principal.impl.ShibHeaderPrincipalSerializer" />
+            <bean class="net.shibboleth.idp.authn.principal.impl.UsernamePrincipalSerializer" />
+            <bean class="net.shibboleth.idp.authn.principal.impl.LDAPPrincipalSerializer" />
+            <bean class="net.shibboleth.idp.authn.duo.impl.DuoPrincipalSerializer" />
+            <bean class="net.shibboleth.idp.authn.principal.impl.IdPAttributePrincipalSerializer" />
+            <bean class="net.shibboleth.idp.authn.principal.impl.PasswordPrincipalSerializer"
+                p:dataSealer="#{'%{idp.sealer.storeResource:}'.trim().length() > 0 ? getObject('shibboleth.DataSealer') : null}" />
+        </list>
+     </property>
+</bean>
+```
+
+### 3. Modify attribute-resolver.xml
+
+After enabling the serializers, you're able to read the corresponding principals' contents in the attribute resolver. See the example below for reading the information for _eppn_ attribute. The same logic should work for other attributes too.
+
+```
+    <resolver:AttributeDefinition id="eppn" xsi:type="ad:Script">
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
+            friendlyName="eduPersonPrincipalName" encodeType="false" />
+        <ad:Script><![CDATA[
+          authnContext = resolutionContext.getParent().getSubcontext("net.shibboleth.idp.authn.context.AuthenticationContext");
+          subject = authnContext.getAuthenticationResult().getSubject();
+          principals = subject.getPrincipals(Java.type("fi.okm.mpass.shibboleth.authn.principal.impl.ShibAttributePrincipal").class);
+          iterator = principals.iterator();
+          while (iterator.hasNext()) {
+              principal = iterator.next();
+              if ("eppn".equals(principal.getType())) {
+                  eppn.addValue(principal.getValue());
+              }
+          }
+	]]></ad:Script>
+```
+
+The filtering of attributes is configured in the similar way as for any Shibboleth IdP attributes in _attribute-filter.xml_.
