@@ -294,48 +294,4 @@ public abstract class AbstractAuthnFlowRestResponseAction extends AbstractRestRe
             throw new ComponentInitializationException("The message source cannot be null");
         }
     }
-    
-    /**
-     * The DTO class for localized response.
-     */
-    protected class LocalizedResponse {
-        
-        /** The language used in the response. */
-        private String lang;
-        
-        /** The response. */
-        private Object response;
-        
-        /**
-         * Get the language used in the response.
-         * @return The language used in the response.
-         */
-        public String getLang() {
-            return lang;
-        }
-        
-        /**
-         * Set the language used in the response.
-         * @param language What to set.
-         */
-        public void setLang(final String language) {
-            lang = language;
-        }
-        
-        /**
-         * Get the response.
-         * @return The response.
-         */
-        public Object getResponse() {
-            return response;
-        }
-        
-        /**
-         * Set the response.
-         * @param resp What to set.
-         */
-        public void setResponse(final Object resp) {
-            response = resp;
-        }
     }
-}
