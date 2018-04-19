@@ -27,11 +27,11 @@ THE SOFTWARE.
     <parent>
         <groupId>fi.okm.mpass</groupId>
         <artifactId>idp-mpass-parent</artifactId>
-        <version>0.9.3-SNAPSHOT</version>
+        <version>0.9.3</version>
         <relativePath>..</relativePath>
     </parent>
     <packaging>jar</packaging>
-    <version>0.9.3-SNAPSHOT</version>
+    <version>0.9.3</version>
     <name>idp-authn-impl-socialuser</name>
     <dependencies>
         <dependency>
@@ -70,7 +70,7 @@ THE SOFTWARE.
         <dependency>
             <groupId>fi.okm.mpass</groupId>
             <artifactId>idp-authn-api-socialuser</artifactId>
-            <version>0.9.3-SNAPSHOT</version>
+            <version>0.9.3</version>
         </dependency>
         <!-- TODO Version to parent pom -->
         <dependency>
