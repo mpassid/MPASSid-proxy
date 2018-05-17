@@ -25,12 +25,12 @@ THE SOFTWARE.
     <parent>
         <artifactId>idp-mpass-parent</artifactId>
         <groupId>fi.okm.mpass</groupId>
-        <version>0.9.4</version>
+        <version>0.9.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fi.okm.mpass</groupId>
     <artifactId>idp-mpass-monitor-api</artifactId>
-    <version>0.9.4</version>
+    <version>0.9.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
