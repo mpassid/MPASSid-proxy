@@ -23,6 +23,7 @@
 
 package fi.okm.mpass.shibboleth.authn.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 
 import javax.annotation.Nonnull;
@@ -63,6 +64,9 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
     
     /** Whether exploit the external authentication context. */
     private boolean exploitExternal;
+    
+    /** The encoding for headers. If not set to null, the header values are transformed into UTF-8. */
+    private String headerEncoding;
 
     /**
      * Constructor.
@@ -80,6 +84,7 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         super();
         variablePrefix = prefix;
         setExploitExternal(false);
+        setHeaderEncoding(null);
     }
 
     /**
@@ -98,6 +103,14 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         return exploitExternal;
     }
     
+    /**
+     * Set the encoding for headers. If not set to null, the header values are transformed into UTF-8.
+     * @param encoding What to set.
+     */
+    public void setHeaderEncoding(final String encoding) {
+        headerEncoding = encoding;
+    }
+    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -109,6 +122,7 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             return;
         }
+        
         if (log.isTraceEnabled()) {
             logHeadersAndAttributes(request);
         }
@@ -187,8 +201,19 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         }
        
         if (isHeader) {
-            log.debug("{} Added value for header {}", getLogPrefix(), key);
-            shibbolethContext.getHeaders().put(key, applyTransforms(value));
+            if (headerEncoding == null) {
+                shibbolethContext.getHeaders().put(key, applyTransforms(value));
+                log.debug("{} Added value for header {}", getLogPrefix(), key);
+            } else {
+                try {
+                    byte[] bytes = value.getBytes(headerEncoding);
+                    final String newValue = new String(bytes, "UTF-8");
+                    shibbolethContext.getHeaders().put(key, applyTransforms(newValue));
+                    log.debug("{} Transformed a value for header {}", getLogPrefix(), key);
+                } catch (UnsupportedEncodingException e) {
+                    log.warn("{} Could not transform a header value", getLogPrefix(), e);
+                }
+            }
         } else {
             log.debug("{} Added value for attribute {}", getLogPrefix(), key);
             shibbolethContext.getAttributes().put(key, applyTransforms(value));
@@ -216,7 +241,18 @@ public class ExtractShibbolethAttributesFromRequest extends AbstractExtractionAc
         while (headerNames.hasMoreElements()) {
             final String header = headerNames.nextElement();
             final String value = request.getHeader(header);
-            log.trace("Header name {} has value {}", header, value);
+            
+            log.trace("Header name {} has a raw value {}", header, value);
+            if (headerEncoding != null) {
+                try {
+                    byte[] bytes = value.getBytes(headerEncoding);
+                    final String newValue = new String(bytes, "UTF-8");
+                    log.trace("Header name {} has a transformed value {}", header, newValue);
+                } catch (UnsupportedEncodingException e) {
+                    log.warn("{} Could not transform a header value", getLogPrefix(), e);
+                }
+                
+            }
         }
         final Enumeration<String> attributeNames = request.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
