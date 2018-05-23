@@ -94,10 +94,20 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
             log.trace("Leaving");
             return;
         }
+        SignedJWT signedJWT = null;
+        try {
+            signedJWT = SignedJWT.parse(suCtx.getIDToken().serialize());
+        } catch (ParseException e) {
+            log.error("{} Error when forming signed JWT", getLogPrefix(), e);
+            ActionSupport.buildEvent(profileRequestContext,
+                    AuthnEventIds.NO_CREDENTIALS);
+            log.trace("Leaving");
+            return;
+        }
         RSAPublicKey providerKey = null;
         try {
             JSONObject key = getProviderRSAJWK(suCtx.getoIDCProviderMetadata()
-                    .getJWKSetURI().toURL().openStream());
+                    .getJWKSetURI().toURL().openStream(), signedJWT.getHeader().getKeyID());
             if (key == null) {
                 log.error("{} Not able to find key to verify signature",
                         getLogPrefix());
@@ -110,16 +120,6 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
         } catch (IOException | java.text.ParseException | JOSEException e) {
             log.error("{} Error when parsing key to verify signature",
                     getLogPrefix(), e);
-            ActionSupport.buildEvent(profileRequestContext,
-                    AuthnEventIds.NO_CREDENTIALS);
-            log.trace("Leaving");
-            return;
-        }
-        SignedJWT signedJWT = null;
-        try {
-            signedJWT = SignedJWT.parse(suCtx.getIDToken().serialize());
-        } catch (ParseException e) {
-            log.error("{} Error when forming signed JWT", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext,
                     AuthnEventIds.NO_CREDENTIALS);
             log.trace("Leaving");
@@ -153,19 +153,23 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
      * 
      * @param is
      *            inputstream containing the key
-     * @return RSA publick key as JSON Object. Null if there is no key
+     * @param kid
+     *            The key ID to be looked after
+     * @return RSA public key as JSON Object. Null if there is no key
      * @throws ParseException
      *             if parsing fails.
      * @throws IOException
      *             if something unexpected happens.
      */
-    private JSONObject getProviderRSAJWK(InputStream is) throws ParseException,
+    private JSONObject getProviderRSAJWK(InputStream is, String kid) throws ParseException,
             IOException {
         log.trace("Entering");
+        if (kid == null) {
+            log.warn("No kid defined in the JWT, no kid check can be performed!");
+        }
         StringWriter writer = new StringWriter();
         IOUtils.copy(is, writer, "UTF-8");
         JSONObject json = JSONObjectUtils.parse(writer.toString());
-        //TODO: USE KEYID TO FETCH CORRECT KEY
         JSONArray keyList = (JSONArray) json.get("keys");
         if (keyList == null){
             log.trace("Leaving");
@@ -174,9 +178,11 @@ public class ValidateOIDCIDTokenSignature extends AbstractAuthenticationAction {
         for (Object key : keyList) {
             JSONObject k = (JSONObject) key;
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
-                log.debug("verification key "+k.toString());
-                log.trace("Leaving");
-                return k;
+                if (kid == null || kid.equals(k.get("kid"))) {
+                    log.debug("verification key "+k.toString());
+                    log.trace("Leaving");
+                    return k;                    
+                }
             }
         }
         log.trace("Leaving");

@@ -30,11 +30,15 @@ import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -55,6 +59,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.nimbusds.jose.Algorithm;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
@@ -109,6 +114,7 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(getOidcProviderMetadata());
+        suCtx.setOidcTokenResponse(getOidcTokenResponse(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
@@ -121,8 +127,9 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
+        suCtx.setOidcTokenResponse(getOidcTokenResponse(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
-        final Event event = executeWithServer(action, null, null);
+        final Event event = executeWithServer(action, null);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
@@ -133,8 +140,9 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
+        suCtx.setOidcTokenResponse(getOidcTokenResponse(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
-        final Event event = executeWithServer(action, "empty-jwk", null);
+        final Event event = executeWithServer(action, "empty-jwk");
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
@@ -145,8 +153,9 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
+        suCtx.setOidcTokenResponse(getOidcTokenResponse(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
-        final Event event = executeWithServer(action, "mock-jwk2", null);
+        final Event event = executeWithServer(action, "mock-jwk2");
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
     
@@ -159,7 +168,7 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
         suCtx.setOidcTokenResponse(getOidcTokenResponse(DEFAULT_ISSUER));
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
-        final Event event = executeWithServer(action, "mock-jwk", null);
+        final Event event = executeWithServer(action, "mock-jwk");
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
     
@@ -171,63 +180,98 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
         
-        final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-        keyGenerator.initialize(2048);
-
-        final RSAPrivateKey privateKey = (RSAPrivateKey) keyGenerator.genKeyPair().getPrivate();
+        final RSAPrivateKey privateKey = (RSAPrivateKey) generateKeyPair(2048).getPrivate();
         
-        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER, null, null);
-
-        final SignedJWT signedJwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);
-        final AccessToken accessToken = new BearerAccessToken();
-        final RefreshToken refreshToken = new RefreshToken();
-        final JWSSigner signer = new RSASSASigner(privateKey);
-        signedJwt.sign(signer);
-        final OIDCTokens oidcTokens = new OIDCTokens(signedJwt, accessToken, refreshToken);
-        final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
+        final OIDCTokenResponse oidcTokenResponse = buildTokenResponse(privateKey, null);
 
         suCtx.setOidcTokenResponse(oidcTokenResponse);
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
         
-        final Event event = executeWithServer(action, "mock-jwk", null);
+        final Event event = executeWithServer(action, "mock-jwk");
         ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
     }
 
     /**
-     * Tests with valid signature.
+     * Tests with valid signature, with no kid defined.
      */
-    @Test public void testValidSignatureToken() throws Exception {
+    @Test public void testValidSignatureTokenNoKid() throws Exception {
         action.initialize();
         final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
         suCtx.setoIDCProviderMetadata(initializeMockMetadata());
         
-        final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-        keyGenerator.initialize(2048);
-
-        final KeyPair keyPair = keyGenerator.generateKeyPair();
+        final KeyPair keyPair = generateKeyPair(2048);
         final RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         
-        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER, null, null);
-
-        final SignedJWT signedJwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);
-        final AccessToken accessToken = new BearerAccessToken();
-        final RefreshToken refreshToken = new RefreshToken();
-        final JWSSigner signer = new RSASSASigner(privateKey);
-        signedJwt.sign(signer);
-        final OIDCTokens oidcTokens = new OIDCTokens(signedJwt, accessToken, refreshToken);
-        final OIDCTokenResponse oidcTokenResponse = new OIDCTokenResponse(oidcTokens);
+        final OIDCTokenResponse oidcTokenResponse = buildTokenResponse(privateKey, null);
 
         suCtx.setOidcTokenResponse(oidcTokenResponse);
         prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
-        final RSAKey rsaKey = new RSAKey((RSAPublicKey)keyPair.getPublic(), KeyUse.SIGNATURE, null, new Algorithm("RS256"), "mock", 
-                new URI("https://mock"), new Base64URL(""), new ArrayList<Base64>());
-        final Event event = executeWithServer(action, null, rsaKey);
+        final Event event = executeWithServer(action, null, buildRsaKey(generateKeyPair(2048), "wrongOne"), 
+                buildRsaKey(keyPair, "mockId"));
+        ActionTestingSupport.assertEvent(event, AuthnEventIds.NO_CREDENTIALS);
+    }
+
+    /**
+     * Tests with valid signature, with matching kid defined.
+     */
+    @Test public void testValidSignatureTokenKid() throws Exception {
+        action.initialize();
+        final SocialUserOpenIdConnectContext suCtx = new SocialUserOpenIdConnectContext();
+        suCtx.setoIDCProviderMetadata(initializeMockMetadata());
+        
+        final KeyPair keyPair = generateKeyPair(2048);
+        final RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        
+        final String kid = "mockId";
+        final OIDCTokenResponse oidcTokenResponse = buildTokenResponse(privateKey, kid);
+
+        suCtx.setOidcTokenResponse(oidcTokenResponse);
+        prc.getSubcontext(AuthenticationContext.class, false).addSubcontext(suCtx);
+        final Event event = executeWithServer(action, null, buildRsaKey(generateKeyPair(2048), "wrongOne"), 
+                buildRsaKey(keyPair, kid));
         Assert.assertNull(event);
+    }
+
+    protected static OIDCTokenResponse buildTokenResponse(final RSAPrivateKey privateKey, final String kid) 
+            throws JOSEException {
+        final JWTClaimsSet claimsSet = buildClaimsSet(null, DEFAULT_ISSUER, null, null);
+
+        final AccessToken accessToken = new BearerAccessToken();
+        final RefreshToken refreshToken = new RefreshToken();
+        final SignedJWT signedJwt = buildSignedJwt(kid, claimsSet, privateKey);
+        final OIDCTokens oidcTokens = new OIDCTokens(signedJwt, accessToken, refreshToken);
+        return new OIDCTokenResponse(oidcTokens);
+    }
+    
+    protected static KeyPair generateKeyPair(final int keysize) throws NoSuchAlgorithmException {
+        final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+        keyGenerator.initialize(keysize);
+        return keyGenerator.generateKeyPair();
+    }
+    
+    protected static JWSHeader buildJwsHeader(final String kid) {
+        return new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(kid).build();
+    }
+    
+    protected static SignedJWT buildSignedJwt(final String kid, final JWTClaimsSet claimsSet, 
+            final RSAPrivateKey privateKey) throws JOSEException {
+        final SignedJWT signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(kid).build(), 
+                claimsSet);
+        final JWSSigner signer = new RSASSASigner(privateKey);
+        signedJwt.sign(signer);
+        return signedJwt;
+    }
+    
+    protected static RSAKey buildRsaKey(final KeyPair keyPair, final String kid) throws URISyntaxException {
+        return new RSAKey((RSAPublicKey)keyPair.getPublic(), KeyUse.SIGNATURE, null, new Algorithm("RS256"), kid, 
+                new URI("https://mock"), new Base64URL(""), new ArrayList<Base64>());
+        
     }
 
     protected static OIDCProviderMetadata initializeMockMetadata() throws Exception {
         final OIDCProviderMetadata oidcMetadata = Mockito.mock(OIDCProviderMetadata.class);
-        Mockito.when(oidcMetadata.getJWKSetURI()).thenReturn(new URI("http://localhost:" + SetOIDCInformationTest.CONTAINER_PORT + "/"));
+        Mockito.when(oidcMetadata.getJWKSetURI()).thenReturn(new URI("http://localhost:" + 
+                SetOIDCInformationTest.CONTAINER_PORT + "/"));
         return oidcMetadata;
     }
 
@@ -258,7 +302,8 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
      * @return
      * @throws Exception
      */
-    protected Event executeWithServer(final ValidateOIDCIDTokenSignature action, final String filename, final RSAKey rsaKey) throws Exception {
+    protected Event executeWithServer(final ValidateOIDCIDTokenSignature action, final String filename, 
+            final RSAKey... rsaKey) throws Exception {
         final Container container = new SimpleContainer(filename, rsaKey);
         final SocketProcessor server = new ContainerSocketProcessor(container);
         final Connection connection = new SocketConnection(server);
@@ -282,14 +327,18 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         private final String filename;
         
         /** The key to publish. */
-        private final RSAKey rsaKey;
+        private final List<RSAKey> rsaKey;
         
         /**
          * Constructor.
          */
-        public SimpleContainer(final String file, final RSAKey key) {
+        public SimpleContainer(final String file, final RSAKey... keys) {
             filename = file;
-            rsaKey = key;
+            if (keys != null) {
+                rsaKey = Arrays.asList(keys);
+            } else {
+                rsaKey = null;
+            }
         }
 
         @Override
@@ -297,10 +346,19 @@ public class ValidateOIDCIDTokenSignatureTest extends AbstractOIDCIDTokenTest {
         public void handle(Request request, Response response) {
             log.trace("Server got request for {}", request.getTarget());
             try {
-                if (rsaKey != null) {
+                if (rsaKey != null && rsaKey.size() > 0) {
                     final String prefix = "{ \"keys\": [";
                     final String postfix = "] }";
-                    final String json = prefix + rsaKey.toJSONString() + postfix;
+                    final String json;
+                    if (rsaKey.size() == 1) {
+                        json = prefix + rsaKey.get(0).toJSONString() + postfix;
+                    } else {
+                        String raw = rsaKey.get(0).toJSONString();
+                        for (int i = 1; i < rsaKey.size(); i++) {
+                            raw = raw + ", " + rsaKey.get(i).toJSONString();
+                        }
+                        json = prefix + raw + postfix;
+                    }
                     log.debug("Streaming the RSAKey {}", json);
                     IOUtils.copy(new StringReader(json), response.getOutputStream());
                 } else {
