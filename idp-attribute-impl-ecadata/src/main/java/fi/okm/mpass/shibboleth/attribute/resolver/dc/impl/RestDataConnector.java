@@ -256,8 +256,13 @@ public class RestDataConnector extends AbstractDataConnector {
                 final String rawSchool = ecaUser.getRoles()[i].getSchool();
                 final String mappedSchool = getSchoolName(getHttpClientBuilder(), rawSchool, nameApiBaseUrl);
                 if (mappedSchool == null) {
-                    populateAttribute(attributes, ATTR_ID_SCHOOLS, rawSchool);                    
-                    populateStructuredRole(attributes, rawSchool, "", ecaUser.getRoles()[i]);
+                    if (StringUtils.isNumeric(rawSchool)) {
+                        populateAttribute(attributes, ATTR_ID_SCHOOL_IDS, rawSchool);                        
+                        populateStructuredRole(attributes, "", rawSchool, ecaUser.getRoles()[i]);
+                    } else {                        
+                        populateAttribute(attributes, ATTR_ID_SCHOOLS, rawSchool);                    
+                        populateStructuredRole(attributes, rawSchool, "", ecaUser.getRoles()[i]);
+                    }
                 } else {
                     populateAttribute(attributes, ATTR_ID_SCHOOLS, mappedSchool);
                     populateAttribute(attributes, ATTR_ID_SCHOOL_IDS, rawSchool);
@@ -550,7 +555,8 @@ public class RestDataConnector extends AbstractDataConnector {
                 return oResponse[0].getMetadata()[0].getName();
             }
         } catch (JsonSyntaxException | IllegalStateException e) {
-            log.warn("Could not parse the response {}", output, e);
+            log.warn("Could not parse the response", e);
+            log.debug("The unparseable response was {}", output);
         }
         log.warn("Could not find name for id {}", id);
         return null;
